@@ -17,11 +17,17 @@ EventBus.addEventListener('refreshPanel', function () {
         let localProps = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {}).Properties || [];
         EventBus.dispatch('refreshPanelProps', localProps);
         EventBus.dispatch('refreshPanelGraphEditor');
+        EventBus.dispatch('refreshPanelCustomize');
     } else {
         $('#generalpanel').show();
     }
 });
 
+EventBus.addEventListener('refreshPanelCustomize', function (params) {
+    var node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
+   
+    $('#customizecolor').val(node.color||'#D2E5FF');
+});
 EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
     var _edges = graphExplorer.data.edges.filter(e => e.to == graphExplorer.data.selectedNode || e.from == graphExplorer.data.selectedNode);
     $('#edges').html('');
@@ -90,6 +96,16 @@ EventBus.addEventListener('deleteEdge', function (e) {
         }
     }
 });
+
+EventBus.addEventListener('customizeNode', function (e) {
+   for(var i =0;i<graphExplorer.data.nodes.length;i++){
+        if(graphExplorer.data.nodes[i].id==graphExplorer.data.selectedNode){
+            graphExplorer.data.nodes[i].color=   $('#customizecolor').val()||'#D2E5FF';
+        }
+   }
+   EventBus.dispatch('graphUpdated');
+});
+
 EventBus.addEventListener('refreshPanelProps', function (params) {
     params = params.target || [];
     $('#properties').html('');
@@ -160,7 +176,7 @@ EventBus.addEventListener('addNode', function (params) {
             }
         }
     }else{
-        graphExplorer.data.nodes[graphExplorer.data.nodes.length]={id:(graphExplorer.data.nodes[graphExplorer.data.nodes.length-1].id+1), label:$('#NodeName').val() };
+        graphExplorer.data.nodes[graphExplorer.data.nodes.length] = { id: (graphExplorer.data.nodes[graphExplorer.data.nodes.length - 1].id + 1), label: $('#NodeName').val(), parentId: graphExplorer.data.parentNode };
        
     }
     EventBus.dispatch('graphUpdated');
@@ -180,56 +196,37 @@ EventBus.addEventListener('modifyNode', function (params) {
 });
 
 EventBus.addEventListener('saveGraph', function () {
-    $.ajax({
-        url: '/api/Values',
-        type: 'POST',
-        data: "="+JSON.stringify(graphExplorer.data) ,
-        success: function (data) {
-            //do something
-        }
-    });
-   // localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
+    if(graphExplorer.isOffline){
+        localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
+        $('#updatemsg').text(`Last Saved: ${new Date().toLocaleString()}`);
+    }else{
+        $.ajax({
+            url: graphExplorer.url,
+            type: 'POST',
+            data: "="+JSON.stringify(graphExplorer.data) ,
+            success: function (data) {
+                //do something
+                if(data){
+                    $('#updatemsg').text(`Last Saved: ${new Date().toLocaleString()}`);
+                }
+            }
+        });
+    }
+   // 
     console.log('saveGraph Event:called');
 });
 
 EventBus.addEventListener('loadGraph', function (params) {
+    console.log('loadGraph Event:', params);
+    if(graphExplorer.isOffline){
+        initialize(localStorage.getItem('graphExplorer.data'));
+    }else{
     $.ajax({
-        url: '/api/Values',
+        url: graphExplorer.url,
         type: 'GET',
-        success: function (_rawData) {
-            console.log('loadGraph Event:', params);
-            graphExplorer.container = graphExplorer.container || document.getElementById('mynetwork');
-            graphExplorer.options = graphExplorer.options || {};
-            //var _rawData = localStorage.getItem('graphExplorer.data');
-            if (!_rawData) {
-                var nodes = [
-                    { id: 1, label: 'Node 1' },
-                    { id: 2, label: 'Node 2' },
-                    { id: 3, label: 'Node 3' },
-                    { id: 4, label: 'Node 4' },
-                    { id: 5, label: 'Node 5' },
-                    { id: 6, label: 'Node 6', parentId: 4 }
-                ];
-
-                // create an array with edges
-                var edges = [
-                    { id: uuidv4(), from: 1, to: 3, label: 'abc' },
-                    { id: uuidv4(), from: 1, to: 2 },
-                    { id: uuidv4(), from: 2, to: 4 },
-                    { id: uuidv4(), from: 2, to: 5 },
-                    { id: uuidv4(), from: 3, to: 3 }
-                ];
-                _rawData = {
-                    nodes: nodes,
-                    edges: edges
-                };
-            } else {
-                _rawData = JSON.parse(_rawData);
-            }
-            graphExplorer.data = _rawData;
-            EventBus.dispatch("graphUpdated");
-        }
+        success:initialize
     });
+    }
 });
 EventBus.addEventListener('graphUpdated', function (params) {
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
@@ -265,6 +262,8 @@ EventBus.addEventListener('graphUpdated', function (params) {
 });
 
 $(document).ready(() => {
+    graphExplorer.isOffline=false;
+    graphExplorer.url ='/api/Values';
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
@@ -274,4 +273,37 @@ function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     )
+}
+
+function initialize(_rawData) {
+    graphExplorer.container = graphExplorer.container || document.getElementById('mynetwork');
+    graphExplorer.options = graphExplorer.options || {};
+    //var _rawData = localStorage.getItem('graphExplorer.data');
+    if (!_rawData) {
+        var nodes = [
+            { id: 1, label: 'Node 1' },
+            { id: 2, label: 'Node 2' },
+            { id: 3, label: 'Node 3' },
+            { id: 4, label: 'Node 4', color: '#7BE141'},
+            { id: 5, label: 'Node 5' },
+            { id: 6, label: 'Node 6', parentId: 4 }
+        ];
+
+        // create an array with edges
+        var edges = [
+            { id: uuidv4(), from: 1, to: 3, label: 'abc' },
+            { id: uuidv4(), from: 1, to: 2 },
+            { id: uuidv4(), from: 2, to: 4 },
+            { id: uuidv4(), from: 2, to: 5 },
+            { id: uuidv4(), from: 3, to: 3 }
+        ];
+        _rawData = {
+            nodes: nodes,
+            edges: edges
+        };
+    } else {
+        _rawData = JSON.parse(_rawData);
+    }
+    graphExplorer.data = _rawData;
+    EventBus.dispatch("graphUpdated");
 }
