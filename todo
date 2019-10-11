@@ -1,5 +1,11 @@
 ---items to do in priority list
-when adding relation use searchable dropdown
+--versioning
+--back button fix on deep node
+versioning with db
+--when adding relation use searchable dropdown
 add tags support in customize tab
 display only related nodes on selected node (optionally)
 abiliy to search all nodes with certain tag
+Move node (change parent)
+Link Far Nodes
+Ability to go to linked far nodes/linked neighbouring nodes

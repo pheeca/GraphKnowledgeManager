@@ -6,222 +6,220 @@
 
 <head>
     <title>Network | Basic usage</title>
-    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
-    <script src="~/Scripts/popper.min.js"></script>
-    <link rel="stylesheet" href="~/Content/bootstrap.min.css">
-    <script src="~/Scripts/bootstrap.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/vis-network.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/eventbus.min.js"></script>
-    <script type="text/javascript" src="~/Scripts/bootstrap-datepicker.min.js"></script>
-    <link href="~/Content/vis-network.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/Content/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+    <script src="Scripts/jquery-3.3.1.min.js"></script>
+    <script src="Scripts/popper.min.js"></script>
+    <link rel="stylesheet" href="Content/bootstrap.min.css">
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="Scripts/vis-network.min.js"></script>
+    <script type="text/javascript" src="Scripts/eventbus.min.js"></script>
+    <script type="text/javascript" src="Scripts/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="Scripts/fstdropdown.min.js"></script>
+    <script type="text/javascript" src="Scripts/jquery-ui.js"></script>
 
-    <style type="text/css">
-        #mynetwork {
-            width: 100%;
-            height: 600px;
-            border: 1px solid lightgray;
-        }
-    </style>
+    <link rel="stylesheet" href="Content/jquery-ui.css">
+    <link href="Content/vis-network.min.css" rel="stylesheet" type="text/css" />
+    <link href="Content/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="Content/fstdropdown.min.css" rel="stylesheet" type="text/css" />
+    <link href="Content/styles.css" rel="stylesheet" type="text/css" />
+
 </head>
 
 <body>
-  <p id='updatemsg'>
-      Create a simple network with some nodes and edges.
-  </p>
-  <div class="container-fluid">
-      <div class="row">
-          <div class="col-sm-12">
+    <p id='updatemsg'>
+        Create a simple network with some nodes and edges.
+    </p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
 
-              <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
-              <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add Node</button>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-sm-9">
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add Node</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-9">
 
-              <div id="mynetwork"></div>
-          </div>
-          <div class="col-sm-3" id="panel">
-              <ul class="nav nav-tabs" id="myTab" role="tablist">
-                  <li class="nav-item">
-                      <a class="nav-link active" id="proppanel-tab" data-toggle="tab" href="#proppanel" role="tab" aria-controls="proppanel"
-                         aria-selected="true">Properties</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" id="grapheditorpanel-tab" data-toggle="tab" href="#grapheditorpanel" role="tab" aria-controls="grapheditorpanel"
-                         aria-selected="false">Graph Editor</a>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link" id="customize-tab" data-toggle="tab" href="#customize" role="tab" aria-controls="customize"
-                         aria-selected="false">Node Customize</a>
-                  </li>
-              </ul>
-              <div class="tab-content" id="myTabContent">
-                  <div class="tab-pane fade show active" id="proppanel" role="tabpanel" aria-labelledby="proppanel-tab">
+                <div id="mynetwork"></div>
+            </div>
+            <div class="col-sm-3" id="panel">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="proppanel-tab" data-toggle="tab" href="#proppanel" role="tab" aria-controls="proppanel"
+                           aria-selected="true">Properties</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="grapheditorpanel-tab" data-toggle="tab" href="#grapheditorpanel" role="tab" aria-controls="grapheditorpanel"
+                           aria-selected="false">Graph Editor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="customize-tab" data-toggle="tab" href="#customize" role="tab" aria-controls="customize"
+                           aria-selected="false">Node Customize</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="proppanel" role="tabpanel" aria-labelledby="proppanel-tab">
 
-                      <table class="table">
-                          <thead>
-                              <tr>
-                                  <th scope="col">Property</th>
-                                  <th scope="col">Value</th>
-                                  <th scope="col">Date</th>
-                              </tr>
-                          </thead>
-                          <tbody id="properties"></tbody>
-                      </table>
-                      <button type="button" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
-                      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">+ Add</button>
-                  </div>
-                  <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel" aria-labelledby="grapheditorpanel-tab">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Property</th>
+                                    <th scope="col">Value</th>
+                                    <th scope="col">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="properties"></tbody>
+                        </table>
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">+ Add</button>
+                    </div>
+                    <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel" aria-labelledby="grapheditorpanel-tab">
 
-                      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal2">Delete Node</button>
-                      <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Edit Node</button>
-                      <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readEdge')">+ Add Relation</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal2">Delete Node</button>
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Edit Node</button>
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readEdge')">+ Add Relation</button>
 
-                      <table class="table">
-                          <thead>
-                              <tr>
-                                  <th scope="col">Relation</th>
-                                  <th scope="col">To</th>
-                                  <th scope="col"></th>
-                              </tr>
-                          </thead>
-                          <tbody id="edges"></tbody>
-                      </table>
-                  </div>
-                  <div class="tab-pane fade" id="customize" role="tabpanel" aria-labelledby="customize-tab">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Relation</th>
+                                    <th scope="col">To</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="edges"></tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane fade" id="customize" role="tabpanel" aria-labelledby="customize-tab">
 
-                      Select your favorite color: <input type="color" id="customizecolor" name="favcolor" value="#ff0000"><br><br>
-                      <button type="button" class="btn btn-success" onclick="EventBus.dispatch('customizeNode')">Update</button>
-                  </div>
-              </div>
-          </div>
-          <div class="col-sm-3" id="generalpanel">
-              <button type="button" class="btn btn-success" onclick="EventBus.dispatch('closeNode')">Back</button>
-          </div>
-      </div>
-  </div>
-  <!-- Modal -->
-  <div id="myModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
+                        Select your favorite color: <input type="color" id="customizecolor" name="favcolor" value="#ff0000"><br><br>
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('customizeNode')">Update</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3" id="generalpanel">
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('closeNode')">Back</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
 
-          <!-- Modal content-->
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h4 class="modal-title">Add/Edit Property</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-              <div class="modal-body">
-                  <form>
-                      <div class="form-group">
-                          <label for="Property">Property:</label>
-                          <input type="Property" class="form-control" id="Property">
-                      </div>
-                      <div class="form-group">
-                          <label for="Value">Value:</label>
-                          <input type="Value" class="form-control" id="Value">
-                      </div>
-                      <div class="form-group">
-                          <label for="Date">Date:</label>
-                          <input type="text" data-date-format="yyyy-MM-dd" class="form-control" id="Date">
-                      </div>
-                      <!--<div class="checkbox">
-                        <label><input type="checkbox"> Remember me</label>
-                      </div>-->
-                  </form>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addPropperty')">addProperty</button>
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add/Edit Property</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="Property">Property:</label>
+                            <input type="Property" class="form-control" id="Property">
+                        </div>
+                        <div class="form-group">
+                            <label for="Value">Value:</label>
+                            <input type="Value" class="form-control" id="Value">
+                        </div>
+                        <div class="form-group">
+                            <label for="Date">Date:</label>
+                            <input type="text" data-date-format="yyyy-MM-dd" class="form-control" id="Date">
+                        </div>
+                        <!--<div class="checkbox">
+                          <label><input type="checkbox"> Remember me</label>
+                        </div>-->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addPropperty')">addProperty</button>
 
-              </div>
-          </div>
+                </div>
+            </div>
 
-      </div>
-  </div>
-  <!-- Modal End-->
-  <div class="modal fade" id="myModal2" role="dialog">
-      <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h4 class="modal-title">Confirm Delete</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-              <div class="modal-body">
-                  <p>This can not be undo, Are you sure to delete this node?</p>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-success" onclick="EventBus.dispatch('removeNode')">Delete Node</button>
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              </div>
-          </div>
-      </div>
-  </div>
+        </div>
+    </div>
+    <!-- Modal End-->
+    <div class="modal fade" id="myModal2" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm Delete</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>This can not be undo, Are you sure to delete this node?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('removeNode')">Delete Node</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <!-- Modal -->
-  <div id="myModal3" class="modal fade" role="dialog">
-      <div class="modal-dialog">
+    <!-- Modal -->
+    <div id="myModal3" class="modal fade" role="dialog">
+        <div class="modal-dialog">
 
-          <!-- Modal content-->
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h4 class="modal-title">Add/Edit Edge</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-              <div class="modal-body">
-                  <form>
-                      <div class="form-group">
-                          <label for="Edge">Edge:</label>
-                          <!--<input class="form-control" id="Edge">-->
-                          <select class="form-control" id="Edge"></select>
-                      </div>
-                      <div class="form-group">
-                          <label for="EdgeValue">EdgeValue:</label>
-                          <input class="form-control" id="EdgeValue">
-                      </div>
-                      <!--<div class="checkbox">
-                        <label><input type="checkbox"> Remember me</label>
-                      </div>-->
-                  </form>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addEdge')">+ Add Edge</button>
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add/Edit Edge</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="Edge">Edge:</label>
+                            <!--<input class="form-control" id="Edge">-->
+                            <select class="form-control fstdropdown-select" id="Edge"></select>
+                        </div>
+                        <div class="form-group ui-widget">
+                            <label for="EdgeValue">EdgeValue:</label>
+                            <input class="form-control" id="EdgeValue">
+                        </div>
+                        <!--<div class="checkbox">
+                          <label><input type="checkbox"> Remember me</label>
+                        </div>-->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addEdge')">+ Add Edge</button>
 
-              </div>
-          </div>
+                </div>
+            </div>
 
-      </div>
-  </div>
-  <!-- Modal -->
-  <!-- Modal End-->
-  <div class="modal fade" id="myModal4" role="dialog">
-      <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h4 class="modal-title">Edit Node</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-              </div>
-              <div class="modal-body">
-                  <form>
-                      <div class="form-group">
-                          <label for="NodeName">Node:</label>
-                          <input type="Value" class="form-control" id="NodeName">
-                      </div>
-                  </form>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addNode')">Edit Node</button>
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              </div>
-          </div>
-      </div>
-  </div>
-  <!-- Modal End-->
+        </div>
+    </div>
+    <!-- Modal -->
+    <!-- Modal End-->
+    <div class="modal fade" id="myModal4" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Edit Node</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="NodeName">Node:</label>
+                            <input type="Value" class="form-control" id="NodeName">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addNode')">Edit Node</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal End-->
 
-    <script type="text/javascript" src="~/Scripts/graphExplorer.js"></script>
-
+    <script type="text/javascript" src="Scripts/graphExplorer.js"></script>
 
 </body>
 

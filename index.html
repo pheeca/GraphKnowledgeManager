@@ -10,16 +10,15 @@
   <script type="text/javascript" src="js/vis-network.min.js"></script>
   <script type="text/javascript" src="js/eventbus.min.js"></script>
   <script type="text/javascript" src="js/bootstrap-datepicker.min.js"></script>
+  <script type="text/javascript" src="js/fstdropdown.min.js"></script>
+  <script type="text/javascript" src="js/jquery-ui.js"></script>
+
+  <link rel="stylesheet" href="css/jquery-ui.css">
   <link href="css/vis-network.min.css" rel="stylesheet" type="text/css" />
   <link href="css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/fstdropdown.min.css" rel="stylesheet" type="text/css" />
+  <link href="css/styles.css" rel="stylesheet" type="text/css" />
   
-  <style type="text/css">
-    #mynetwork {
-      width: 100%;
-      height: 600px;
-      border: 1px solid lightgray;
-    }
-  </style>
 </head>
 
 <body>
@@ -171,9 +170,9 @@
                       <div class="form-group">
                           <label for="Edge">Edge:</label>
                           <!--<input class="form-control" id="Edge">-->
-                          <select class="form-control" id="Edge"></select>
+                          <select class="form-control fstdropdown-select" id="Edge"></select>
                       </div>
-                      <div class="form-group">
+                      <div class="form-group ui-widget">
                           <label for="EdgeValue">EdgeValue:</label>
                           <input class="form-control" id="EdgeValue">
                       </div>
@@ -218,7 +217,6 @@
   <!-- Modal End-->
   
   <script type="text/javascript" src="js/graphExplorer.js"></script>
-
 
 </body>
 
