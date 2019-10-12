@@ -199,6 +199,16 @@
     <Content Include="Content\bootstrap-reboot.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\fstdropdown.min.css" />
+    <Content Include="Content\img\network\downArrow.png" />
+    <Content Include="Content\img\network\leftArrow.png" />
+    <Content Include="Content\img\network\minus.png" />
+    <Content Include="Content\img\network\plus.png" />
+    <Content Include="Content\img\network\rightArrow.png" />
+    <Content Include="Content\img\network\upArrow.png" />
+    <Content Include="Content\img\network\zoomExtends.png" />
+    <Content Include="Content\jquery-ui.css" />
+    <Content Include="Content\styles.css" />
     <Content Include="Content\vis-network.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -231,8 +241,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Scripts\eventbus.min.js" />
+    <Content Include="Scripts\fstdropdown.min.js" />
     <Content Include="Scripts\graphExplorer.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\popper.min.js" />
     <Content Include="Scripts\vis-network.min.js" />
     <Content Include="Web.config" />

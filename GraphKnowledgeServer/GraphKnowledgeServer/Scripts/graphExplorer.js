@@ -76,12 +76,12 @@ EventBus.addEventListener('readEdge', function (e) {
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
     document.querySelector("#Edge").fstdropdown.rebind();
-    let siblingNodeIds = siblingNodes.map(e=>e.id);
-    let edgeValueHelper = graphExplorer.data.edges.filter(e=>siblingNodeIds.indexOf( e.from)>-1 ||siblingNodeIds.indexOf( e.to)>-1).map(e=>e.label).filter((v, i, a) => a.indexOf(v) === i);
+    let siblingNodeIds = siblingNodes.map(e => e.id);
+    let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
     debugger
-    $( "#EdgeValue" ).autocomplete({
+    $("#EdgeValue").autocomplete({
         source: edgeValueHelper
-      });
+    });
 });
 EventBus.addEventListener('addEdge', function (e) {
     if (!graphExplorer.data.currentEdge) {
@@ -290,7 +290,7 @@ $(document).ready(() => {
     setFstDropdown();
 
     graphExplorer.isOffline = false;
-    graphExplorer.isDev = true;
+    graphExplorer.isDev = (window.location.origin == "file://" || window.location.origin.indexOf('localhost') > -1);
     graphExplorer.url = graphExplorer.isDev ? 'http://localhost:50090/api/Values' : '/api/Values';
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}

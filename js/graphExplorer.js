@@ -290,7 +290,7 @@ $(document).ready(() => {
     setFstDropdown();
 
     graphExplorer.isOffline = false;
-    graphExplorer.isDev = true;
+    graphExplorer.isDev = (window.location.origin=="file://" || window.location.origin.indexOf('localhost')>-1);
     graphExplorer.url = graphExplorer.isDev ? 'http://localhost:50090/api/Values' : '/api/Values';
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
