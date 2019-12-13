@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphKnowledgeServer", "GraphKnowledgeServer\GraphKnowledgeServer.csproj", "{6382BFBF-A3E9-4202-8829-4C7D512741AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{A0662A91-756E-405C-99BD-146D151BC939}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{108F486A-F984-4AA1-BFA2-C2B60F386126}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,16 @@ Global
 		{6382BFBF-A3E9-4202-8829-4C7D512741AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6382BFBF-A3E9-4202-8829-4C7D512741AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6382BFBF-A3E9-4202-8829-4C7D512741AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0662A91-756E-405C-99BD-146D151BC939}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0662A91-756E-405C-99BD-146D151BC939}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0662A91-756E-405C-99BD-146D151BC939}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0662A91-756E-405C-99BD-146D151BC939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{108F486A-F984-4AA1-BFA2-C2B60F386126}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

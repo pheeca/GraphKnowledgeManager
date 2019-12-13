@@ -4,11 +4,23 @@ var EventBus = EventBus || {};
 
 EventBus.addEventListener('selectNode', function (params) {
     graphExplorer.data.selectedNode = params.target.nodes[0] || null;
+    if (graphExplorer.onlyNeighbour) {
+        console.log("selectNode", graphExplorer.data.selectedNode);
+        EventBus.dispatch('graphUpdated');
+    }
     EventBus.dispatch('refreshPanel');
 });
 EventBus.addEventListener('deselectNode', function () {
     graphExplorer.data.selectedNode = null;
-    EventBus.dispatch('refreshPanel');
+    if (graphExplorer.onlyNeighbour) {
+        setTimeout(() => {
+            if (!graphExplorer.data.selectedNode) {
+                EventBus.dispatch('graphUpdated');
+            }
+        }, 100)
+    } else {
+        EventBus.dispatch('refreshPanel');
+    }
 });
 EventBus.addEventListener('refreshPanel', function () {
     $('#panel,#generalpanel').hide();
@@ -253,21 +265,46 @@ EventBus.addEventListener('loadGraph', function (params) {
         });
     }
 });
-EventBus.addEventListener('graphUpdated', function (params) {
-    var _data = JSON.parse(JSON.stringify(graphExplorer.data));
+function getCurrentNodes(_data) {
+
     var _tempNodes = [];
     if (graphExplorer.data.parentNode) {
-        _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode);
+        _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode && ValidateNeighbouringNode(e, _data));
     } else {
-        _tempNodes = _data.nodes.filter(e => !e.parentId);
+        _tempNodes = _data.nodes.filter(e => !e.parentId && ValidateNeighbouringNode(e, _data));
     }
     for (var i = 0; i < _tempNodes.length; i++) {
         if (_data.nodes.map(e => e.parentId).filter(e => e).indexOf(_tempNodes[i].id) > -1) {
             _tempNodes[i].shape = 'hexagon';
         }
     }
+    return _tempNodes;
+}
+function ValidateNeighbouringNode(node, _data) {
+    if (graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
+        let l = _data.edges.filter(e => (e.from == node.id || e.to == node.id) && (e.from == graphExplorer.data.selectedNode || e.to == graphExplorer.data.selectedNode)).length;
+        return l > 0;
+    } else {
+        return true
+    }
+}
+function hashCode(text) {
+    var hash = 0, i, chr;
+    if (text.length === 0) return hash;
+    for (i = 0; i < text.length; i++) {
+        chr = text.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};
+var graphHash = null;
+EventBus.addEventListener('graphUpdated', function (params) {
+    var _data = JSON.parse(JSON.stringify(graphExplorer.data));
+    var _tempNodes = getCurrentNodes(_data);
     _data.nodes = new vis.DataSet(_tempNodes);
     _data.edges = new vis.DataSet(_data.edges.filter(e => _tempNodes.map(_d => _d.id).indexOf(e.from) != -1 && _tempNodes.map(_d => _d.id).indexOf(e.to) != -1));
+    let currentHash = null;
     if (!graphExplorer.network) {
         graphExplorer.network = new vis.Network(graphExplorer.container, _data, graphExplorer.options);
 
@@ -281,9 +318,21 @@ EventBus.addEventListener('graphUpdated', function (params) {
             EventBus.dispatch('openNode');
         });
     } else {
-        graphExplorer.network.setData(_data)
+        currentHash = hashCode(JSON.stringify(graphExplorer.data));
+        if (currentHash != graphHash) {
+            graphExplorer.network.setData(_data);
+            if (graphExplorer.data.selectedNode) {
+                graphExplorer.network.selectNodes([graphExplorer.data.selectedNode]);
+            }
+        }
     }
+    graphHash = currentHash;
     EventBus.dispatch('refreshPanel');
+});
+
+EventBus.addEventListener('onlyNeighbourToggle', function () {
+    graphExplorer.onlyNeighbour = !graphExplorer.onlyNeighbour;
+    EventBus.dispatch('graphUpdated');
 });
 
 $(document).ready(() => {
@@ -296,6 +345,7 @@ $(document).ready(() => {
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
+    $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e))
 });
 function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -310,6 +360,11 @@ function initialize(_rawData) {
         interaction: {
             navigationButtons: true,
             keyboard: true
+        },
+        physics: {
+            stabilization: {
+                iterations: 10
+            }
         }
     };
     //var _rawData = localStorage.getItem('graphExplorer.data');

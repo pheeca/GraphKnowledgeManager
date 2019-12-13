@@ -20,7 +20,6 @@
   <link href="css/styles.css" rel="stylesheet" type="text/css" />
   
 </head>
-
 <body>
   <p id='updatemsg'>
       Create a simple network with some nodes and edges.
@@ -31,6 +30,10 @@
 
               <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
               <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add Node</button>
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
+                <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring Nodes</label>
+              </div>
           </div>
       </div>
       <div class="row">

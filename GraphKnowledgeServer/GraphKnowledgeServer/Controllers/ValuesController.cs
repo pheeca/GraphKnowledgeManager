@@ -15,7 +15,10 @@ namespace GraphKnowledgeServer.Controllers
         // GET api/values
         public string Get()
         {
-            return File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/graph.json"));
+            var ctx = new DataAccess.GraphKnowledgeEntities();
+            return ctx.SchemaInformations
+                      .OrderByDescending(p => p.CreationDate)
+                      .FirstOrDefault()?.SchemaInfo;
         }
 
         // GET api/values/5
@@ -29,11 +32,18 @@ namespace GraphKnowledgeServer.Controllers
         {
             try
             {
-                if (!File.Exists(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json")))
+                var ctx = new DataAccess.GraphKnowledgeEntities();
+                ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
                 {
-                    File.WriteAllText(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json"), File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/graph.json")));
-                }
-                File.WriteAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/graph.json"), value);
+                    SchemaInfo = value,
+                    CreationDate = DateTime.UtcNow
+                });
+                ctx.SaveChanges();
+                //if (!File.Exists(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json")))
+                //{
+                //    File.WriteAllText(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json"), File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/graph.json")));
+                //}
+                //File.WriteAllText(System.Web.HttpContext.Current.Server.MapPath("~/Content/graph.json"), value);
                 return true;
             }
             catch (Exception e)
