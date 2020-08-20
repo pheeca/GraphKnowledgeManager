@@ -4,21 +4,21 @@ var EventBus = EventBus || {};
 
 EventBus.addEventListener('selectNode', function (params) {
     graphExplorer.data.selectedNode = params.target.nodes[0] || null;
-    if (graphExplorer.onlyNeighbour) {
-        console.log("selectNode", graphExplorer.data.selectedNode);
+    if(graphExplorer.onlyNeighbour){
+        console.log("selectNode",graphExplorer.data.selectedNode);
         EventBus.dispatch('graphUpdated');
     }
     EventBus.dispatch('refreshPanel');
 });
 EventBus.addEventListener('deselectNode', function () {
     graphExplorer.data.selectedNode = null;
-    if (graphExplorer.onlyNeighbour) {
-        setTimeout(() => {
-            if (!graphExplorer.data.selectedNode) {
+    if(graphExplorer.onlyNeighbour){
+        setTimeout(()=>{
+            if(!graphExplorer.data.selectedNode){
                 EventBus.dispatch('graphUpdated');
             }
-        }, 100)
-    } else {
+        },100) 
+    }else{
         EventBus.dispatch('refreshPanel');
     }
 });
@@ -88,12 +88,12 @@ EventBus.addEventListener('readEdge', function (e) {
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
     document.querySelector("#Edge").fstdropdown.rebind();
-    let siblingNodeIds = siblingNodes.map(e => e.id);
-    let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
-    debugger
-    $("#EdgeValue").autocomplete({
+    let siblingNodeIds = siblingNodes.map(e=>e.id);
+    let edgeValueHelper = graphExplorer.data.edges.filter(e=>siblingNodeIds.indexOf( e.from)>-1 ||siblingNodeIds.indexOf( e.to)>-1).map(e=>e.label).filter((v, i, a) => a.indexOf(v) === i);
+    
+    $( "#EdgeValue" ).autocomplete({
         source: edgeValueHelper
-    });
+      });
 });
 EventBus.addEventListener('addEdge', function (e) {
     if (!graphExplorer.data.currentEdge) {
@@ -171,7 +171,7 @@ EventBus.addEventListener('addPropperty', function () {
             props = graphExplorer.data.nodes[i].Properties || [];
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
-                if (graphExplorer.data.currentProperty) {
+                if (graphExplorer.data.currentProperty && props[$(graphExplorer.data.currentProperty).prevAll().length]) {
                     props[$(graphExplorer.data.currentProperty).prevAll().length].key = $('#Property').val() || '';
                     props[$(graphExplorer.data.currentProperty).prevAll().length].value = $('#Value').val() || '';
                     props[$(graphExplorer.data.currentProperty).prevAll().length].date = $('#Date').val() || '';
@@ -265,13 +265,13 @@ EventBus.addEventListener('loadGraph', function (params) {
         });
     }
 });
-function getCurrentNodes(_data) {
+function  getCurrentNodes(_data){
 
     var _tempNodes = [];
     if (graphExplorer.data.parentNode) {
-        _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode && ValidateNeighbouringNode(e, _data));
+        _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode && ValidateNeighbouringNode(e,_data));
     } else {
-        _tempNodes = _data.nodes.filter(e => !e.parentId && ValidateNeighbouringNode(e, _data));
+        _tempNodes = _data.nodes.filter(e => !e.parentId && ValidateNeighbouringNode(e,_data));
     }
     for (var i = 0; i < _tempNodes.length; i++) {
         if (_data.nodes.map(e => e.parentId).filter(e => e).indexOf(_tempNodes[i].id) > -1) {
@@ -280,10 +280,10 @@ function getCurrentNodes(_data) {
     }
     return _tempNodes;
 }
-function ValidateNeighbouringNode(node, _data) {
-    if (graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
+function  ValidateNeighbouringNode(node,_data){
+    if ( graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
         let l = _data.edges.filter(e => (e.from == node.id || e.to == node.id) && (e.from == graphExplorer.data.selectedNode || e.to == graphExplorer.data.selectedNode)).length;
-        return l > 0;
+        return l>0;
     } else {
         return true
     }
@@ -292,12 +292,12 @@ function hashCode(text) {
     var hash = 0, i, chr;
     if (text.length === 0) return hash;
     for (i = 0; i < text.length; i++) {
-        chr = text.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
+      chr   = text.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
     }
     return hash;
-};
+  };
 var graphHash = null;
 EventBus.addEventListener('graphUpdated', function (params) {
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
@@ -319,9 +319,9 @@ EventBus.addEventListener('graphUpdated', function (params) {
         });
     } else {
         currentHash = hashCode(JSON.stringify(graphExplorer.data));
-        if (currentHash != graphHash) {
+        if (currentHash != graphHash){
             graphExplorer.network.setData(_data);
-            if (graphExplorer.data.selectedNode) {
+            if(graphExplorer.data.selectedNode){
                 graphExplorer.network.selectNodes([graphExplorer.data.selectedNode]);
             }
         }
@@ -331,7 +331,7 @@ EventBus.addEventListener('graphUpdated', function (params) {
 });
 
 EventBus.addEventListener('onlyNeighbourToggle', function () {
-    graphExplorer.onlyNeighbour = !graphExplorer.onlyNeighbour;
+    graphExplorer.onlyNeighbour=!graphExplorer.onlyNeighbour;
     EventBus.dispatch('graphUpdated');
 });
 
@@ -339,13 +339,13 @@ $(document).ready(() => {
     setFstDropdown();
 
     graphExplorer.isOffline = false;
-    graphExplorer.isDev = (window.location.origin == "file://" || window.location.origin.indexOf('localhost') > -1);
+    graphExplorer.isDev = (window.location.origin=="file://" || window.location.origin.indexOf('localhost')>-1);
     graphExplorer.url = graphExplorer.isDev ? 'http://localhost:50090/api/Values' : '/api/Values';
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
-    $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e))
+    $('#neighbouringNodesSwitch').on('change',(e) => EventBus.dispatch('onlyNeighbourToggle', e))
 });
 function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -364,8 +364,8 @@ function initialize(_rawData) {
         physics: {
             stabilization: {
                 iterations: 10
-            }
-        }
+              }
+         }
     };
     //var _rawData = localStorage.getItem('graphExplorer.data');
     if (!_rawData) {

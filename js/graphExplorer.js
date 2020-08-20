@@ -90,7 +90,7 @@ EventBus.addEventListener('readEdge', function (e) {
     document.querySelector("#Edge").fstdropdown.rebind();
     let siblingNodeIds = siblingNodes.map(e=>e.id);
     let edgeValueHelper = graphExplorer.data.edges.filter(e=>siblingNodeIds.indexOf( e.from)>-1 ||siblingNodeIds.indexOf( e.to)>-1).map(e=>e.label).filter((v, i, a) => a.indexOf(v) === i);
-    debugger
+    
     $( "#EdgeValue" ).autocomplete({
         source: edgeValueHelper
       });
@@ -171,7 +171,7 @@ EventBus.addEventListener('addPropperty', function () {
             props = graphExplorer.data.nodes[i].Properties || [];
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
-                if (graphExplorer.data.currentProperty) {
+                if (graphExplorer.data.currentProperty && props[$(graphExplorer.data.currentProperty).prevAll().length]) {
                     props[$(graphExplorer.data.currentProperty).prevAll().length].key = $('#Property').val() || '';
                     props[$(graphExplorer.data.currentProperty).prevAll().length].value = $('#Value').val() || '';
                     props[$(graphExplorer.data.currentProperty).prevAll().length].date = $('#Date').val() || '';
