@@ -1,0 +1,31 @@
+{
+  "name": "graphknowledgemanager",
+  "version": "1.0.0",
+  "description": "A web-app tool to help organize your life. With 3-D Graph structure store even the most complex information with incredible ease of use",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pheeca/GraphKnowledgeManager.git"
+  },
+  "keywords": [
+    "design-systems",
+    "design",
+    "design-tools",
+    "meaningful",
+    "data",
+    "data-populator",
+    "data",
+    "utilities",
+    "todo",
+    "data-management"
+  ],
+  "author": "pheeca",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pheeca/GraphKnowledgeManager/issues"
+  },
+  "homepage": "https://github.com/pheeca/GraphKnowledgeManager#readme"
+}

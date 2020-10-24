@@ -26,5 +26,7 @@ namespace DataAccess
         }
     
         public virtual DbSet<SchemaInformation> SchemaInformations { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserSchema> UserSchemas { get; set; }
     }
 }

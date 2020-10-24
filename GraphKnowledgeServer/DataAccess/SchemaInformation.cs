@@ -17,5 +17,8 @@ namespace DataAccess
         public long Id { get; set; }
         public string SchemaInfo { get; set; }
         public Nullable<System.DateTime> CreationDate { get; set; }
+        public int UserSchemaId { get; set; }
+    
+        public virtual UserSchema UserSchema { get; set; }
     }
 }

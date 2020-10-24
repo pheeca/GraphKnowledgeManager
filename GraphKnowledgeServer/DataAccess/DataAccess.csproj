@@ -68,6 +68,12 @@
     <Compile Include="SchemaInformation.cs">
       <DependentUpon>GraphKnowledgeModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="User.cs">
+      <DependentUpon>GraphKnowledgeModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UserSchema.cs">
+      <DependentUpon>GraphKnowledgeModel.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="GraphKnowledgeModel.edmx">
