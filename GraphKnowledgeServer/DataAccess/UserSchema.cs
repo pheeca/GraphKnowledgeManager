@@ -10,6 +10,7 @@
 namespace DataAccess
 {
     using System;
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Collections.Generic;
     
     public partial class UserSchema
@@ -26,7 +27,9 @@ namespace DataAccess
         public Nullable<int> OwnerUserId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [NotMapped]
         public virtual ICollection<SchemaInformation> SchemaInformations { get; set; }
+        [NotMapped]
         public virtual User User { get; set; }
     }
 }

@@ -10,6 +10,7 @@
 namespace DataAccess
 {
     using System;
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Collections.Generic;
     
     public partial class SchemaInformation
@@ -19,6 +20,7 @@ namespace DataAccess
         public Nullable<System.DateTime> CreationDate { get; set; }
         public int UserSchemaId { get; set; }
     
+        [NotMapped]
         public virtual UserSchema UserSchema { get; set; }
     }
 }

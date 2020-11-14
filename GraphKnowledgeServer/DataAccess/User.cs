@@ -10,6 +10,7 @@
 namespace DataAccess
 {
     using System;
+    using System.ComponentModel.DataAnnotations.Schema;
     using System.Collections.Generic;
     
     public partial class User
@@ -18,6 +19,7 @@ namespace DataAccess
         public string Username { get; set; }
         public string Password { get; set; }
     
+        [NotMapped]
         public virtual UserSchema UserSchema { get; set; }
     }
 }

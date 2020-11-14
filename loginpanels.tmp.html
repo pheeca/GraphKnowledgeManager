@@ -1,0 +1,24 @@
+<div id="appcontainer">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Login</h3>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="pheeca">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" value="password1">
+                </div>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('App.UI.Login')">Login</button>
+
+            </div>
+            <div class="col-sm-12">
+                <div class="list-group" id="schemaname"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="Scripts/login.js"></script>
+</div>

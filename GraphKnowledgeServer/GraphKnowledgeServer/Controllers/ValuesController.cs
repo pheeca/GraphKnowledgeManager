@@ -9,7 +9,7 @@ using System.Web.Http.Cors;
 
 namespace GraphKnowledgeServer.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
+    //[EnableCors(origins: "*", headers: "*", methods: "*")]
     public class ValuesController : ApiController
     {
         // GET api/values
@@ -24,17 +24,21 @@ namespace GraphKnowledgeServer.Controllers
         // GET api/values/5
         public string Get(int id)
         {
-            return "value";
+            var ctx = new DataAccess.GraphKnowledgeEntities();
+            return ctx.SchemaInformations.Where(f => f.UserSchemaId == id)
+                      .OrderByDescending(p => p.CreationDate)
+                      .FirstOrDefault()?.SchemaInfo;
         }
 
         // POST api/values
-        public bool Post([FromBody]string value)
+        public bool Post(int id,[FromBody]string value)
         {
             try
             {
                 var ctx = new DataAccess.GraphKnowledgeEntities();
                 ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
                 {
+                     UserSchemaId=id,
                     SchemaInfo = value,
                     CreationDate = DateTime.UtcNow
                 });

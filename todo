@@ -8,9 +8,11 @@ add tags support in customize tab
 --display only related nodes on selected node (optionally)
 abiliy to search all nodes with certain tag
 Move node (change parent)
-Link Far Nodes
+Link Far Nodes as single unit
 Ability to go to linked far nodes/linked neighbouring nodes
-multi-user,multi-tenancy
+--multi-user
+multi-tenancy
+multi-graph
 
 
 look into 

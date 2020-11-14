@@ -4,7 +4,12 @@
   "description": "A web-app tool to help organize your life. With 3-D Graph structure store even the most complex information with incredible ease of use",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"FOR /L %N IN (1,0,2) DO npm run start",
+    "start":"npm run copyjs && npm run copytemplate && npm run copyIndex",
+    "copyjs":"copy \"Scripts\\*.js\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Scripts\" /Y",
+    "copytemplate":"copy \"*.tmp.html\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Templates\" /Y",
+    "copyIndex":"copy /b \"GraphKnowledgeServer\\GraphKnowledgeServer\\Templates\\text.txt\" + index.html \"GraphKnowledgeServer\\GraphKnowledgeServer\\Views\\Home\\Index.cshtml\" /Y"
   },
   "repository": {
     "type": "git",

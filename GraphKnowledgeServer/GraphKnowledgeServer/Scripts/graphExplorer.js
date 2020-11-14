@@ -1,5 +1,6 @@
 var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
+var AppConfig = AppConfig || {};
 
 
 EventBus.addEventListener('selectNode', function (params) {
@@ -235,7 +236,7 @@ EventBus.addEventListener('modifyNode', function (params) {
 EventBus.addEventListener('saveGraph', function () {
     if (graphExplorer.isOffline) {
         localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
-        $('#updatemsg').text(`Last Saved: ${new Date().toLocaleString()}`);
+        $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
     } else {
         $.ajax({
             url: graphExplorer.url,
@@ -244,7 +245,7 @@ EventBus.addEventListener('saveGraph', function () {
             success: function (data) {
                 //do something
                 if (data) {
-                    $('#updatemsg').text(`Last Saved: ${new Date().toLocaleString()}`);
+                    $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
                 }
             }
         });
@@ -334,19 +335,24 @@ EventBus.addEventListener('onlyNeighbourToggle', function () {
     graphExplorer.onlyNeighbour=!graphExplorer.onlyNeighbour;
     EventBus.dispatch('graphUpdated');
 });
-
-$(document).ready(() => {
+EventBus.addEventListener('onGraphEnabled', function (params) {
+   
     setFstDropdown();
-
     graphExplorer.isOffline = false;
-    graphExplorer.isDev = (window.location.origin=="file://" || window.location.origin.indexOf('localhost')>-1);
-    graphExplorer.url = graphExplorer.isDev ? 'http://localhost:50090/api/Values' : '/api/Values';
+    var UserSchemaId = sessionStorage.getItem("UserSchemaId");
+    debugger
+    if(!UserSchemaId){
+        EventBus.dispatch('App.Redirect',"/login");
+        return;
+    }
+    graphExplorer.url = AppConfig.domain+'/api/Values/'+UserSchemaId;
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
     $('#neighbouringNodesSwitch').on('change',(e) => EventBus.dispatch('onlyNeighbourToggle', e))
 });
+
 function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
