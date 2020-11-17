@@ -2,24 +2,29 @@ var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
 
+graphExplorer.graphConfig = {
+    defaultNodeColor: '#97c2fc',
+    searchtag: '#searchtag',
+    tagContextGlobal: '#tagContextGlobal'
+};
 
 EventBus.addEventListener('selectNode', function (params) {
     graphExplorer.data.selectedNode = params.target.nodes[0] || null;
-    if(graphExplorer.onlyNeighbour){
-        console.log("selectNode",graphExplorer.data.selectedNode);
+    if (graphExplorer.onlyNeighbour) {
+        console.log("selectNode", graphExplorer.data.selectedNode);
         EventBus.dispatch('graphUpdated');
     }
     EventBus.dispatch('refreshPanel');
 });
 EventBus.addEventListener('deselectNode', function () {
     graphExplorer.data.selectedNode = null;
-    if(graphExplorer.onlyNeighbour){
-        setTimeout(()=>{
-            if(!graphExplorer.data.selectedNode){
+    if (graphExplorer.onlyNeighbour) {
+        setTimeout(() => {
+            if (!graphExplorer.data.selectedNode) {
                 EventBus.dispatch('graphUpdated');
             }
-        },100) 
-    }else{
+        }, 100)
+    } else {
         EventBus.dispatch('refreshPanel');
     }
 });
@@ -39,10 +44,10 @@ EventBus.addEventListener('refreshPanel', function () {
 EventBus.addEventListener('refreshPanelCustomize', function (params) {
     var node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
     //Reference:https://www.jqueryscript.net/form/Bootstrap-4-Tag-Input-Plugin-jQuery.html
-    var tagsTextbox=$('#tags').tagsinput()[$('#tags').tagsinput().length-1];
+    var tagsTextbox = $('#tags').tagsinput()[$('#tags').tagsinput().length - 1];
     tagsTextbox.removeAll();
     tagsTextbox.add((node.tags || []).toString());
-    $('#customizecolor').val(node.color || graphExplorer.graphConfig.defaultNodeColor );
+    $('#customizecolor').val(node.color || graphExplorer.graphConfig.defaultNodeColor);
 });
 EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
     var _edges = graphExplorer.data.edges.filter(e => e.to == graphExplorer.data.selectedNode || e.from == graphExplorer.data.selectedNode);
@@ -69,7 +74,7 @@ EventBus.addEventListener('readEdge', function (e) {
                 } else if (fromedges.length > 0) {
                     extralabel = " (" + fromedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0].label + ")";
                 }
-            } catch{
+            } catch {
                 console.log(1);
             }
         }
@@ -92,12 +97,12 @@ EventBus.addEventListener('readEdge', function (e) {
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
     document.querySelector("#Edge").fstdropdown.rebind();
-    let siblingNodeIds = siblingNodes.map(e=>e.id);
-    let edgeValueHelper = graphExplorer.data.edges.filter(e=>siblingNodeIds.indexOf( e.from)>-1 ||siblingNodeIds.indexOf( e.to)>-1).map(e=>e.label).filter((v, i, a) => a.indexOf(v) === i);
-    
-    $( "#EdgeValue" ).autocomplete({
+    let siblingNodeIds = siblingNodes.map(e => e.id);
+    let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
+
+    $("#EdgeValue").autocomplete({
         source: edgeValueHelper
-      });
+    });
 });
 EventBus.addEventListener('addEdge', function (e) {
     if (!graphExplorer.data.currentEdge) {
@@ -141,10 +146,10 @@ EventBus.addEventListener('deleteEdge', function (e) {
 EventBus.addEventListener('customizeNode', function (e) {
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.nodes[i].id == graphExplorer.data.selectedNode) {
-           
-            graphExplorer.data.nodes[i].color = $('#customizecolor').val() || graphExplorer.graphConfig.defaultNodeColor ;
+
+            graphExplorer.data.nodes[i].color = $('#customizecolor').val() || graphExplorer.graphConfig.defaultNodeColor;
             graphExplorer.data.nodes[i].tags = $('#tags').val().split(',');
-           
+
         }
     }
     EventBus.dispatch('graphUpdated');
@@ -272,13 +277,24 @@ EventBus.addEventListener('loadGraph', function (params) {
         });
     }
 });
-function  getCurrentNodes(_data){
+function getCurrentNodes(_data) {
+
+    var tagFilter = $(graphExplorer.graphConfig.searchtag).val() || null;
+    var tagContextGlobal = $(graphExplorer.graphConfig.tagContextGlobal).is(':checked');
 
     var _tempNodes = [];
-    if (graphExplorer.data.parentNode) {
-        _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode && ValidateNeighbouringNode(e,_data));
+    if (!tagContextGlobal) {
+
+        if (graphExplorer.data.parentNode) {
+            _tempNodes = _data.nodes.filter(e => e.parentId == graphExplorer.data.parentNode && ValidateNeighbouringNode(e, _data));
+        } else {
+            _tempNodes = _data.nodes.filter(e => !e.parentId && ValidateNeighbouringNode(e, _data));
+        }
     } else {
-        _tempNodes = _data.nodes.filter(e => !e.parentId && ValidateNeighbouringNode(e,_data));
+        _tempNodes = _data.nodes;
+    }
+    if (tagFilter) {
+        _tempNodes = _tempNodes.filter(e => (e.tags || []).filter(t => t.indexOf(tagFilter) > -1).length > 0);
     }
     for (var i = 0; i < _tempNodes.length; i++) {
         if (_data.nodes.map(e => e.parentId).filter(e => e).indexOf(_tempNodes[i].id) > -1) {
@@ -287,10 +303,10 @@ function  getCurrentNodes(_data){
     }
     return _tempNodes;
 }
-function  ValidateNeighbouringNode(node,_data){
-    if ( graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
+function ValidateNeighbouringNode(node, _data) {
+    if (graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
         let l = _data.edges.filter(e => (e.from == node.id || e.to == node.id) && (e.from == graphExplorer.data.selectedNode || e.to == graphExplorer.data.selectedNode)).length;
-        return l>0;
+        return l > 0;
     } else {
         return true
     }
@@ -299,14 +315,15 @@ function hashCode(text) {
     var hash = 0, i, chr;
     if (text.length === 0) return hash;
     for (i = 0; i < text.length; i++) {
-      chr   = text.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+        chr = text.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
     }
     return hash;
-  };
+};
 var graphHash = null;
 EventBus.addEventListener('graphUpdated', function (params) {
+
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
     var _tempNodes = getCurrentNodes(_data);
     _data.nodes = new vis.DataSet(_tempNodes);
@@ -325,10 +342,12 @@ EventBus.addEventListener('graphUpdated', function (params) {
             EventBus.dispatch('openNode');
         });
     } else {
-        currentHash = hashCode(JSON.stringify(graphExplorer.data));
-        if (currentHash != graphHash){
+        var tagFilter = $(graphExplorer.graphConfig.searchtag).val() || '';
+        var tagContextGlobal = $(graphExplorer.graphConfig.tagContextGlobal).is(':checked');
+        currentHash = hashCode(JSON.stringify(graphExplorer.data) + tagFilter + tagContextGlobal);
+        if (currentHash != graphHash) {
             graphExplorer.network.setData(_data);
-            if(graphExplorer.data.selectedNode){
+            if (graphExplorer.data.selectedNode) {
                 graphExplorer.network.selectNodes([graphExplorer.data.selectedNode]);
             }
         }
@@ -338,30 +357,31 @@ EventBus.addEventListener('graphUpdated', function (params) {
 });
 
 EventBus.addEventListener('onlyNeighbourToggle', function () {
-    graphExplorer.onlyNeighbour=!graphExplorer.onlyNeighbour;
+    graphExplorer.onlyNeighbour = !graphExplorer.onlyNeighbour;
     EventBus.dispatch('graphUpdated');
 });
 EventBus.addEventListener('onGraphEnabled', function (params) {
-   
+
     setFstDropdown();
     graphExplorer.isOffline = false;
     var UserSchemaId = sessionStorage.getItem("UserSchemaId");
-    
-    if(!UserSchemaId){
-        EventBus.dispatch('App.Redirect',"/login");
+
+    if (!UserSchemaId) {
+        EventBus.dispatch('App.Redirect', "/login");
         return;
     }
-    graphExplorer.url = AppConfig.domain+'/api/Values/'+UserSchemaId;
+    graphExplorer.url = AppConfig.domain + '/api/Values/' + UserSchemaId;
     EventBus.dispatch('loadGraph');
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
-    $('#neighbouringNodesSwitch').on('change',(e) => EventBus.dispatch('onlyNeighbourToggle', e));
+    $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
+    $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal).on('change', (e) => EventBus.dispatch('graphUpdated', e));
     // $('#customize input').on('change',(e) => {
     //     if($('#customizecolor').val()){
     //         EventBus.dispatch('customizeNode')
     //     }
-        
+
     // });
 });
 
@@ -382,17 +402,15 @@ function initialize(_rawData) {
         physics: {
             stabilization: {
                 iterations: 10
-              }
-         }
+            }
+        }
     };
-    graphExplorer.graphConfig={
-        defaultNodeColor:'#97c2fc'
-    };
+
     //var _rawData = localStorage.getItem('graphExplorer.data');
-    
+
     if (!_rawData) {
         var nodes = [
-            { id: 1, label: 'Node 1',"color":graphExplorer.graphConfig.defaultNodeColor ,tags:['a','b'] },
+            { id: 1, label: 'Node 1', "color": graphExplorer.graphConfig.defaultNodeColor, tags: ['a', 'b'] },
             { id: 2, label: 'Node 2' },
             { id: 3, label: 'Node 3' },
             { id: 4, label: 'Node 4', color: '#7BE141' },

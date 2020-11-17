@@ -4,11 +4,22 @@
     </p>
     <div class="container-fluid" id="mainpanelgroup">
         <div class="row">
-            <div class="col-sm-12">
-
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
+            <div class="col-sm-2">
+                <button type="button" class="btn btn-success"
+                    onclick="EventBus.dispatch('saveGraph')">Save</button>
                 <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add
                     Node</button>
+            </div>
+            <div class="col-sm-2 ">
+
+                <span class="fa fa-search form-control-feedback col-sm-1"></span>
+                <input type="text" id="searchtag" class="form-control  col-sm-5" placeholder="search tag">
+                <div class="custom-control custom-switch  col-sm-6">
+                    <input type="checkbox" class="custom-control-input" id="tagContextGlobal" value="false">
+                    <label class="custom-control-label" for="tagContextGlobal">Global</label>
+                </div>
+            </div>
+            <div class=" col-sm-3">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
                     <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
@@ -58,8 +69,8 @@
                     <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel"
                         aria-labelledby="grapheditorpanel-tab">
 
-                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                            data-target="#myModal2">Delete Node</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal2">Delete
+                            Node</button>
                         <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Edit
                             Node</button>
                         <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readEdge')">+ Add
@@ -77,10 +88,12 @@
                         </table>
                     </div>
                     <div class="tab-pane fade" id="customize" role="tabpanel" aria-labelledby="customize-tab">
-                    
-                        Select your favorite color: <input type="color" id="customizecolor" name="favcolor" value="#ff0000"><br>
+
+                        Select your favorite color: <input type="color" id="customizecolor" name="favcolor"
+                            value="#ff0000"><br>
                         Tags: <input data-role="tagsinput" id="tags" value=""><br><br>
-                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('customizeNode')">Update</button>
+                        <button type="button" class="btn btn-success"
+                            onclick="EventBus.dispatch('customizeNode')">Update</button>
                     </div>
                 </div>
             </div>
@@ -216,9 +229,9 @@
     <script type="text/javascript" src="Scripts/graphExplorer.js"></script>
     <style>
         .bootstrap-tagsinput .badge {
-    margin-left: 2px;
-    margin-right: 2px;
-    font-size: 17px;
-}
+            margin-left: 2px;
+            margin-right: 2px;
+            font-size: 17px;
+        }
     </style>
 </div>
