@@ -12,8 +12,14 @@ Link Far Nodes as single unit
 Ability to go to linked far nodes/linked neighbouring nodes
 --multi-user
 multi-tenancy
-multi-graph
+--multi-graph
+notification engine:mobile alarm,mobile notification,email
+share graph/permission 
 
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1
+
+to analyze
+How to visualize information at run time
+how to automated data entry at run time

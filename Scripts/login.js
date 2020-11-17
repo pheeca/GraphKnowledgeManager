@@ -39,6 +39,7 @@ EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
             url: AppConfig.domain + '/api/UserAuth/'+userId,
             type: "GET",
             success: function (data) {
+                $(`#schemaname`).html('');
                 if (data) {
                   data.forEach(element => {
                     $(`#schemaname`).append( 
@@ -52,6 +53,7 @@ EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
                       </a>`);
                     });
                 }
+                $(`#schemaname`).append('<button type="button" type="button" class="btn btn-success" data-toggle="modal" data-target="#GraphPopup">Add Graph</button>');
             },
             error: function (xhr, status) {
                 console.log(xhr, status);
@@ -67,4 +69,32 @@ EventBus.addEventListener('App.UI.Login.schemaSelect', function (params) {
         sessionStorage.setItem("UserSchemaId", params.target);
         EventBus.dispatch('App.Redirect',"/");
     }
+});
+
+
+EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
+    var graphName=$('#graphname').val();
+    var userId = sessionStorage.getItem("UserId");
+    if(graphName){
+        $.ajax({
+            url: AppConfig.domain + '/api/UserSchema',
+            data: { 
+                OwnerUserId:userId,
+                SchemaName:graphName, 
+                SchemaDesc:graphName},
+            type: "POST",
+            success: function (data) {
+                if(data){
+                    EventBus.dispatch('App.UI.Login.LoadUserInfo');
+                }else{
+                    alert("Sorry, there was a problem!");
+                }
+            },
+            error: function (xhr, status) {
+                console.log(xhr, status);
+                alert("Sorry, there was a problem!");
+            }
+        });
+    }
+       
 });
