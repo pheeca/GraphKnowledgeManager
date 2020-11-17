@@ -77,11 +77,10 @@
                         </table>
                     </div>
                     <div class="tab-pane fade" id="customize" role="tabpanel" aria-labelledby="customize-tab">
-
-                        Select your favorite color: <input type="color" id="customizecolor" name="favcolor"
-                            value="#ff0000"><br><br>
-                        <button type="button" class="btn btn-success"
-                            onclick="EventBus.dispatch('customizeNode')">Update</button>
+                    
+                        Select your favorite color: <input type="color" id="customizecolor" name="favcolor" value="#ff0000"><br>
+                        Tags: <input data-role="tagsinput" id="tags" value=""><br><br>
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('customizeNode')">Update</button>
                     </div>
                 </div>
             </div>
@@ -212,5 +211,14 @@
         </div>
     </div>
     <!-- Modal End-->
+    <link href="Content/tagsinput.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="Scripts/tagsinput.js"></script>
     <script type="text/javascript" src="Scripts/graphExplorer.js"></script>
+    <style>
+        .bootstrap-tagsinput .badge {
+    margin-left: 2px;
+    margin-right: 2px;
+    font-size: 17px;
+}
+    </style>
 </div>

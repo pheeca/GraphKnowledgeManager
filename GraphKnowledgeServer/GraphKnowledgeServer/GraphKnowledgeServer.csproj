@@ -224,10 +224,12 @@
     <Content Include="Content\img\network\zoomExtends.png" />
     <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\styles.css" />
+    <Content Include="Content\tagsinput.css" />
     <Content Include="Content\vis-network.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\app.js" />
     <Content Include="Scripts\bootstrap-datepicker.min.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -262,6 +264,7 @@
     <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\login.js" />
     <Content Include="Scripts\popper.min.js" />
+    <Content Include="Scripts\tagsinput.js" />
     <Content Include="Scripts\vis-network.min.js" />
     <Content Include="Templates\loginpanels.tmp.html" />
     <Content Include="Templates\mainpanels.tmp.html" />

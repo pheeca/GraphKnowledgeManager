@@ -38,8 +38,11 @@ EventBus.addEventListener('refreshPanel', function () {
 
 EventBus.addEventListener('refreshPanelCustomize', function (params) {
     var node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
-
-    $('#customizecolor').val(node.color || '#D2E5FF');
+    //Reference:https://www.jqueryscript.net/form/Bootstrap-4-Tag-Input-Plugin-jQuery.html
+    var tagsTextbox=$('#tags').tagsinput()[$('#tags').tagsinput().length-1];
+    tagsTextbox.removeAll();
+    tagsTextbox.add((node.tags || []).toString());
+    $('#customizecolor').val(node.color || graphExplorer.graphConfig.defaultNodeColor );
 });
 EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
     var _edges = graphExplorer.data.edges.filter(e => e.to == graphExplorer.data.selectedNode || e.from == graphExplorer.data.selectedNode);
@@ -138,7 +141,10 @@ EventBus.addEventListener('deleteEdge', function (e) {
 EventBus.addEventListener('customizeNode', function (e) {
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.nodes[i].id == graphExplorer.data.selectedNode) {
-            graphExplorer.data.nodes[i].color = $('#customizecolor').val() || '#D2E5FF';
+           
+            graphExplorer.data.nodes[i].color = $('#customizecolor').val() || graphExplorer.graphConfig.defaultNodeColor ;
+            graphExplorer.data.nodes[i].tags = $('#tags').val().split(',');
+           
         }
     }
     EventBus.dispatch('graphUpdated');
@@ -340,7 +346,7 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     setFstDropdown();
     graphExplorer.isOffline = false;
     var UserSchemaId = sessionStorage.getItem("UserSchemaId");
-    debugger
+    
     if(!UserSchemaId){
         EventBus.dispatch('App.Redirect',"/login");
         return;
@@ -350,7 +356,13 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
-    $('#neighbouringNodesSwitch').on('change',(e) => EventBus.dispatch('onlyNeighbourToggle', e))
+    $('#neighbouringNodesSwitch').on('change',(e) => EventBus.dispatch('onlyNeighbourToggle', e));
+    // $('#customize input').on('change',(e) => {
+    //     if($('#customizecolor').val()){
+    //         EventBus.dispatch('customizeNode')
+    //     }
+        
+    // });
 });
 
 function uuidv4() {
@@ -373,10 +385,14 @@ function initialize(_rawData) {
               }
          }
     };
+    graphExplorer.graphConfig={
+        defaultNodeColor:'#97c2fc'
+    };
     //var _rawData = localStorage.getItem('graphExplorer.data');
+    
     if (!_rawData) {
         var nodes = [
-            { id: 1, label: 'Node 1' },
+            { id: 1, label: 'Node 1',"color":graphExplorer.graphConfig.defaultNodeColor ,tags:['a','b'] },
             { id: 2, label: 'Node 2' },
             { id: 3, label: 'Node 3' },
             { id: 4, label: 'Node 4', color: '#7BE141' },

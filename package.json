@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev":"FOR /L %N IN (1,0,2) DO npm run start",
-    "start":"npm run copyjs && npm run copytemplate && npm run copyIndex",
-    "copyjs":"copy \"Scripts\\*.js\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Scripts\" /Y",
+    "start":"npm run copyjs && npm run copycss && npm run copytemplate && npm run copyIndex",
+    "copyjs":"copy \"Scripts\\*.*\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Scripts\" /Y",
+    "copycss":"copy \"Content\\*.*\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Content\" /Y",
     "copytemplate":"copy \"*.tmp.html\" \"GraphKnowledgeServer\\GraphKnowledgeServer\\Templates\" /Y",
     "copyIndex":"copy /b \"GraphKnowledgeServer\\GraphKnowledgeServer\\Templates\\text.txt\" + index.html \"GraphKnowledgeServer\\GraphKnowledgeServer\\Views\\Home\\Index.cshtml\" /Y"
   },
