@@ -5,7 +5,8 @@ var AppConfig = AppConfig || {};
 graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
     searchtag: '#searchtag',
-    tagContextGlobal: '#tagContextGlobal'
+    tagContextGlobal: '#tagContextGlobal',
+    changeparent:'#changeparent'
 };
 
 EventBus.addEventListener('selectNode', function (params) {
@@ -62,24 +63,7 @@ EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
     }
 });
 EventBus.addEventListener('readEdge', function (e) {
-    function createOption(e, siblingNodes) {
-        let extralabel = '';
-        if (siblingNodes.map(s => s.label).filter(s => s.toLowerCase() == e.label.toLocaleLowerCase()).length > 1) {
-            let edges = graphExplorer.data.edges.filter(ed => ed.to == e.id || ed.from == e.id);
-            let toedges = edges.filter(ed => ed.to == e.id);
-            let fromedges = edges.filter(ed => ed.from == e.id);
-            try {
-                if (toedges.length > 0) {
-                    extralabel = " (" + toedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0].label + ")";
-                } else if (fromedges.length > 0) {
-                    extralabel = " (" + fromedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0].label + ")";
-                }
-            } catch {
-                console.log(1);
-            }
-        }
-        return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
-    }
+
     $('#myModal3').modal("show");
     var connectedNodeId = 0;
     var edgeVal = '';
@@ -322,6 +306,23 @@ function hashCode(text) {
     return hash;
 };
 var graphHash = null;
+
+EventBus.addEventListener('changeparent', function (params) {
+
+    var parentId =parseInt($(graphExplorer.graphConfig.changeparent).val());
+    
+    graphExplorer.data.nodes.forEach(function(item){
+        if(item.id==graphExplorer.data.selectedNode){
+            if(item.parentId){
+                item.parentId=parentId;
+                EventBus.dispatch("deselectNode");
+                EventBus.dispatch('graphUpdated');
+            }else{
+                alert('parent can not change of root nodes')
+            }
+        }
+    });
+});
 EventBus.addEventListener('graphUpdated', function (params) {
 
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
@@ -329,6 +330,11 @@ EventBus.addEventListener('graphUpdated', function (params) {
     _data.nodes = new vis.DataSet(_tempNodes);
     _data.edges = new vis.DataSet(_data.edges.filter(e => _tempNodes.map(_d => _d.id).indexOf(e.from) != -1 && _tempNodes.map(_d => _d.id).indexOf(e.to) != -1));
     let currentHash = null;
+    var siblingNodes = graphExplorer.data.nodes;
+    var _html = siblingNodes.map(e => createOption(e, siblingNodes)).reduce((a, b) => a + b, '');
+    $(graphExplorer.graphConfig.changeparent).html(_html);
+    document.querySelector(graphExplorer.graphConfig.changeparent).fstdropdown.rebind();
+    
     if (!graphExplorer.network) {
         graphExplorer.network = new vis.Network(graphExplorer.container, _data, graphExplorer.options);
 
@@ -377,6 +383,9 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
     $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
     $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal).on('change', (e) => EventBus.dispatch('graphUpdated', e));
+    $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
+    $('#changeparent').on('change',(e) =>  EventBus.dispatch('changeparent'))
+
     // $('#customize input').on('change',(e) => {
     //     if($('#customizecolor').val()){
     //         EventBus.dispatch('customizeNode')
@@ -435,4 +444,22 @@ function initialize(_rawData) {
     }
     graphExplorer.data = _rawData;
     EventBus.dispatch("graphUpdated");
+}
+function createOption(e, siblingNodes) {
+    let extralabel = '';
+    if (siblingNodes.map(s => s.label).filter(s => s.toLowerCase() == e.label.toLocaleLowerCase()).length > 1) {
+        let edges = graphExplorer.data.edges.filter(ed => ed.to == e.id || ed.from == e.id);
+        let toedges = edges.filter(ed => ed.to == e.id);
+        let fromedges = edges.filter(ed => ed.from == e.id);
+        try {
+            if (toedges.length > 0) {
+                extralabel = " (" + toedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0].label + ")";
+            } else if (fromedges.length > 0) {
+                extralabel = " (" + fromedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0].label + ")";
+            }
+        } catch {
+            console.log(1);
+        }
+    }
+    return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
 }

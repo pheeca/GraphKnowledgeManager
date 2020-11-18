@@ -46,6 +46,10 @@
                         <a class="nav-link" id="customize-tab" data-toggle="tab" href="#customize" role="tab"
                             aria-controls="customize" aria-selected="false">Node Customize</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="advancedactions-tab" data-toggle="tab" href="#advancedActions" role="tab"
+                            aria-controls="advancedactions" aria-selected="false">Advance Actions</a>
+                    </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="proppanel" role="tabpanel"
@@ -94,6 +98,16 @@
                         Tags: <input data-role="tagsinput" id="tags" value=""><br><br>
                         <button type="button" class="btn btn-success"
                             onclick="EventBus.dispatch('customizeNode')">Update</button>
+                    </div>
+                    <div class="tab-pane fade" id="advancedactions" role="tabpanel" aria-labelledby="advancedactions-tab">
+                        <div class="form-group">
+                            <label for="advancedactions">Change Parent:</label>
+                            <select class="form-control fstdropdown-select" id="changeparent"></select>
+                            <input id="changeparentValue"  type="hidden"/>
+                        </div>
+                        <br><br>
+                        <button type="button" class="btn btn-success"
+                            onclick="EventBus.dispatch('advancedactions')">Update</button>
                     </div>
                 </div>
             </div>
