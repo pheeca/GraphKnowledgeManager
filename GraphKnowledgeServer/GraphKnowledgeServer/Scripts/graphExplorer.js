@@ -84,9 +84,9 @@ EventBus.addEventListener('readEdge', function (e) {
     let siblingNodeIds = siblingNodes.map(e => e.id);
     let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
 
-    $("#EdgeValue").autocomplete({
-        source: edgeValueHelper
-    });
+    // $("#EdgeValue").autocomplete({
+    //     source: edgeValueHelper
+    // });
 });
 EventBus.addEventListener('addEdge', function (e) {
     if (!graphExplorer.data.currentEdge) {

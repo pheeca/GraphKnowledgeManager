@@ -4,11 +4,12 @@
 --optimization
 --versioning with db
 --when adding relation use searchable dropdown
---add tags support in customize tab
+--add tags support in customize tab (https://www.jqueryscript.net/form/Bootstrap-4-Tag-Input-Plugin-jQuery.html)
 --display only related nodes on selected node (optionally)
 --abiliy to search all nodes with certain tag
 --Move node (change parent)
-responsive
+--responsive
+convert to mobile (https://auth0.com/blog/converting-your-web-app-to-mobile/)
 notification engine:mobile alarm,mobile notification,email
 Link Far Nodes as single unit
 Ability to go to linked far nodes/linked neighbouring nodes
