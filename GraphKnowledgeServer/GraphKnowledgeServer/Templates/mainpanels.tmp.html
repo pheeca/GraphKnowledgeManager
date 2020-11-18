@@ -4,13 +4,13 @@
     </p>
     <div class="container-fluid" id="mainpanelgroup">
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-6 col-md-2">
                 <button type="button" class="btn btn-success"
                     onclick="EventBus.dispatch('saveGraph')">Save</button>
                 <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add
                     Node</button>
             </div>
-            <div class="col-sm-2 ">
+            <div class="col-sm-6 col-md-2">
 
                 <span class="fa fa-search form-control-feedback col-sm-1"></span>
                 <input type="text" id="searchtag" class="form-control  col-sm-5" placeholder="search tag">
@@ -101,13 +101,16 @@
                     </div>
                     <div class="tab-pane fade" id="advancedactions" role="tabpanel" aria-labelledby="advancedactions-tab">
                         <div class="form-group">
-                            <label for="advancedactions">Change Parent:</label>
+                            <label for="changeparent">Change Parent:</label>
                             <select class="form-control fstdropdown-select" id="changeparent"></select>
-                            <input id="changeparentValue"  type="hidden"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="linkNodes">Link Far Nodes:</label>
+                            <select class="form-control fstdropdown-select" id="linkNodes"></select>
                         </div>
                         <br><br>
-                        <button type="button" class="btn btn-success"
-                            onclick="EventBus.dispatch('advancedactions')">Update</button>
+                       <!-- <button type="button" class="btn btn-success"
+                            onclick="EventBus.dispatch('advancedactions')">Update</button>-->
                     </div>
                 </div>
             </div>

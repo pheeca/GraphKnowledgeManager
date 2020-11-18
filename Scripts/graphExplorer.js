@@ -447,18 +447,31 @@ function initialize(_rawData) {
 }
 function createOption(e, siblingNodes) {
     let extralabel = '';
-    if (siblingNodes.map(s => s.label).filter(s => s.toLowerCase() == e.label.toLocaleLowerCase()).length > 1) {
+    if (e && siblingNodes.map(s => s.label||'').filter(s => s.toLowerCase() == (e.label||'').toLocaleLowerCase()).length > 1) {
         let edges = graphExplorer.data.edges.filter(ed => ed.to == e.id || ed.from == e.id);
         let toedges = edges.filter(ed => ed.to == e.id);
         let fromedges = edges.filter(ed => ed.from == e.id);
+        
         try {
+            
             if (toedges.length > 0) {
-                extralabel = " (" + toedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0].label + ")";
+                let edgeNode =graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0];
+                if(edgeNode){
+                    extralabel = " (" + toedges[0].label + ' - ' + edgeNode.label + ")";
+                }else{
+                    console.log('missing node ',toedges[0]);
+                }
             } else if (fromedges.length > 0) {
-                extralabel = " (" + fromedges[0].label + ' - ' + graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0].label + ")";
+                let edgeNode =graphExplorer.data.nodes.filter(f => f.id == fromedges[0].from)[0];
+                if(edgeNode){
+                    extralabel = " (" + fromedges[0].label + ' - ' + edgeNode.label + ")";
+                }else{
+                    console.log('missing node ',fromedges[0]);
+                }
             }
-        } catch {
-            console.log(1);
+        } catch(e) {
+             console.log(e,siblingNodes.map(s => s.label));
+            console.log(toedges,fromedges,1);
         }
     }
     return `<option value="${e.id}" >${e.label}${extralabel}</option>`;

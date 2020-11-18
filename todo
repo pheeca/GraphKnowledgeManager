@@ -8,12 +8,13 @@
 --display only related nodes on selected node (optionally)
 --abiliy to search all nodes with certain tag
 --Move node (change parent)
+responsive
+notification engine:mobile alarm,mobile notification,email
 Link Far Nodes as single unit
 Ability to go to linked far nodes/linked neighbouring nodes
 --multi-user
 multi-tenancy
 --multi-graph
-notification engine:mobile alarm,mobile notification,email
 share graph/permission 
 
 
