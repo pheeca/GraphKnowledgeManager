@@ -110,6 +110,17 @@
                         <div class="form-group">
                             <label for="linkNodes">Link Far Nodes:</label>
                             <select class="form-control fstdropdown-select" id="linkNodes"></select>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Related Node</th>
+                                        <th scope="col">Context</th>
+                                        <th scope="col">id</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="linkNodesInfo"></tbody>
+                            </table>
                         </div>
                         <br><br>
                        <!-- <button type="button" class="btn btn-success"
@@ -118,7 +129,7 @@
                 </div>
             </div>
             <div class="col-sm-12 col-md-3" id="generalpanel">
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('closeNode')">Back</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('closeNode')">Go to Parent</button>
             </div>
         </div>
     </div>

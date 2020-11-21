@@ -6,9 +6,10 @@ graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
     searchtag: '#searchtag',
     tagContextGlobal: '#tagContextGlobal',
-    changeparent:'#changeparent',
-    modal:{
-        property:'#myModal'
+    changeparent: '#changeparent',
+    linkNodes: '#linkNodes',
+    modal: {
+        property: '#myModal'
     }
 };
 
@@ -41,9 +42,38 @@ EventBus.addEventListener('refreshPanel', function () {
         EventBus.dispatch('refreshPanelProps', localProps);
         EventBus.dispatch('refreshPanelGraphEditor');
         EventBus.dispatch('refreshPanelCustomize');
+        EventBus.dispatch('refreshPanelAdvanceAction');
     } else {
         $('#generalpanel').show();
     }
+});
+
+EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
+    var _node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
+    //for async, taking over half second on 1k nodes
+    var optionNodes = graphExplorer.data.nodes;
+    var _html = `<option>Select</option>` + optionNodes.map(e => createOption(e)).reduce((a, b) => a + b, '');
+    $(graphExplorer.graphConfig.changeparent).html(_html);
+    $(graphExplorer.graphConfig.changeparent).val(_node.parentId);
+    document.querySelector(graphExplorer.graphConfig.changeparent).fstdropdown.rebind();
+    $(graphExplorer.graphConfig.linkNodes).html(_html);
+    var linkedNodes = optionNodes.filter(o => o.nodeUnit == _node.nodeUnit && _node.nodeUnit && o.id != graphExplorer.data.selectedNode);
+    var linkedNodesid = linkedNodes.map(e => e.id)[0] || '';
+    $(graphExplorer.graphConfig.linkNodes).val(linkedNodesid);
+    document.querySelector(graphExplorer.graphConfig.linkNodes).fstdropdown.rebind();
+    $('#linkNodesInfo').html('');
+    if (linkedNodes.length > 0) {
+        linkedNodes.forEach(function (_linkedNode) {
+            var parent = optionNodes.filter(f=>f.id==_linkedNode.parentId)[0]||{};
+            $('#linkNodesInfo').append(`<tr data-id='${JSON.stringify(_linkedNode)}'>
+                <td>${_linkedNode.label || ''}</td>
+                <td>${parent.label || ''}</td>
+                <td>${_linkedNode.nodeUnit || ''}</td>
+                <td> <button type="button" class="btn btn-warning" onclick=EventBus.dispatch("redirectNode",'${JSON.stringify(_linkedNode)}')>Redirect</button></td>
+              </tr>`);
+        });
+    }
+
 });
 
 EventBus.addEventListener('refreshPanelCustomize', function (params) {
@@ -81,7 +111,7 @@ EventBus.addEventListener('readEdge', function (e) {
         graphExplorer.data.currentEdge = e.target.currentTarget;
     }
     var siblingNodes = graphExplorer.data.nodes.filter(f => f.id != graphExplorer.data.selectedNode && f.id != graphExplorer.data.selectedNode && (f.parentId || 0) == (graphExplorer.data.parentNode || 0));
-    $('#Edge').html(siblingNodes.map(e => createOption(e, siblingNodes)).reduce((a, b) => a + b, ''));
+    $('#Edge').html(siblingNodes.map(e => createOptionToSiblings(e, siblingNodes)).reduce((a, b) => a + b, ''));
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
     document.querySelector("#Edge").fstdropdown.rebind();
@@ -165,11 +195,11 @@ EventBus.addEventListener('readPropperty', function (e) {
     graphExplorer.data.currentProperty = e.target.currentTarget;
 });
 EventBus.addEventListener('addPropperty', function () {
-    
+
     var props = [];
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.selectedNode == graphExplorer.data.nodes[i].id) {
-            
+
             props = graphExplorer.data.nodes[i].Properties || [];
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
@@ -187,7 +217,7 @@ EventBus.addEventListener('addPropperty', function () {
     }
     EventBus.dispatch('refreshPanelProps', props);
     $(graphExplorer.graphConfig.modal.property).modal('hide');
-    $(graphExplorer.graphConfig.modal.property+' input').val('');
+    $(graphExplorer.graphConfig.modal.property + ' input').val('');
     graphExplorer.data.currentProperty = null;
 });
 EventBus.addEventListener('openNode', function () {
@@ -315,20 +345,36 @@ var graphHash = null;
 
 EventBus.addEventListener('changeparent', function (params) {
 
-    var parentId =parseInt($(graphExplorer.graphConfig.changeparent).val());
-    
-    graphExplorer.data.nodes.forEach(function(item){
-        if(item.id==graphExplorer.data.selectedNode){
-            if(item.parentId){
-                item.parentId=parentId;
+    var parentId = parseInt($(graphExplorer.graphConfig.changeparent).val());
+
+    graphExplorer.data.nodes.forEach(function (item) {
+        if (item.id == graphExplorer.data.selectedNode) {
+            if (item.parentId) {
+                item.parentId = parentId;
                 EventBus.dispatch("deselectNode");
                 EventBus.dispatch('graphUpdated');
-            }else{
+            } else {
                 alert('parent can not change of root nodes')
             }
         }
     });
 });
+EventBus.addEventListener('linkNode', function (params) {
+    var item = graphExplorer.data.nodes.filter(item => item.id == graphExplorer.data.selectedNode)[0];
+    var linkId = parseInt($(graphExplorer.graphConfig.linkNodes).val());
+    var linkedNode = graphExplorer.data.nodes.filter(e => e.id == linkId)[0];
+    var expectedNodeUnit = (linkedNode||{}).nodeUnit || item.nodeUnit || uuidv4();
+    graphExplorer.data.nodes.forEach(function(_node){
+        if(!linkedNode && _node.id==item.id){
+            _node.nodeUnit = null;
+        }
+        if(linkedNode && (_node.nodeUnit && (_node.nodeUnit==linkedNode.nodeUnit || _node.nodeUnit==item.nodeUnit)) || _node.id==item.id || _node.id==linkId){
+            _node.nodeUnit=expectedNodeUnit;
+        }
+    });
+    EventBus.dispatch('refreshPanelAdvanceAction');
+});
+
 EventBus.addEventListener('graphUpdated', function (params) {
 
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
@@ -336,11 +382,8 @@ EventBus.addEventListener('graphUpdated', function (params) {
     _data.nodes = new vis.DataSet(_tempNodes);
     _data.edges = new vis.DataSet(_data.edges.filter(e => _tempNodes.map(_d => _d.id).indexOf(e.from) != -1 && _tempNodes.map(_d => _d.id).indexOf(e.to) != -1));
     let currentHash = null;
-    var siblingNodes = graphExplorer.data.nodes;
-    var _html = siblingNodes.map(e => createOption(e, siblingNodes)).reduce((a, b) => a + b, '');
-    $(graphExplorer.graphConfig.changeparent).html(_html);
-    document.querySelector(graphExplorer.graphConfig.changeparent).fstdropdown.rebind();
-    
+
+
     if (!graphExplorer.network) {
         graphExplorer.network = new vis.Network(graphExplorer.container, _data, graphExplorer.options);
 
@@ -390,8 +433,9 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
     $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal).on('change', (e) => EventBus.dispatch('graphUpdated', e));
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
-    $('#changeparent').on('change',(e) =>  EventBus.dispatch('changeparent'))
-
+    $(graphExplorer.graphConfig.changeparent).on('change', (e) => EventBus.dispatch('changeparent'));
+    $(graphExplorer.graphConfig.linkNodes).on('change', (e) => EventBus.dispatch('linkNode'));
+    
     // $('#customize input').on('change',(e) => {
     //     if($('#customizecolor').val()){
     //         EventBus.dispatch('customizeNode')
@@ -399,6 +443,13 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
 
     // });
 });
+EventBus.addEventListener('redirectNode', function (params) {
+    
+    graphExplorer.data.parentNode =JSON.parse(params.target).parentId||null;
+    graphExplorer.data.selectedNode =JSON.parse(params.target).id;
+    EventBus.dispatch('graphUpdated');
+});
+
 
 function uuidv4() {
     return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
@@ -425,12 +476,12 @@ function initialize(_rawData) {
 
     if (!_rawData) {
 
-        
-         // create an array with nodeUnit
-         var nodeUnits = [uuidv4()];
+
+        // create an array with nodeUnit
+        var nodeUnits = [uuidv4()];
 
         var nodes = [
-            { id: 1, label: 'Node 1', "color": graphExplorer.graphConfig.defaultNodeColor, tags: ['a', 'b'],  nodeUnit:nodeUnits[0] },
+            { id: 1, label: 'Node 1', "color": graphExplorer.graphConfig.defaultNodeColor, tags: ['a', 'b'], nodeUnit: nodeUnits[0] },
             { id: 2, label: 'Node 2' },
             { id: 3, label: 'Node 3' },
             { id: 4, label: 'Node 4', color: '#7BE141' },
@@ -459,40 +510,53 @@ function initialize(_rawData) {
     graphExplorer.data = _rawData;
     EventBus.dispatch("graphUpdated");
 }
-function createOption(e, siblingNodes) {
+function createOptionToSiblings(e, siblingNodes) {
     let extralabel = '';
-    if (e && siblingNodes.map(s => s.label||'').filter(s => s.toLowerCase() == (e.label||'').toLocaleLowerCase()).length > 1) {
+    if (e && siblingNodes.map(s => s.label || '').filter(s => s.toLowerCase() == (e.label || '').toLocaleLowerCase()).length > 1) {
         let edges = graphExplorer.data.edges.filter(ed => ed.to == e.id || ed.from == e.id);
         let toedges = edges.filter(ed => ed.to == e.id);
         let fromedges = edges.filter(ed => ed.from == e.id);
-        
+
         try {
-            
+
             if (toedges.length > 0) {
-                let edgeNode =graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0];
-                if(edgeNode){
+                let edgeNode = graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0];
+                if (edgeNode) {
                     extralabel = " (" + toedges[0].label + ' - ' + edgeNode.label + ")";
-                }else{
-                    console.log('missing node ',toedges[0]);
+                } else {
+                    console.log('missing node ', toedges[0]);
                 }
             } else if (fromedges.length > 0) {
-                let edgeNode =graphExplorer.data.nodes.filter(f => f.id == fromedges[0].from)[0];
-                if(edgeNode){
+                let edgeNode = graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0];
+                if (edgeNode) {
                     extralabel = " (" + fromedges[0].label + ' - ' + edgeNode.label + ")";
-                }else{
-                    console.log('missing node ',fromedges[0]);
+                } else {
+                    console.log('missing node ', fromedges[0]);
                 }
             }
-        } catch(e) {
-             console.log(e,siblingNodes.map(s => s.label));
-            console.log(toedges,fromedges,1);
+        } catch (e) {
+            console.log(e, siblingNodes.map(s => s.label));
+            console.log(toedges, fromedges, 1);
         }
     }
     return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
 }
 
+function createOption(e) {
+    let extralabel = '';
+    if (e && e.id) {
+        try {
+            let edgeNode = graphExplorer.data.nodes.filter(f => f.id == e.parentId)[0];
+            if (edgeNode) {
+                extralabel = " (" + edgeNode.label +(edgeNode.nodeUnit? (' - ' + edgeNode.nodeUnit):'') + ")";
+            } 
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
+}
 $(graphExplorer.graphConfig.modal.property).on('hidden.bs.modal', function () {
-   
-    graphExplorer.data.currentProperty=null;
+    graphExplorer.data.currentProperty = null;
     EventBus.dispatch('refreshPanel');
 });
