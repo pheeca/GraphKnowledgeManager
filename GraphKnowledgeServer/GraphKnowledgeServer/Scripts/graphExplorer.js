@@ -6,7 +6,10 @@ graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
     searchtag: '#searchtag',
     tagContextGlobal: '#tagContextGlobal',
-    changeparent:'#changeparent'
+    changeparent:'#changeparent',
+    modal:{
+        property:'#myModal'
+    }
 };
 
 EventBus.addEventListener('selectNode', function (params) {
@@ -19,6 +22,7 @@ EventBus.addEventListener('selectNode', function (params) {
 });
 EventBus.addEventListener('deselectNode', function () {
     graphExplorer.data.selectedNode = null;
+    graphExplorer.data.currentProperty = null;
     if (graphExplorer.onlyNeighbour) {
         setTimeout(() => {
             if (!graphExplorer.data.selectedNode) {
@@ -81,8 +85,8 @@ EventBus.addEventListener('readEdge', function (e) {
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
     document.querySelector("#Edge").fstdropdown.rebind();
-    let siblingNodeIds = siblingNodes.map(e => e.id);
-    let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
+    //let siblingNodeIds = siblingNodes.map(e => e.id);
+    //let edgeValueHelper = graphExplorer.data.edges.filter(e => siblingNodeIds.indexOf(e.from) > -1 || siblingNodeIds.indexOf(e.to) > -1).map(e => e.label).filter((v, i, a) => a.indexOf(v) === i);
 
     // $("#EdgeValue").autocomplete({
     //     source: edgeValueHelper
@@ -157,13 +161,15 @@ EventBus.addEventListener('readPropperty', function (e) {
     $('#Property').val($(e.target.currentTarget).find('td').eq(0).text());
     $('#Value').val($(e.target.currentTarget).find('td').eq(1).text());
     $('#Date').val($(e.target.currentTarget).find('td').eq(2).text());
-    $('#myModal').modal("show");
+    $(graphExplorer.graphConfig.modal.property).modal("show");
     graphExplorer.data.currentProperty = e.target.currentTarget;
 });
 EventBus.addEventListener('addPropperty', function () {
+    
     var props = [];
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.selectedNode == graphExplorer.data.nodes[i].id) {
+            
             props = graphExplorer.data.nodes[i].Properties || [];
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
@@ -180,8 +186,8 @@ EventBus.addEventListener('addPropperty', function () {
         }
     }
     EventBus.dispatch('refreshPanelProps', props);
-    $('#myModal').modal('hide');
-    $('#myModal input').val('');
+    $(graphExplorer.graphConfig.modal.property).modal('hide');
+    $(graphExplorer.graphConfig.modal.property+' input').val('');
     graphExplorer.data.currentProperty = null;
 });
 EventBus.addEventListener('openNode', function () {
@@ -418,8 +424,13 @@ function initialize(_rawData) {
     //var _rawData = localStorage.getItem('graphExplorer.data');
 
     if (!_rawData) {
+
+        
+         // create an array with nodeUnit
+         var nodeUnits = [uuidv4()];
+
         var nodes = [
-            { id: 1, label: 'Node 1', "color": graphExplorer.graphConfig.defaultNodeColor, tags: ['a', 'b'] },
+            { id: 1, label: 'Node 1', "color": graphExplorer.graphConfig.defaultNodeColor, tags: ['a', 'b'],  nodeUnit:nodeUnits[0] },
             { id: 2, label: 'Node 2' },
             { id: 3, label: 'Node 3' },
             { id: 4, label: 'Node 4', color: '#7BE141' },
@@ -435,9 +446,12 @@ function initialize(_rawData) {
             { id: uuidv4(), from: 2, to: 5 },
             { id: uuidv4(), from: 3, to: 3 }
         ];
+
+
         _rawData = {
             nodes: nodes,
-            edges: edges
+            edges: edges,
+            nodeUnits: nodeUnits
         };
     } else {
         _rawData = JSON.parse(_rawData);
@@ -476,3 +490,9 @@ function createOption(e, siblingNodes) {
     }
     return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
 }
+
+$(graphExplorer.graphConfig.modal.property).on('hidden.bs.modal', function () {
+   
+    graphExplorer.data.currentProperty=null;
+    EventBus.dispatch('refreshPanel');
+});
