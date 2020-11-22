@@ -67,7 +67,7 @@ EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
 EventBus.addEventListener('App.UI.Login.schemaSelect', function (params) {
     if(params.target){
         sessionStorage.setItem("UserSchemaId", params.target);
-        EventBus.dispatch('App.Redirect',"/");
+        EventBus.dispatch('App.Redirect',AppConfig.GraphUrl);
     }
 });
 

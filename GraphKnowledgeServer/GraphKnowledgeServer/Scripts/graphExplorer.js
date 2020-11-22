@@ -64,7 +64,7 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     $('#linkNodesInfo').html('');
     if (linkedNodes.length > 0) {
         linkedNodes.forEach(function (_linkedNode) {
-            var parent = optionNodes.filter(f=>f.id==_linkedNode.parentId)[0]||{};
+            var parent = optionNodes.filter(f => f.id == _linkedNode.parentId)[0] || {};
             $('#linkNodesInfo').append(`<tr data-id='${JSON.stringify(_linkedNode)}'>
                 <td>${_linkedNode.label || ''}</td>
                 <td>${parent.label || ''}</td>
@@ -73,6 +73,10 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
               </tr>`);
         });
     }
+    var linkUrl = location.origin + '/#' + AppConfig.GraphUrl + '/' + sessionStorage.getItem("UserSchemaId") + '/' + graphExplorer.data.selectedNode;
+    linkUrl += '/' + window.btoa(linkUrl);
+    $('#sharelink').val(linkUrl);
+
 
 });
 
@@ -226,8 +230,10 @@ EventBus.addEventListener('openNode', function () {
     EventBus.dispatch('graphUpdated');
 });
 EventBus.addEventListener('closeNode', function () {
-    if (graphExplorer.data.parentNode) {
+    var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
+    if (graphExplorer.data.parentNode && routeParams.NodeId != graphExplorer.data.parentNode) {
         graphExplorer.data.parentNode = ((graphExplorer.data.nodes.filter(e => e.id == graphExplorer.data.parentNode)[0] || {}).parentId || null);
+
         EventBus.dispatch('graphUpdated');
     }
 });
@@ -269,32 +275,37 @@ EventBus.addEventListener('saveGraph', function () {
         localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
         $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
     } else {
-        $.ajax({
-            url: graphExplorer.url,
-            type: 'POST',
-            data: "=" + JSON.stringify(graphExplorer.data),
-            success: function (data) {
-                //do something
-                if (data) {
-                    $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
+        if (!routeParams.UserSchemaId || window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) == routeParams.key) {
+            $.ajax({
+                url: graphExplorer.url,
+                type: 'POST',
+                data: "=" + JSON.stringify(graphExplorer.data),
+                success: function (data) {
+                    //do something
+                    if (data) {
+                        $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     // 
     console.log('saveGraph Event:called');
 });
 
 EventBus.addEventListener('loadGraph', function (params) {
-    console.log('loadGraph Event:', params);
+    var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
+    console.log('loadGraph Event:', params, routeParams);
     if (graphExplorer.isOffline) {
         initialize(localStorage.getItem('graphExplorer.data'));
     } else {
-        $.ajax({
-            url: graphExplorer.url,
-            type: 'GET',
-            success: initialize
-        });
+        if (!routeParams.UserSchemaId || window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) == routeParams.key) {
+            $.ajax({
+                url: graphExplorer.url,
+                type: 'GET',
+                success: initialize
+            });
+        }
     }
 });
 function getCurrentNodes(_data) {
@@ -363,13 +374,13 @@ EventBus.addEventListener('linkNode', function (params) {
     var item = graphExplorer.data.nodes.filter(item => item.id == graphExplorer.data.selectedNode)[0];
     var linkId = parseInt($(graphExplorer.graphConfig.linkNodes).val());
     var linkedNode = graphExplorer.data.nodes.filter(e => e.id == linkId)[0];
-    var expectedNodeUnit = (linkedNode||{}).nodeUnit || item.nodeUnit || uuidv4();
-    graphExplorer.data.nodes.forEach(function(_node){
-        if(!linkedNode && _node.id==item.id){
+    var expectedNodeUnit = (linkedNode || {}).nodeUnit || item.nodeUnit || uuidv4();
+    graphExplorer.data.nodes.forEach(function (_node) {
+        if (!linkedNode && _node.id == item.id) {
             _node.nodeUnit = null;
         }
-        if(linkedNode && (_node.nodeUnit && (_node.nodeUnit==linkedNode.nodeUnit || _node.nodeUnit==item.nodeUnit)) || _node.id==item.id || _node.id==linkId){
-            _node.nodeUnit=expectedNodeUnit;
+        if (linkedNode && (_node.nodeUnit && (_node.nodeUnit == linkedNode.nodeUnit || _node.nodeUnit == item.nodeUnit)) || _node.id == item.id || _node.id == linkId) {
+            _node.nodeUnit = expectedNodeUnit;
         }
     });
     EventBus.dispatch('refreshPanelAdvanceAction');
@@ -420,8 +431,9 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     setFstDropdown();
     graphExplorer.isOffline = false;
     var UserSchemaId = sessionStorage.getItem("UserSchemaId");
+    var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
 
-    if (!UserSchemaId) {
+    if (!UserSchemaId || (routeParams.UserSchemaId && window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) != routeParams.key)) {
         EventBus.dispatch('App.Redirect', "/login");
         return;
     }
@@ -435,7 +447,27 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
     $(graphExplorer.graphConfig.changeparent).on('change', (e) => EventBus.dispatch('changeparent'));
     $(graphExplorer.graphConfig.linkNodes).on('change', (e) => EventBus.dispatch('linkNode'));
-    
+    $('#sharelinkbtn').on('click', function () {
+        $('#sharelink').select();
+        document.execCommand("copy");
+        $('#sharelinkbtn').tooltip({
+            trigger: 'click',
+            placement: 'bottom'
+        });
+        setTooltip('Copied!');
+        setTimeout(hideTooltip, 1000);
+        function setTooltip(message) {
+            $('#sharelinkbtn').tooltip('hide')
+                .attr('data-original-title', message)
+                .tooltip('show');
+        }
+
+        function hideTooltip() {
+            setTimeout(function () {
+                $('#sharelinkbtn').tooltip('hide');
+            }, 1000);
+        }
+    })
     // $('#customize input').on('change',(e) => {
     //     if($('#customizecolor').val()){
     //         EventBus.dispatch('customizeNode')
@@ -444,9 +476,9 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     // });
 });
 EventBus.addEventListener('redirectNode', function (params) {
-    
-    graphExplorer.data.parentNode =JSON.parse(params.target).parentId||null;
-    graphExplorer.data.selectedNode =JSON.parse(params.target).id;
+
+    graphExplorer.data.parentNode = JSON.parse(params.target).parentId || null;
+    graphExplorer.data.selectedNode = JSON.parse(params.target).id;
     EventBus.dispatch('graphUpdated');
 });
 
@@ -508,6 +540,8 @@ function initialize(_rawData) {
         _rawData = JSON.parse(_rawData);
     }
     graphExplorer.data = _rawData;
+    var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
+    graphExplorer.data.parentNode = routeParams.NodeId || graphExplorer.data.parentNode || null;
     EventBus.dispatch("graphUpdated");
 }
 function createOptionToSiblings(e, siblingNodes) {
@@ -548,8 +582,8 @@ function createOption(e) {
         try {
             let edgeNode = graphExplorer.data.nodes.filter(f => f.id == e.parentId)[0];
             if (edgeNode) {
-                extralabel = " (" + edgeNode.label +(edgeNode.nodeUnit? (' - ' + edgeNode.nodeUnit):'') + ")";
-            } 
+                extralabel = " (" + edgeNode.label + (e.nodeUnit ? ('|' + e.nodeUnit) : '') + ")";
+            }
         } catch (e) {
             console.log(e);
         }
