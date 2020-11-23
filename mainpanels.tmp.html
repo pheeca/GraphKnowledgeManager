@@ -1,12 +1,9 @@
-<div>
-    
+
     <div class="container-fluid" id="mainpanelgroup">
-        <div class="row">
-            <p id='updatemsg'>
+        <div class="row h-25">
+            <p id='updatemsg' class="col-sm-12">
                 Create a simple network with some nodes and edges.
             </p>
-        </div>
-        <div class="row">
             <div class="col-sm-6 col-md-2">
                 <button type="button" class="btn btn-success"
                     onclick="EventBus.dispatch('saveGraph')">Save</button>
@@ -22,7 +19,7 @@
                     <label class="custom-control-label" for="tagContextGlobal">Global</label>
                 </div>
             </div>
-            <div class="col-sm-12  col-sm-3">
+            <div class="col-sm-12  col-md-3">
                 <div class="custom-control custom-switch">
                     <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
                     <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
@@ -30,12 +27,12 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-sm-12 col-md-9">
+        <div class="row h-75 border">
+            <div class="col-sm-12 col-md-9  h-100">
 
                 <div id="mynetwork"></div>
             </div>
-            <div class="col-sm-12 col-md-3" id="panel">
+            <div class="col-sm-12 col-md-3 border" id="panel">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="proppanel-tab" data-toggle="tab" href="#proppanel" role="tab"
@@ -50,7 +47,7 @@
                             aria-controls="customize" aria-selected="false">Node Customize</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="advancedactions-tab" data-toggle="tab" href="#advancedActions" role="tab"
+                        <a class="nav-link" id="advancedactions-tab" data-toggle="tab" href="#advancedactions" role="tab"
                             aria-controls="advancedactions" aria-selected="false">Advance Actions</a>
                     </li>
                 </ul>
@@ -103,7 +100,8 @@
                             onclick="EventBus.dispatch('customizeNode')">Update</button>
                     </div>
                     <div class="tab-pane fade" id="advancedactions" role="tabpanel" aria-labelledby="advancedactions-tab">
-                        <div class="form-group">
+                      
+                       <div class="form-group">
                             <label for="changeparent">Change Parent:</label>
                             <select class="form-control fstdropdown-select" id="changeparent"></select>
                         </div>
@@ -127,8 +125,6 @@
                             <input id="sharelink" value="">
                         </div>
                         <br><br>
-                       <!-- <button type="button" class="btn btn-success"
-                            onclick="EventBus.dispatch('advancedactions')">Update</button>-->
                     </div>
                 </div>
             </div>
@@ -271,9 +267,12 @@
         
     #mynetwork {
         width: 100%;
-        height: 600px;
-        border: 1px solid lightgray;
+        /* height: 600px;
+        border: 1px solid lightgray; */
       }
 
-    </style>
-</div>
+    </style><script>
+        $(document).ready(function(){
+            $('#mynetwork').height(Math.floor(($(window).height()/100)*85));
+        })
+    </script>

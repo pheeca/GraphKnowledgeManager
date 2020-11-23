@@ -4,6 +4,8 @@
     [SchemaDesc]   NVARCHAR (200) NULL,
     [OwnerUserId]  INT            NULL,
     CONSTRAINT [PK_UserSchema] PRIMARY KEY CLUSTERED ([UserSchemaId] ASC),
-    CONSTRAINT [FK_UserSchema_Users] FOREIGN KEY ([UserSchemaId]) REFERENCES [dbo].[Users] ([UserId])
+    CONSTRAINT [FK_UserSchema_Users] FOREIGN KEY ([OwnerUserId]) REFERENCES [dbo].[Users] ([UserId])
 );
+
+
 

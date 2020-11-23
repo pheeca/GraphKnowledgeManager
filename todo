@@ -14,6 +14,7 @@ notification engine:mobile alarm,mobile notification,email
 --Link Far Nodes as single unit
 --Ability to go to linked far nodes/linked neighbouring nodes
 --multi-user
+--create user
 multi-tenancy
 --multi-graph
 --share graph

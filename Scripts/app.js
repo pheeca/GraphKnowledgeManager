@@ -7,21 +7,28 @@ var AppConfig = {
     mainpanelgroup: '#mainpanelgroup',
     pageSection: '#pageSection',
     isDev: _isDev,
-    domain: _isDev ? 'http://localhost:50090' : '',//server domain
-    loginUrl: 'Login',
-    GraphUrl: '/Graph'
+    domain: _isDev ? '' : '',//server domain (dev:'http://localhost:50090')
+    loginUrl: '/Login',
+    GraphUrl: '/Graph',
+    defaultUrl:'/Login'
 };
 var AppRoutes = [
-    { path: '/Graph/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: '/Graph', isAuthenticated: true, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: '/login', isAuthenticated: false, event: 'App.Route.Login', file: 'loginpanels.tmp.html' },
+    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
+    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
+    { path: AppConfig.loginUrl , isAuthenticated: false, event: 'App.Route.Login', file: 'loginpanels.tmp.html' },
 ];
 
 
 $(document).ready(() => {
     if (!window.location.hash) {
         // Fragment doesn't exist
-        window.location.hash = '/';
+        var userId = sessionStorage.getItem("UserId");
+        var userSchemaId = sessionStorage.getItem("UserSchemaId");
+        if(userId && userSchemaId){
+            window.location.hash = AppConfig.GraphUrl;
+        }else{
+            window.location.hash = AppConfig.defaultUrl;
+        }
     }
     EventBus.dispatch('App.UiChanged');
 
@@ -39,6 +46,7 @@ EventBus.addEventListener('App.Route.Login', function (params) {
 
 
 EventBus.addEventListener('App.UiChanged', function (params) {
+    
     $(AppConfig.pageSection).html('');
     var currentPath = window.location.hash.replace('#', '');
     var currentRoute;
@@ -76,7 +84,7 @@ EventBus.addEventListener('App.UiChanged', function (params) {
                     if (userId) {
                         isAllowed = true;
                     } else {
-                        window.location.hash = '/' + AppConfig.loginUrl;
+                        window.location.hash =  AppConfig.loginUrl;
                         EventBus.dispatch('App.UiChanged');
                     }
                 }

@@ -275,6 +275,7 @@ EventBus.addEventListener('saveGraph', function () {
         localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
         $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
     } else {
+        var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
         if (!routeParams.UserSchemaId || window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) == routeParams.key) {
             $.ajax({
                 url: graphExplorer.url,

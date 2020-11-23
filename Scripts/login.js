@@ -2,6 +2,7 @@ var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
 
 EventBus.removeEventListener("App.UI.Login");
+EventBus.removeEventListener("App.UI.CreateUser");
 EventBus.removeEventListener("App.UI.Login.LoadUserInfo");
 EventBus.removeEventListener("App.UI.Login.schemaSelect");
 EventBus.addEventListener('App.UI.Login', function (params) {
@@ -23,7 +24,6 @@ EventBus.addEventListener('App.UI.Login', function (params) {
             }
         },
         error: function (xhr, status) {
-            debugger
             console.log(xhr, status);
             alert("Sorry, there was a problem!");
         }
@@ -78,7 +78,7 @@ EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
     if(graphName){
         $.ajax({
             url: AppConfig.domain + '/api/UserSchema',
-            data: { 
+            data: {  
                 OwnerUserId:userId,
                 SchemaName:graphName, 
                 SchemaDesc:graphName},
@@ -97,4 +97,29 @@ EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
         });
     }
        
+});
+EventBus.addEventListener('App.UI.CreateUser', function (params) {
+    var email = $('#email').val();
+    var password = $('#password').val();
+    $.ajax({
+        url: AppConfig.domain + '/api/User',
+        type: "POST",
+        data: {
+            username: email,
+            password: password,
+        },
+        success: function (data) {
+            if (data) {
+                alert('success')
+                EventBus.dispatch('App.UI.Login');
+            }else{
+                alert('user already exists');
+            }
+        },
+        error: function (xhr, status) {
+            console.log(xhr, status);
+            alert("Sorry, there was a problem!");
+        }
+    });
+
 });
