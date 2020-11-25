@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GraphKnowledgeServer.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace GraphKnowledgeServer.Controllers
         }
 
         // POST api/values
-        public bool Post(int id,[FromBody]string value)
+        public bool Post(int id,[FromBody] SchemaStore value)
         {
             try
             {
@@ -39,7 +40,7 @@ namespace GraphKnowledgeServer.Controllers
                 ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
                 {
                      UserSchemaId=id,
-                    SchemaInfo = value,
+                    SchemaInfo = value.SchemaInfo,
                     CreationDate = DateTime.UtcNow
                 });
                 ctx.SaveChanges();

@@ -15,6 +15,11 @@ notification engine:mobile alarm,mobile notification,email
 --Ability to go to linked far nodes/linked neighbouring nodes
 --multi-user
 --create user
+--complex character hyper-link embeding support
+links support
+link files (how to upload files without storage limit restriction)
+undo, with active inactive clause
+node scale,title
 multi-tenancy
 --multi-graph
 --share graph

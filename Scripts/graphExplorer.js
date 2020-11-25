@@ -280,7 +280,9 @@ EventBus.addEventListener('saveGraph', function () {
             $.ajax({
                 url: graphExplorer.url,
                 type: 'POST',
-                data: "=" + JSON.stringify(graphExplorer.data),
+                data: {
+                    SchemaInfo:JSON.stringify(graphExplorer.data)
+                },
                 success: function (data) {
                     //do something
                     if (data) {
