@@ -65,12 +65,13 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     if (linkedNodes.length > 0) {
         linkedNodes.forEach(function (_linkedNode) {
             var parent = optionNodes.filter(f => f.id == _linkedNode.parentId)[0] || {};
-            $('#linkNodesInfo').append(`<tr data-id='${JSON.stringify(_linkedNode)}'>
-                <td>${_linkedNode.label || ''}</td>
-                <td>${parent.label || ''}</td>
-                <td>${_linkedNode.nodeUnit || ''}</td>
-                <td> <button type="button" class="btn btn-warning" onclick=EventBus.dispatch("redirectNode",'${JSON.stringify(_linkedNode)}')>Redirect</button></td>
-              </tr>`);
+            let linkedHtml =`<tr data-id='${JSON.stringify(_linkedNode)}'>
+            <td>${_linkedNode.label || ''}</td>
+            <td>${parent.label || ''}</td>
+            <td>${_linkedNode.nodeUnit || ''}</td>
+            <td> <button type="button" class="btn btn-warning" onclick='EventBus.dispatch("redirectNode",JSON.stringify(${JSON.stringify(_linkedNode)}))'>Redirect</button></td>
+          </tr>`;
+            $('#linkNodesInfo').append(linkedHtml);
         });
     }
     var linkUrl = location.origin + '/#' + AppConfig.GraphUrl + '/' + sessionStorage.getItem("UserSchemaId") + '/' + graphExplorer.data.selectedNode;

@@ -10,12 +10,13 @@ var AppConfig = {
     domain: _isDev ? '' : '',//server domain (dev:'http://localhost:50090')
     loginUrl: '/Login',
     GraphUrl: '/Graph',
-    defaultUrl:'/Login'
+    defaultUrl:'/Login',
+    title:'Graph Knowledge'
 };
 var AppRoutes = [
     { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: AppConfig.loginUrl , isAuthenticated: false, event: 'App.Route.Login', file: 'loginpanels.tmp.html' },
+    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'App.Route.Main', file: 'mainpanels.tmp.html', title:'Graph Explorer' },
+    { path: AppConfig.loginUrl , isAuthenticated: false, event: 'App.Route.Login', file: 'loginpanels.tmp.html' , title:'Login' },
 ];
 
 
@@ -90,6 +91,7 @@ EventBus.addEventListener('App.UiChanged', function (params) {
                 }
                 if (isAllowed) {
                     $(AppConfig.pageSection).html(s);
+                    $('title').text(`${currentRoute.title||AppConfig.title} | ${AppConfig.title}`);
                     EventBus.dispatch(currentRoute.event);
                 }
             },
