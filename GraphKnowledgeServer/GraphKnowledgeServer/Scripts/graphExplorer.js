@@ -1,6 +1,7 @@
 var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
+var utilities = utilities || {};
 
 graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
@@ -182,19 +183,22 @@ EventBus.addEventListener('refreshPanelProps', function (params) {
     params = params.target || [];
     $('#properties').html('');
     for (var i = 0; i < params.length; i++) {
+        let potentialUrl=(params[i].value||'').split('/');
+        potentialUrl=(potentialUrl.pop()||potentialUrl.pop()).split('?')[0];
+        potentialUrl=potentialUrl.replace(/_|-/g, " ");
         $('#properties').append(`<tr>
             <td>${params[i].key}</td>
-            <td>${params[i].value}</td>
+            <td data-val="${params[i].value}">${utilities.validateURL(params[i].value)?`<a  target="_blank" href="${params[i].value}">${potentialUrl}</a>`:params[i].value}</td>
             <td>${params[i].date}</td>
           </tr>`);
     }
 });
 EventBus.addEventListener('readPropperty', function (e) {
-    if (!e.target) {
+    if (!e.target || e.target.target.nodeName=='A') {
         return;
     }
     $('#Property').val($(e.target.currentTarget).find('td').eq(0).text());
-    $('#Value').val($(e.target.currentTarget).find('td').eq(1).text());
+    $('#Value').val($(e.target.currentTarget).find('td').eq(1).data('val'));
     $('#Date').val($(e.target.currentTarget).find('td').eq(2).text());
     $(graphExplorer.graphConfig.modal.property).modal("show");
     graphExplorer.data.currentProperty = e.target.currentTarget;
