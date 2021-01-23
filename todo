@@ -24,7 +24,7 @@ multi-tenancy
 --multi-graph
 --share graph
 share graph permission 
-
+concurrent user via locking nodes and edges
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1
@@ -32,3 +32,27 @@ https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide
 to analyze
 How to visualize information at run time
 how to automated data entry at run time
+
+
+to do?
+ keep track of important notes, documents, voice recordings and external system references (e.g whatsapp chat quote or gmail email)
+ add tasks (manual + automated)
+ add events and trigger engine 
+ turn property into bool/check list
+ sequencing(may be drag/drop) of properties
+ sequencing of nodes??
+ tags= tag name+value
+ calendar/schedular integration
+
+ declaration of processes???->notification(including absoltue start end,interval type,interval start end,interval delayed custom point)
+ schedular
+ reporter
+ prioritizer
+ information manipulator -  interface and non interface conventions that facilitate viewing, searching, and changing information
+
+representing graph into n-d tabular info
+
+
+
+ system?
+dynamic event placement engine+events+actions+information+process declaration+inferencing/estimating all these 
