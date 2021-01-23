@@ -286,7 +286,8 @@ EventBus.addEventListener('saveGraph', function () {
                 url: graphExplorer.url,
                 type: 'POST',
                 data: {
-                    SchemaInfo:JSON.stringify(graphExplorer.data)
+                    SchemaInfo:JSON.stringify(graphExplorer.data),
+                    ModifiedBy:sessionStorage.getItem("UserId")
                 },
                 success: function (data) {
                     //do something

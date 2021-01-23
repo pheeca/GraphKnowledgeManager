@@ -9,5 +9,6 @@ namespace GraphKnowledgeServer.Models
     {
         public int UserSchemaId { get; set; }
         public string SchemaInfo { get; set; }
+        public int ModifiedBy { get;  set; }
     }
 }

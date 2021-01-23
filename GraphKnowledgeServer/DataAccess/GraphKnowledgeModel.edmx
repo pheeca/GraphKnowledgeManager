@@ -13,6 +13,8 @@
           <Property Name="SchemaInfo" Type="nvarchar(max)" />
           <Property Name="CreationDate" Type="datetime" />
           <Property Name="UserSchemaId" Type="int" Nullable="false" />
+          <Property Name="ModifiedBy" Type="int" />
+          <Property Name="Status" Type="nvarchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -93,6 +95,8 @@
           <Property Name="SchemaInfo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CreationDate" Type="DateTime" Precision="3" />
           <Property Name="UserSchemaId" Type="Int32" Nullable="false" />
+          <Property Name="ModifiedBy" Type="Int32" />
+          <Property Name="Status" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="UserSchema" Relationship="GraphKnowledgeModel.FK_SchemaInformation_UserSchema" FromRole="SchemaInformation" ToRole="UserSchema" />
         </EntityType>
         <EntityType Name="User">
@@ -148,6 +152,8 @@
           <EntitySetMapping Name="SchemaInformations">
             <EntityTypeMapping TypeName="GraphKnowledgeModel.SchemaInformation">
               <MappingFragment StoreEntitySet="SchemaInformation">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
                 <ScalarProperty Name="UserSchemaId" ColumnName="UserSchemaId" />
                 <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
                 <ScalarProperty Name="SchemaInfo" ColumnName="SchemaInfo" />

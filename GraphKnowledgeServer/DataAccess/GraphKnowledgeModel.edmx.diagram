@@ -6,8 +6,8 @@
     <edmx:Diagrams>
       <Diagram DiagramId="7da9dab7cfa04812ba8663a497f35184" Name="Diagram1" >
         <EntityTypeShape EntityType="GraphKnowledgeModel.SchemaInformation" Width="1.5" PointX="5.25" PointY="1" />
-        <EntityTypeShape EntityType="GraphKnowledgeModel.User" Width="1.5" PointX="0.75" PointY="1.125" />
-        <EntityTypeShape EntityType="GraphKnowledgeModel.UserSchema" Width="1.5" PointX="3" PointY="0.875" />
+        <EntityTypeShape EntityType="GraphKnowledgeModel.User" Width="1.5" PointX="0.75" PointY="1.25" />
+        <EntityTypeShape EntityType="GraphKnowledgeModel.UserSchema" Width="1.5" PointX="3" PointY="1" />
         <AssociationConnector Association="GraphKnowledgeModel.FK_SchemaInformation_UserSchema" />
         <AssociationConnector Association="GraphKnowledgeModel.FK_UserSchema_Users" />
       </Diagram>

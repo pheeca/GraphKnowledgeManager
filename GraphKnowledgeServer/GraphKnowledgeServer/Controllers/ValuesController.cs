@@ -39,9 +39,11 @@ namespace GraphKnowledgeServer.Controllers
                 var ctx = new DataAccess.GraphKnowledgeEntities();
                 ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
                 {
-                     UserSchemaId=id,
+                    UserSchemaId = id,
                     SchemaInfo = value.SchemaInfo,
-                    CreationDate = DateTime.UtcNow
+                    CreationDate = DateTime.UtcNow,
+                    ModifiedBy = value.ModifiedBy,
+                    Status = Constants.Active
                 });
                 ctx.SaveChanges();
                 //if (!File.Exists(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json")))
