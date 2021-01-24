@@ -2,6 +2,7 @@ var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
 var utilities = utilities || {};
+graphExplorer.ctx = graphExplorer.ctx || {};
 
 graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
@@ -598,6 +599,37 @@ function initialize(_rawData) {
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
     graphExplorer.data.parentNode = routeParams.NodeId || graphExplorer.data.parentNode || null;
     EventBus.dispatch("graphUpdated");
+}
+
+EventBus.removeEventListener('Undo');
+EventBus.addEventListener('Undo',()=>graphExplorer.ctx.History('Undo'));
+
+EventBus.removeEventListener('Redo');
+EventBus.addEventListener('Redo',()=>graphExplorer.ctx.History('Redo'));
+
+graphExplorer.ctx.History =function(mode) {
+    $.ajax({
+        url: graphExplorer.url + "?mode="+mode,
+        type: 'PUT',
+        data: {
+            ModifiedBy: sessionStorage.getItem("UserId")
+        },
+        success: function (_rawData) {
+            //do something
+            if (_rawData) {
+                try{
+
+                    graphExplorer.data = JSON.parse(_rawData);
+                    EventBus.dispatch("graphUpdated");
+                    $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
+
+                }catch(e){
+                    console.log(e,_rawData);
+                    alert(_rawData);
+                }
+            }
+        }
+    });
 }
 function createOptionToSiblings(e, siblingNodes) {
     let extralabel = '';

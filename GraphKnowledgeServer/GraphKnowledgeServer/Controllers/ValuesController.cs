@@ -26,18 +26,18 @@ namespace GraphKnowledgeServer.Controllers
         public string Get(int id)
         {
             var ctx = new DataAccess.GraphKnowledgeEntities();
-            return ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status==Constants.Active)
+            return ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.Active)
                       .OrderByDescending(p => p.CreationDate)
                       .FirstOrDefault()?.SchemaInfo;
         }
 
         // POST api/values
-        public bool Post(int id,[FromBody] SchemaStore value)
+        public bool Post(int id, [FromBody] SchemaStore value)
         {
             try
             {
                 var ctx = new DataAccess.GraphKnowledgeEntities();
-                ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
+                var schemaInfo = ctx.SchemaInformations.Add(new DataAccess.SchemaInformation
                 {
                     UserSchemaId = id,
                     SchemaInfo = value.SchemaInfo,
@@ -45,6 +45,13 @@ namespace GraphKnowledgeServer.Controllers
                     ModifiedBy = value.ModifiedBy,
                     Status = Constants.Active
                 });
+                var schemaInfoChanges = ctx.SaveChanges();
+                var informations = ctx.SchemaInformations
+                    .Where(f => f.UserSchemaId == id && f.Status == Constants.Active && schemaInfo.Id != f.Id).ToList();
+                foreach (var information in informations)
+                {
+                    information.Status = Constants.InActive;
+                }
                 ctx.SaveChanges();
                 //if (!File.Exists(System.Web.HttpContext.Current.Server.MapPath($"~/Content/graph{DateTime.Now.ToString("yyyyMMdd")}.json")))
                 //{
@@ -60,8 +67,55 @@ namespace GraphKnowledgeServer.Controllers
         }
 
         // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
+        public string Put(int id, string mode, [FromBody] SchemaStore value)
         {
+            try
+            {
+                var ctx = new DataAccess.GraphKnowledgeEntities();
+                if (mode?.ToLowerInvariant() == "undo")
+                {
+                    var SchemaInformationFrom = ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.Active)
+                          .OrderByDescending(p => p.CreationDate)
+                          .FirstOrDefault();
+                    var SchemaInformationTo = ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.InActive
+                    && f.Id < SchemaInformationFrom.Id)
+                          .OrderByDescending(p => p.CreationDate)
+                          .FirstOrDefault();
+                    if (SchemaInformationFrom==null || SchemaInformationTo==null)
+                    {
+                        return "Data Missing";
+                    }
+                    SchemaInformationFrom.Status = Constants.InActive;
+                    SchemaInformationTo.Status = Constants.Active;
+                    ctx.SaveChanges();
+                    return SchemaInformationTo.SchemaInfo;
+                }
+                else if (mode?.ToLowerInvariant() == "redo")
+                {
+
+                    var SchemaInformationFrom = ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.Active)
+                          .OrderByDescending(p => p.CreationDate)
+                          .FirstOrDefault();
+
+                    var SchemaInformationTo = ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.InActive
+                    && f.Id > SchemaInformationFrom.Id).OrderByDescending(p => p.CreationDate)
+                          .FirstOrDefault();
+
+                    if (SchemaInformationFrom == null || SchemaInformationTo == null)
+                    {
+                        return "Data Missing";
+                    }
+                    SchemaInformationFrom.Status = Constants.InActive;
+                    SchemaInformationTo.Status = Constants.Active;
+                    ctx.SaveChanges();
+                    return SchemaInformationTo.SchemaInfo;
+                }
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+            return string.Empty;
         }
 
         // DELETE api/values/5

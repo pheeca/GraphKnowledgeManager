@@ -18,7 +18,7 @@ notification engine:mobile alarm,mobile notification,email
 --complex character hyper-link embeding support
 --links support
 link files (how to upload files without storage limit restriction)
-undo, with active inactive clause
+undo,redo with active inactive clause
 node scale,title
 multi-tenancy
 --multi-graph

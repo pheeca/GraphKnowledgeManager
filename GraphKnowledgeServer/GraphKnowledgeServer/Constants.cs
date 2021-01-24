@@ -8,5 +8,6 @@ namespace GraphKnowledgeServer
     public class Constants
     {
         public static string Active { get { return "Active"; } }
+        public static string InActive { get { return "InActive"; } }
     }
 }
