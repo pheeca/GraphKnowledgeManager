@@ -5,6 +5,9 @@ EventBus.removeEventListener("App.UI.Login");
 EventBus.removeEventListener("App.UI.CreateUser");
 EventBus.removeEventListener("App.UI.Login.LoadUserInfo");
 EventBus.removeEventListener("App.UI.Login.schemaSelect");
+
+
+
 EventBus.addEventListener('App.UI.Login', function (params) {
     var email = $('#email').val();
     var password = $('#password').val();
@@ -81,7 +84,8 @@ EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
             data: {  
                 OwnerUserId:userId,
                 SchemaName:graphName, 
-                SchemaDesc:graphName},
+                SchemaDesc:graphName
+            },
             type: "POST",
             success: function (data) {
                 if(data){

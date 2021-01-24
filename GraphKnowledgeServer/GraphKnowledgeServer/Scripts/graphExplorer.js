@@ -14,6 +14,7 @@ graphExplorer.graphConfig = {
     }
 };
 
+EventBus.removeEventListener('selectNode');
 EventBus.addEventListener('selectNode', function (params) {
     graphExplorer.data.selectedNode = params.target.nodes[0] || null;
     if (graphExplorer.onlyNeighbour) {
@@ -22,6 +23,8 @@ EventBus.addEventListener('selectNode', function (params) {
     }
     EventBus.dispatch('refreshPanel');
 });
+
+EventBus.removeEventListener('deselectNode');
 EventBus.addEventListener('deselectNode', function () {
     graphExplorer.data.selectedNode = null;
     graphExplorer.data.currentProperty = null;
@@ -35,6 +38,8 @@ EventBus.addEventListener('deselectNode', function () {
         EventBus.dispatch('refreshPanel');
     }
 });
+
+EventBus.removeEventListener('refreshPanel');
 EventBus.addEventListener('refreshPanel', function () {
     $('#panel,#generalpanel').hide();
     if (graphExplorer.data.selectedNode) {
@@ -49,6 +54,7 @@ EventBus.addEventListener('refreshPanel', function () {
     }
 });
 
+EventBus.removeEventListener('refreshPanelAdvanceAction');
 EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     var _node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
     //for async, taking over half second on 1k nodes
@@ -82,6 +88,7 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
 
 });
 
+EventBus.removeEventListener('refreshPanelCustomize');
 EventBus.addEventListener('refreshPanelCustomize', function (params) {
     var node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
     //Reference:https://www.jqueryscript.net/form/Bootstrap-4-Tag-Input-Plugin-jQuery.html
@@ -90,6 +97,8 @@ EventBus.addEventListener('refreshPanelCustomize', function (params) {
     tagsTextbox.add((node.tags || []).toString());
     $('#customizecolor').val(node.color || graphExplorer.graphConfig.defaultNodeColor);
 });
+
+EventBus.removeEventListener('refreshPanelGraphEditor');
 EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
     var _edges = graphExplorer.data.edges.filter(e => e.to == graphExplorer.data.selectedNode || e.from == graphExplorer.data.selectedNode);
     $('#edges').html('');
@@ -102,6 +111,8 @@ EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
           </tr>`);
     }
 });
+
+EventBus.removeEventListener('readEdge');
 EventBus.addEventListener('readEdge', function (e) {
 
     $('#myModal3').modal("show");
@@ -128,6 +139,9 @@ EventBus.addEventListener('readEdge', function (e) {
     //     source: edgeValueHelper
     // });
 });
+
+
+EventBus.removeEventListener('addEdge');
 EventBus.addEventListener('addEdge', function (e) {
     if (!graphExplorer.data.currentEdge) {
         graphExplorer.data.edges[graphExplorer.data.edges.length] = { id: uuidv4(), to: graphExplorer.data.selectedNode, from: parseInt($('#Edge').val()), label: $('#EdgeValue').val() };
@@ -155,6 +169,8 @@ EventBus.addEventListener('addEdge', function (e) {
     graphExplorer.data.currentEdge = null;
     EventBus.dispatch('graphUpdated');
 });
+
+EventBus.removeEventListener('deleteEdge');
 EventBus.addEventListener('deleteEdge', function (e) {
     if (e.target) {
         for (var i = 0; i < graphExplorer.data.edges.length; i++) {
@@ -167,6 +183,7 @@ EventBus.addEventListener('deleteEdge', function (e) {
     }
 });
 
+EventBus.removeEventListener('customizeNode');
 EventBus.addEventListener('customizeNode', function (e) {
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.nodes[i].id == graphExplorer.data.selectedNode) {
@@ -179,6 +196,7 @@ EventBus.addEventListener('customizeNode', function (e) {
     EventBus.dispatch('graphUpdated');
 });
 
+EventBus.removeEventListener('refreshPanelProps');
 EventBus.addEventListener('refreshPanelProps', function (params) {
     params = params.target || [];
     $('#properties').html('');
@@ -193,6 +211,8 @@ EventBus.addEventListener('refreshPanelProps', function (params) {
           </tr>`);
     }
 });
+
+EventBus.removeEventListener('readPropperty');
 EventBus.addEventListener('readPropperty', function (e) {
     if (!e.target || e.target.target.nodeName=='A') {
         return;
@@ -203,6 +223,8 @@ EventBus.addEventListener('readPropperty', function (e) {
     $(graphExplorer.graphConfig.modal.property).modal("show");
     graphExplorer.data.currentProperty = e.target.currentTarget;
 });
+
+EventBus.removeEventListener('addPropperty');
 EventBus.addEventListener('addPropperty', function () {
 
     var props = [];
@@ -229,11 +251,16 @@ EventBus.addEventListener('addPropperty', function () {
     $(graphExplorer.graphConfig.modal.property + ' input').val('');
     graphExplorer.data.currentProperty = null;
 });
+
+
+EventBus.removeEventListener('openNode');
 EventBus.addEventListener('openNode', function () {
     graphExplorer.data.parentNode = graphExplorer.data.selectedNode;
     EventBus.dispatch('deselectNode');
     EventBus.dispatch('graphUpdated');
 });
+
+EventBus.removeEventListener('closeNode');
 EventBus.addEventListener('closeNode', function () {
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
     if (graphExplorer.data.parentNode && routeParams.NodeId != graphExplorer.data.parentNode) {
@@ -243,11 +270,15 @@ EventBus.addEventListener('closeNode', function () {
     }
 });
 
+
+EventBus.removeEventListener('readNode');
 EventBus.addEventListener('readNode', function () {
     $('#myModal4').modal("show");
     $('#NodeName').val(((graphExplorer.data.nodes.filter(f => f.id == graphExplorer.data.selectedNode)[0] || {}).label || ''));
     EventBus.dispatch('graphUpdated');
 });
+
+EventBus.removeEventListener('addNode');
 EventBus.addEventListener('addNode', function (params) {
     if (graphExplorer.data.selectedNode) {
         for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
@@ -262,6 +293,8 @@ EventBus.addEventListener('addNode', function (params) {
     EventBus.dispatch('graphUpdated');
     $('#myModal4').modal("hide");
 });
+
+EventBus.removeEventListener('removeNode');
 EventBus.addEventListener('removeNode', function (params) {
     graphExplorer.data.nodes = graphExplorer.data.nodes.filter(f => f.id != graphExplorer.data.selectedNode && f.parentId != graphExplorer.data.selectedNode);
     graphExplorer.data.edges = graphExplorer.data.edges.filter(f => f.from != graphExplorer.data.selectedNode && f.to != graphExplorer.data.selectedNode);
@@ -270,11 +303,13 @@ EventBus.addEventListener('removeNode', function (params) {
     EventBus.dispatch('graphUpdated');
 });
 
+EventBus.removeEventListener('modifyNode');
 EventBus.addEventListener('modifyNode', function (params) {
     console.log('modifyNode Event:', params);
     EventBus.dispatch('graphUpdated');
 });
 
+EventBus.removeEventListener('saveGraph');
 EventBus.addEventListener('saveGraph', function () {
     if (graphExplorer.isOffline) {
         localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
@@ -302,6 +337,7 @@ EventBus.addEventListener('saveGraph', function () {
     console.log('saveGraph Event:called');
 });
 
+EventBus.removeEventListener('loadGraph');
 EventBus.addEventListener('loadGraph', function (params) {
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
     console.log('loadGraph Event:', params, routeParams);
@@ -363,6 +399,7 @@ function hashCode(text) {
 };
 var graphHash = null;
 
+EventBus.removeEventListener('changeparent');
 EventBus.addEventListener('changeparent', function (params) {
 
     var parentId = parseInt($(graphExplorer.graphConfig.changeparent).val());
@@ -379,6 +416,8 @@ EventBus.addEventListener('changeparent', function (params) {
         }
     });
 });
+
+EventBus.removeEventListener('linkNode');
 EventBus.addEventListener('linkNode', function (params) {
     var item = graphExplorer.data.nodes.filter(item => item.id == graphExplorer.data.selectedNode)[0];
     var linkId = parseInt($(graphExplorer.graphConfig.linkNodes).val());
@@ -395,6 +434,7 @@ EventBus.addEventListener('linkNode', function (params) {
     EventBus.dispatch('refreshPanelAdvanceAction');
 });
 
+EventBus.removeEventListener('graphUpdated');
 EventBus.addEventListener('graphUpdated', function (params) {
 
     var _data = JSON.parse(JSON.stringify(graphExplorer.data));
@@ -431,11 +471,15 @@ EventBus.addEventListener('graphUpdated', function (params) {
     EventBus.dispatch('refreshPanel');
 });
 
+EventBus.removeEventListener('onlyNeighbourToggle');
 EventBus.addEventListener('onlyNeighbourToggle', function () {
     graphExplorer.onlyNeighbour = !graphExplorer.onlyNeighbour;
     EventBus.dispatch('graphUpdated');
 });
+
+EventBus.removeEventListener('onGraphEnabled');
 EventBus.addEventListener('onGraphEnabled', function (params) {
+    EventBus.removeEventListener('onGraphEnabled');
 
     setFstDropdown();
     graphExplorer.isOffline = false;
@@ -484,6 +528,8 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
 
     // });
 });
+
+EventBus.removeEventListener('redirectNode');
 EventBus.addEventListener('redirectNode', function (params) {
 
     graphExplorer.data.parentNode = JSON.parse(params.target).parentId || null;

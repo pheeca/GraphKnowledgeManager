@@ -26,7 +26,7 @@ namespace GraphKnowledgeServer.Controllers
         public string Get(int id)
         {
             var ctx = new DataAccess.GraphKnowledgeEntities();
-            return ctx.SchemaInformations.Where(f => f.UserSchemaId == id)
+            return ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status==Constants.Active)
                       .OrderByDescending(p => p.CreationDate)
                       .FirstOrDefault()?.SchemaInfo;
         }

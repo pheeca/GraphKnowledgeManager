@@ -36,16 +36,19 @@ $(document).ready(() => {
 });
 
 //Pages - start
+EventBus.removeEventListener('App.Route.Main');
 EventBus.addEventListener('App.Route.Main', function (params) {
     EventBus.dispatch('onGraphEnabled');
 });
 
+EventBus.removeEventListener('App.Route.Login');
 EventBus.addEventListener('App.Route.Login', function (params) {
     sessionStorage.clear();
 });
 //Pages - end
 
 
+EventBus.removeEventListener('App.UiChanged');
 EventBus.addEventListener('App.UiChanged', function (params) {
     
     $(AppConfig.pageSection).html('');
@@ -72,9 +75,9 @@ EventBus.addEventListener('App.UiChanged', function (params) {
         }
     });
     if (currentRoute) {
-
+        let requestUrl =AppConfig.domain + '/Home/template?Templatename=' + currentRoute.file;
         $.ajax({
-            url: AppConfig.domain + '/Home/template?Templatename=' + currentRoute.file,
+            url: requestUrl,
             dataType: "html",
             type: "GET",
             success: function (s) {
@@ -85,8 +88,7 @@ EventBus.addEventListener('App.UiChanged', function (params) {
                     if (userId) {
                         isAllowed = true;
                     } else {
-                        window.location.hash =  AppConfig.loginUrl;
-                        EventBus.dispatch('App.UiChanged');
+                        EventBus.dispatch('App.Logout');
                     }
                 }
                 if (isAllowed) {
@@ -105,7 +107,14 @@ EventBus.addEventListener('App.UiChanged', function (params) {
     }
 });
 
+EventBus.removeEventListener('App.Redirect');
 EventBus.addEventListener('App.Redirect', function (url) {
     window.location.hash = url.target;
     EventBus.dispatch('App.UiChanged');
+});
+
+EventBus.removeEventListener('App.Logout');
+EventBus.addEventListener('App.Logout', function () {
+    sessionStorage.clear();
+    EventBus.dispatch('App.Redirect',AppConfig.loginUrl);
 });
