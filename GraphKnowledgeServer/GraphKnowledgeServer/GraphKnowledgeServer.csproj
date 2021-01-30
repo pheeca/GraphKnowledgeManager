@@ -306,6 +306,10 @@
       <Project>{a0662a91-756e-405c-99bd-146d151bc939}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EventBus\EventBus.csproj">
+      <Project>{a8cf9c64-8cd2-4c37-b73b-b6649f1ae806}</Project>
+      <Name>EventBus</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Templates\text.txt" />

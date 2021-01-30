@@ -18,13 +18,14 @@ notification engine:mobile alarm,mobile notification,email
 --complex character hyper-link embeding support
 --links support
 link files (how to upload files without storage limit restriction)
-undo,redo with active inactive clause
+--undo,redo with active inactive clause
 node scale,title
 multi-tenancy
 --multi-graph
 --share graph
 share graph permission 
 concurrent user via locking nodes and edges
+?? turn property into bool-check list/numeric/currency/enum/binary/time/timeOffset/time-range/geography/geometry/image/guid/hierarchyid/file/external system(s) ids(including refids)
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1
@@ -38,11 +39,12 @@ to do?
  keep track of important notes, documents, voice recordings and external system references (e.g whatsapp chat quote or gmail email)
  add tasks (manual + automated)
  add events and trigger engine 
- turn property into bool/check list
  sequencing(may be drag/drop) of properties
  sequencing of nodes??
  tags= tag name+value
  calendar/schedular integration
+ communicating with app via console integrate it with prolog/etc
+ properties vs tasks (should actions be added like properties)
 
  declaration of processes???->notification(including absoltue start end,interval type,interval start end,interval delayed custom point)
  schedular
@@ -53,6 +55,21 @@ to do?
 representing graph into n-d tabular info
 
 
+event types?
+-app events->app start,app end, time interval increased(second,minute,hour,day,month,year),onerror
+-system events - user logged in attempt(user id,isSuccess),logout,graph created,graph saved,graph opened,node added, node modified,node deleted, property added,property modified,property deleted,undo,redo,(link node?),edge added,edge modified,edge deleted etc
+-bot events - ?? 
+-3rd party platform (fb/whatsapp/twitter/news) events, data pipelines to data lakes -
+-schedular events -
+-reporter events -
+-prioritizer events -
+-notification events -
+-inferencing events - 
+-custom events - ???
+-information manipulator/data aggregationevents??
+-dynamic event placement??
+-UI events
+-action events -
 
  system?
 dynamic event placement engine+events+actions+information+process declaration+inferencing/estimating all these 
