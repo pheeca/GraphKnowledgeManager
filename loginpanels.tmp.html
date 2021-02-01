@@ -14,8 +14,8 @@
                     <!--password1-->
                     <input type="password" class="form-control" id="password" placeholder="Password" value="">
                 </div>
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('App.UI.Login')">Login</button>
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('App.UI.CreateUser')">User Create</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.Login')">Login</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.CreateUser')">User Create</button>
                 <div class="list-group mt-3" id="schemaname"></div>
             </div>
         </div>
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('App.UI.Login.schemaAdd')">Add</button>
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.Login.schemaAdd')">Add</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>

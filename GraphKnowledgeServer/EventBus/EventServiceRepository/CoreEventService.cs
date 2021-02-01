@@ -22,7 +22,7 @@ namespace EventBus.EventServiceRepository
             }
             if (_previous.Minute != DateTime.UtcNow.Minute)
             {
-                e._bus.Trigger(AppEvents.AppTimeIntervalIncreasedMinute);
+                e._bus.Trigger(AppEvents.AppTimeIntervalIncreasedMinute,this,e.Message);
             }
             if (_previous.Hour != DateTime.UtcNow.Hour)
             {

@@ -488,7 +488,7 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
 
     if (!UserSchemaId || (routeParams.UserSchemaId && window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) != routeParams.key)) {
-        EventBus.dispatch('App.Redirect', "/login");
+        EventBus.dispatch('UI.Web.App.Redirect', "/login");
         return;
     }
     graphExplorer.url = AppConfig.domain + '/api/Values/' + UserSchemaId;

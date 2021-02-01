@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -29,25 +30,34 @@ namespace EventBus
         }
 
         private event EventHandler<MessageBusEventArgs<T>> MessageRecieved;
-
-        public void Trigger(string eventName, object sender=null, T Message = default)
+        static string[] exclusionEventList = { "Server.Web.", "APP." };
+        public void Trigger(string eventName, object sender = null, T Message = default, bool isolate = false)
         {
             foreach (var MessageRecieveditem in MessageRecieved.GetInvocationList())
             {
                 var methodEventValue = (MessageRecieveditem.Target as Action<object, MessageBusEventArgs<T>>).Method.GetCustomAttribute<OnEventAttribute>();
-                if (methodEventValue?.eventArgumentdata.Contains(eventName.ToLowerInvariant())??false)
+                if (methodEventValue?.eventArgumentdata.Contains(eventName.ToLowerInvariant()) ?? false)
                 {
-                    MessageRecieveditem.DynamicInvoke(new object[] {sender, new MessageBusEventArgs<T>(this,eventName.ToLowerInvariant(),Message) });
+                    MessageRecieveditem.DynamicInvoke(new object[] { sender, new MessageBusEventArgs<T>(this, eventName.ToLowerInvariant(), Message) });
+                    if (!isolate)
+                    {
+                        if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())))
+                        {
+                            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MessageBusHub>();
+                            hubContext.Clients.All.receivemessage(eventName, Message);
+
+                        }
+                    }
                 }
             }
             //MessageRecieved?.Invoke(sender, new MessageBusEventArgs<T>(Message));
         }
-       
+
         public void addListener(Action<object, MessageBusEventArgs<T>> @delegate)
         {
             MessageRecieved += new EventHandler<MessageBusEventArgs<T>>(@delegate);
         }
-        public void removeListener(string eventName, Action<object, MessageBusEventArgs<T>> @delegate=default)
+        public void removeListener(string eventName, Action<object, MessageBusEventArgs<T>> @delegate = default)
         {
             foreach (var MessageRecieveditem in MessageRecieved.GetInvocationList())
             {
@@ -55,7 +65,7 @@ namespace EventBus
                 var methodEventValue = _target.Method.GetCustomAttribute<OnEventAttribute>();
                 if ((methodEventValue?.eventArgumentdata.Contains(eventName.ToLowerInvariant()) ?? false) && (@delegate == default || @delegate == _target))
                 {
-                    methodEventValue.eventArgumentdata = methodEventValue?.eventArgumentdata.Where(e=>e.ToLowerInvariant()!= eventName.ToLowerInvariant()).ToArray();
+                    methodEventValue.eventArgumentdata = methodEventValue?.eventArgumentdata.Where(e => e.ToLowerInvariant() != eventName.ToLowerInvariant()).ToArray();
                     if ((methodEventValue.eventArgumentdata?.Length ?? 0) == 0)
                     {
                         MessageRecieved -= new EventHandler<MessageBusEventArgs<T>>(_target);

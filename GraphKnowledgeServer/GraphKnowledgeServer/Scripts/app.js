@@ -14,9 +14,9 @@ var AppConfig = {
     title:'Graph Knowledge'
 };
 var AppRoutes = [
-    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'App.Route.Main', file: 'mainpanels.tmp.html', title:'Graph Explorer' },
-    { path: AppConfig.loginUrl , isAuthenticated: false, event: 'App.Route.Login', file: 'loginpanels.tmp.html' , title:'Login' },
+    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html' },
+    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html', title:'Graph Explorer' },
+    { path: AppConfig.loginUrl , isAuthenticated: false, event: 'UI.Web.App.Route.Login', file: 'loginpanels.tmp.html' , title:'Login' },
 ];
 
 
@@ -31,25 +31,25 @@ $(document).ready(() => {
             window.location.hash = AppConfig.defaultUrl;
         }
     }
-    EventBus.dispatch('App.UiChanged');
+    EventBus.dispatch('UI.Web.App.UiChanged');
 
 });
 
 //Pages - start
-EventBus.removeEventListener('App.Route.Main');
-EventBus.addEventListener('App.Route.Main', function (params) {
+EventBus.removeEventListener('UI.Web.App.Route.Main');
+EventBus.addEventListener('UI.Web.App.Route.Main', function (params) {
     EventBus.dispatch('onGraphEnabled');
 });
 
-EventBus.removeEventListener('App.Route.Login');
-EventBus.addEventListener('App.Route.Login', function (params) {
+EventBus.removeEventListener('UI.Web.App.Route.Login');
+EventBus.addEventListener('UI.Web.App.Route.Login', function (params) {
     sessionStorage.clear();
 });
 //Pages - end
 
 
-EventBus.removeEventListener('App.UiChanged');
-EventBus.addEventListener('App.UiChanged', function (params) {
+EventBus.removeEventListener('UI.Web.App.UiChanged');
+EventBus.addEventListener('UI.Web.App.UiChanged', function (params) {
     
     $(AppConfig.pageSection).html('');
     var currentPath = window.location.hash.replace('#', '');
@@ -88,7 +88,7 @@ EventBus.addEventListener('App.UiChanged', function (params) {
                     if (userId) {
                         isAllowed = true;
                     } else {
-                        EventBus.dispatch('App.Logout');
+                        EventBus.dispatch('UI.Web.App.Logout');
                     }
                 }
                 if (isAllowed) {
@@ -107,14 +107,14 @@ EventBus.addEventListener('App.UiChanged', function (params) {
     }
 });
 
-EventBus.removeEventListener('App.Redirect');
-EventBus.addEventListener('App.Redirect', function (url) {
+EventBus.removeEventListener('UI.Web.App.Redirect');
+EventBus.addEventListener('UI.Web.App.Redirect', function (url) {
     window.location.hash = url.target;
-    EventBus.dispatch('App.UiChanged');
+    EventBus.dispatch('UI.Web.App.UiChanged');
 });
 
-EventBus.removeEventListener('App.Logout');
-EventBus.addEventListener('App.Logout', function () {
+EventBus.removeEventListener('UI.Web.App.Logout');
+EventBus.addEventListener('UI.Web.App.Logout', function () {
     sessionStorage.clear();
-    EventBus.dispatch('App.Redirect',AppConfig.loginUrl);
+    EventBus.dispatch('UI.Web.App.Redirect',AppConfig.loginUrl);
 });

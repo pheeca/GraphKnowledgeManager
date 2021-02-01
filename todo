@@ -70,6 +70,12 @@ event types?
 -dynamic event placement??
 -UI events
 -action events -
+-------------------------
+sub-system events
+UI->UI.Web.XX
+WEB->Server.Web.XX
+WEB->APP.XX
+--------------------------
 
  system?
 dynamic event placement engine+events+actions+information+process declaration+inferencing/estimating all these 

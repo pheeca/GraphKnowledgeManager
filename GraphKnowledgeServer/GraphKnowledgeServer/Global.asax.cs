@@ -22,8 +22,11 @@ namespace GraphKnowledgeServer
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             GlobalConfiguration.Configuration.Formatters.Remove(GlobalConfiguration.Configuration.Formatters.XmlFormatter);
+
+            
 
             MessageBus<object>.Instance.RegisterService(new SampleEventService<object>());
             MessageBus<object>.Instance.Trigger("ABC", this, "XYZ");

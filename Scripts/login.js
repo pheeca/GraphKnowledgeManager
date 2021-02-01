@@ -1,14 +1,14 @@
 var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
 
-EventBus.removeEventListener("App.UI.Login");
-EventBus.removeEventListener("App.UI.CreateUser");
-EventBus.removeEventListener("App.UI.Login.LoadUserInfo");
-EventBus.removeEventListener("App.UI.Login.schemaSelect");
+EventBus.removeEventListener("UI.Web.App.UI.Login");
+EventBus.removeEventListener("UI.Web.App.UI.CreateUser");
+EventBus.removeEventListener("UI.Web.App.UI.Login.LoadUserInfo");
+EventBus.removeEventListener("UI.Web.App.UI.Login.schemaSelect");
 
 
 
-EventBus.addEventListener('App.UI.Login', function (params) {
+EventBus.addEventListener('UI.Web.App.UI.Login', function (params) {
     var email = $('#email').val();
     var password = $('#password').val();
     $.ajax({
@@ -21,7 +21,7 @@ EventBus.addEventListener('App.UI.Login', function (params) {
         success: function (data) {
             if (data) {
                 sessionStorage.setItem("UserId", data.UserId);
-                EventBus.dispatch('App.UI.Login.LoadUserInfo');
+                EventBus.dispatch('UI.Web.App.UI.Login.LoadUserInfo');
             }else{
                 alert('invalid credentials');
             }
@@ -34,7 +34,7 @@ EventBus.addEventListener('App.UI.Login', function (params) {
 
 });
 
-EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
+EventBus.addEventListener('UI.Web.App.UI.Login.LoadUserInfo', function (params) {
 
     var userId = sessionStorage.getItem("UserId");
     if(userId){
@@ -46,7 +46,7 @@ EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
                 if (data) {
                   data.forEach(element => {
                     $(`#schemaname`).append( 
-                        ` <a href="#" class="list-group-item list-group-item-action flex-column align-items-start " onclick="EventBus.dispatch('App.UI.Login.schemaSelect',${element.UserSchemaId})">
+                        ` <a href="#" class="list-group-item list-group-item-action flex-column align-items-start " onclick="EventBus.dispatch('UI.Web.App.UI.Login.schemaSelect',${element.UserSchemaId})">
                         <div class="d-flex w-100 justify-content-between">
                           <h5 class="mb-1">${element.SchemaName}</h5>
                           <!--<small>3 days ago</small>-->
@@ -67,15 +67,15 @@ EventBus.addEventListener('App.UI.Login.LoadUserInfo', function (params) {
     }
 });
 
-EventBus.addEventListener('App.UI.Login.schemaSelect', function (params) {
+EventBus.addEventListener('UI.Web.App.UI.Login.schemaSelect', function (params) {
     if(params.target){
         sessionStorage.setItem("UserSchemaId", params.target);
-        EventBus.dispatch('App.Redirect',AppConfig.GraphUrl);
+        EventBus.dispatch('UI.Web.App.Redirect',AppConfig.GraphUrl);
     }
 });
 
 
-EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
+EventBus.addEventListener('UI.Web.App.UI.Login.schemaAdd', function (params) {
     var graphName=$('#graphname').val();
     var userId = sessionStorage.getItem("UserId");
     if(graphName){
@@ -89,7 +89,7 @@ EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
             type: "POST",
             success: function (data) {
                 if(data){
-                    EventBus.dispatch('App.UI.Login.LoadUserInfo');
+                    EventBus.dispatch('UI.Web.App.UI.Login.LoadUserInfo');
                 }else{
                     alert("Sorry, there was a problem!");
                 }
@@ -102,7 +102,7 @@ EventBus.addEventListener('App.UI.Login.schemaAdd', function (params) {
     }
        
 });
-EventBus.addEventListener('App.UI.CreateUser', function (params) {
+EventBus.addEventListener('UI.Web.App.UI.CreateUser', function (params) {
     var email = $('#email').val();
     var password = $('#password').val();
     $.ajax({
@@ -115,7 +115,7 @@ EventBus.addEventListener('App.UI.CreateUser', function (params) {
         success: function (data) {
             if (data) {
                 alert('success')
-                EventBus.dispatch('App.UI.Login');
+                EventBus.dispatch('UI.Web.App.UI.Login');
             }else{
                 alert('user already exists');
             }
