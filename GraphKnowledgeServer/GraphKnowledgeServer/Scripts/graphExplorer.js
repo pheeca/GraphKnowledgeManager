@@ -60,7 +60,7 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     var _node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
     //for async, taking over half second on 1k nodes
     var optionNodes = graphExplorer.data.nodes;
-    var _html = `<option>Select</option>` + optionNodes.map(e => createOption(e)).reduce((a, b) => a + b, '');
+    var _html = `<option value="">Select</option>` + optionNodes.map(e => createOption(e)).reduce((a, b) => a + b, '');
     $(graphExplorer.graphConfig.changeparent).html(_html);
     $(graphExplorer.graphConfig.changeparent).val(_node.parentId);
     document.querySelector(graphExplorer.graphConfig.changeparent).fstdropdown.rebind();
@@ -70,6 +70,10 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     $(graphExplorer.graphConfig.linkNodes).val(linkedNodesid);
     document.querySelector(graphExplorer.graphConfig.linkNodes).fstdropdown.rebind();
     $('#linkNodesInfo').html('');
+    $('#deleteLinkNode').hide();
+    if(_node.nodeUnit){
+        $('#deleteLinkNode').show();
+    }
     if (linkedNodes.length > 0) {
         linkedNodes.forEach(function (_linkedNode) {
             var parent = optionNodes.filter(f => f.id == _linkedNode.parentId)[0] || {};
@@ -77,7 +81,9 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
             <td>${_linkedNode.label || ''}</td>
             <td>${parent.label || ''}</td>
             <td>${_linkedNode.nodeUnit || ''}</td>
-            <td> <button type="button" class="btn btn-warning" onclick='EventBus.dispatch("redirectNode",JSON.stringify(${JSON.stringify(_linkedNode)}))'>Redirect</button></td>
+            <td> <button type="button" class="mb-1 btn btn-warning" onclick='EventBus.dispatch("redirectNode",JSON.stringify(${JSON.stringify(_linkedNode)}))'>Redirect</button>
+            <button type="button" class="mb-1 btn btn-warning" onclick='EventBus.dispatch("deleteLinkNode",JSON.stringify(${JSON.stringify(_linkedNode)}))'>Delete Link</button>
+            </td>
           </tr>`;
             $('#linkNodesInfo').append(linkedHtml);
         });
@@ -402,7 +408,7 @@ var graphHash = null;
 
 EventBus.removeEventListener('changeparent');
 EventBus.addEventListener('changeparent', function (params) {
-
+    debugger
     var parentId = parseInt($(graphExplorer.graphConfig.changeparent).val());
 
     graphExplorer.data.nodes.forEach(function (item) {
@@ -536,6 +542,19 @@ EventBus.addEventListener('redirectNode', function (params) {
     graphExplorer.data.parentNode = JSON.parse(params.target).parentId || null;
     graphExplorer.data.selectedNode = JSON.parse(params.target).id;
     EventBus.dispatch('graphUpdated');
+});
+
+EventBus.removeEventListener('deleteLinkNode');
+EventBus.addEventListener('deleteLinkNode', function (params) {
+    graphExplorer.data.nodes.forEach((node) => {
+        if (!params.target && node.id == graphExplorer.data.selectedNode) {
+            debugger
+            node.nodeUnit = null;
+        } else if (params.target && node.id == JSON.parse(params.target).id) {
+            node.nodeUnit = null;
+        }
+    });
+    EventBus.dispatch('refreshPanel');
 });
 
 

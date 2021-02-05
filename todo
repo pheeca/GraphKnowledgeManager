@@ -26,6 +26,7 @@ multi-tenancy
 share graph permission 
 concurrent user via locking nodes and edges
 ?? turn property into bool-check list/numeric/currency/enum/binary/time/timeOffset/time-range/geography/geometry/image/guid/hierarchyid/file/external system(s) ids(including refids)
+--disconnect linked node
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1
@@ -55,7 +56,7 @@ to do?
 representing graph into n-d tabular info
 
 
-event types?
+event types? (onchange->time,place,person,action,state[key-value pair])
 -app events->app start,app end, time interval increased(second,minute,hour,day,month,year),onerror
 -system events - user logged in attempt(user id,isSuccess),logout,graph created,graph saved,graph opened,node added, node modified,node deleted, property added,property modified,property deleted,undo,redo,(link node?),edge added,edge modified,edge deleted etc
 -bot events - ?? 
