@@ -9,36 +9,37 @@
 --abiliy to search all nodes with certain tag
 --Move node (change parent)
 --responsive
-convert to mobile (https://auth0.com/blog/converting-your-web-app-to-mobile/)
-notification engine:mobile alarm,mobile notification,email
 --Link Far Nodes as single unit
 --Ability to go to linked far nodes/linked neighbouring nodes
 --multi-user
 --create user
 --complex character hyper-link embeding support
 --links support
-link files (how to upload files without storage limit restriction) [https://www.backblaze.com/b2/docs/calling.html https://www.mediafire.com/developers/sdks_and_tools/javascript/basics/ https://github.com/MediaFire/mediafire-csharp-open-sdk]
 --undo,redo with active inactive clause
+--multi-graph
+--share graph
+--de-select node before saving and then reselect
+--display current version of APP on screen
+--neighbouring node - n-level
+documentation link on site
+create multiple nodes linked(via edges+edge value) to current node
+Search node, on node select search clear
+validation user,graph creation
 node scale,title
 tag type
 multi-tenancy
---multi-graph
---share graph
 share graph permission 
 concurrent user via locking nodes and edges
 ?? turn property into bool-check list/numeric/currency/enum/binary/time/timeOffset/time-range/geography/geometry/image/guid/hierarchyid/file/external system(s) ids(including refids)
+link files (how to upload files without storage limit restriction) [https://www.backblaze.com/b2/docs/calling.html https://www.mediafire.com/developers/sdks_and_tools/javascript/basics/ https://github.com/MediaFire/mediafire-csharp-open-sdk]
 --disconnect linked node
 Make a template for standard knowledge Graph, which will be default of tenant
 Change Text color (on dark background harder to recognize text) - maaz suggestion
 not overlap the nodes on top of each other - maaz suggestion
-de-select node before saving and then reselect
-display current version of APP on screen
-neighbouring node - n-level
-documentation link on site
-create multiple nodes linked(via edges+edge value) to current node
-Search node, on node select search clear
 Admin user to have access of other graphs
-validation user,graph creation
+convert to mobile (https://auth0.com/blog/converting-your-web-app-to-mobile/)
+notification engine:mobile alarm,mobile notification,email
+version of app on screen dynamic
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1

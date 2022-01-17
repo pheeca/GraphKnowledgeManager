@@ -33,7 +33,7 @@ namespace EventBus
         static string[] exclusionEventList = { "Server.Web.", "APP." };
         public void Trigger(string eventName, object sender = null, T Message = default, bool isolate = false)
         {
-            if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())))
+            if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())) && MessageRecieved!=null)
             {
                 foreach (var MessageRecieveditem in MessageRecieved.GetInvocationList())
                 {

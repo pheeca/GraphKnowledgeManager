@@ -209,7 +209,7 @@ Contextualized (wrt graph,user,tenant)
 	DataPipeline
 		Twitter/FB (fb/whatsapp/twitter/news)
 	Process (Actions)
-	Bot(??? Not sure)
+	Bot(??? Not sure,manual + automated)
 	Prioritizer
 	Inference
 		Logical (prolog)

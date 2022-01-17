@@ -329,11 +329,16 @@ EventBus.addEventListener('saveGraph', function () {
     } else {
         var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
         if (!routeParams.UserSchemaId || window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) == routeParams.key) {
+            var clone = JSON.parse(JSON.stringify(graphExplorer.data));
+            clone.selectedNode = null;
+            clone.currentEdge = null;
+            clone.currentProperty = null;
+            
             $.ajax({
                 url: graphExplorer.url,
                 type: 'POST',
                 data: {
-                    SchemaInfo:JSON.stringify(graphExplorer.data),
+                    SchemaInfo:JSON.stringify(clone),
                     ModifiedBy:sessionStorage.getItem("UserId")
                 },
                 success: function (data) {
@@ -393,8 +398,19 @@ function getCurrentNodes(_data) {
 }
 function ValidateNeighbouringNode(node, _data) {
     if (graphExplorer.onlyNeighbour && graphExplorer.data.selectedNode) {
-        let l = _data.edges.filter(e => (e.from == node.id || e.to == node.id) && (e.from == graphExplorer.data.selectedNode || e.to == graphExplorer.data.selectedNode)).length;
-        return l > 0;
+        var nLevel =$('#nLevelNeighbouringNode').val();
+        let l = _data.edges.filter(e => (e.from == graphExplorer.data.selectedNode || e.to == graphExplorer.data.selectedNode));
+        
+        
+        for(var index=0;index<nLevel;index++)
+        {
+            var nIndexes=l.map(e=>e.to).concat(l.map(e=>e.from)).filter((v, i, a) => a.indexOf(v) === i);
+            if(nIndexes.indexOf(node.id)>-1){
+                return true;
+            }
+            l=_data.edges.filter(e => (nIndexes.indexOf(e.from)>-1||nIndexes.indexOf(e.to)>-1)).concat(l);
+        }
+        return false;
     } else {
         return true
     }
@@ -413,7 +429,6 @@ var graphHash = null;
 
 EventBus.removeEventListener('changeparent');
 EventBus.addEventListener('changeparent', function (params) {
-    debugger
     var parentId = parseInt($(graphExplorer.graphConfig.changeparent).val());
 
     graphExplorer.data.nodes.forEach(function (item) {
@@ -469,9 +484,10 @@ EventBus.addEventListener('graphUpdated', function (params) {
             EventBus.dispatch('openNode');
         });
     } else {
+        var nLevelNeighbouringNode = $('#nLevelNeighbouringNode').val();
         var tagFilter = $(graphExplorer.graphConfig.searchtag).val() || '';
         var tagContextGlobal = $(graphExplorer.graphConfig.tagContextGlobal).is(':checked');
-        currentHash = hashCode(JSON.stringify(graphExplorer.data) + tagFilter + tagContextGlobal);
+        currentHash = hashCode(JSON.stringify(graphExplorer.data) + tagFilter + tagContextGlobal+graphExplorer.onlyNeighbour+nLevelNeighbouringNode);
         if (currentHash != graphHash) {
             graphExplorer.network.setData(_data);
             if (graphExplorer.data.selectedNode) {
@@ -553,7 +569,6 @@ EventBus.removeEventListener('deleteLinkNode');
 EventBus.addEventListener('deleteLinkNode', function (params) {
     graphExplorer.data.nodes.forEach((node) => {
         if (!params.target && node.id == graphExplorer.data.selectedNode) {
-            debugger
             node.nodeUnit = null;
         } else if (params.target && node.id == JSON.parse(params.target).id) {
             node.nodeUnit = null;

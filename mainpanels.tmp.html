@@ -1,6 +1,7 @@
 <div class="container-fluid" id="mainpanelgroup">
     <div class="row h-25">
-        <p id='updatemsg' class="col-sm-12">
+        <div class="col-sm-1">version 1.0.2</div>
+        <p id="updatemsg" class="col-sm-11">
             Create a simple network with some nodes and edges.
         </p>
         <div class="col-sm-6 col-md-2">
@@ -35,6 +36,8 @@
         </div>
         <div class="col-sm-12  col-md-3">
             <div class="custom-control custom-switch">
+                <input type="number" id="nLevelNeighbouringNode" onclick="EventBus.dispatch('graphUpdated')" class="form-control  col-sm-2" value="1" min="1" max="10" placeholder="nLevel">
+                <label for="nLevelNeighbouringNode">N-Level Neighbouring</label>
                 <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
                 <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
                     Nodes</label>
