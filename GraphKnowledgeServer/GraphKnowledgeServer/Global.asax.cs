@@ -28,24 +28,24 @@ namespace GraphKnowledgeServer
 
             
 
-            MessageBus<object>.Instance.RegisterService(new SampleEventService<object>());
-            MessageBus<object>.Instance.Trigger("ABC", this, "XYZ");
-            MessageBus<object>.Instance.Trigger("ABC2", this, "XYZ");
-            MessageBus<object>.Instance.Trigger("ABC3", this, "XYZ");
+            //MessageBus<object>.Instance.RegisterService(new SampleEventService<object>());
+            //MessageBus<object>.Instance.Trigger("ABC", this, "XYZ");
+            //MessageBus<object>.Instance.Trigger("ABC2", this, "XYZ");
+            //MessageBus<object>.Instance.Trigger("ABC3", this, "XYZ");
 
+
+            ////MessageBus<object>.Instance.RegisterService(new CoreEventService<object>());
+            ////MessageBus<object>.Instance.removeListener("ABC2");
+            ////MessageBus<object>.Instance.Trigger("ABC2", this, "XYZ");
 
             //MessageBus<object>.Instance.RegisterService(new CoreEventService<object>());
-            //MessageBus<object>.Instance.removeListener("ABC2");
-            //MessageBus<object>.Instance.Trigger("ABC2", this, "XYZ");
 
-            MessageBus<object>.Instance.RegisterService(new CoreEventService<object>());
-
-            MessageBus<object>.Instance.Trigger(AppEvents.AppStart, this);
+            //MessageBus<object>.Instance.Trigger(AppEvents.AppStart, this);
         }
 
         protected void Application_End()
         {
-            MessageBus<object>.Instance.Trigger(AppEvents.AppEnd, this);
+            //MessageBus<object>.Instance.Trigger(AppEvents.AppEnd, this);
         }
         //https://stackoverflow.com/questions/45855363/enable-cors-in-mvc-controller
         protected void Application_BeginRequest()

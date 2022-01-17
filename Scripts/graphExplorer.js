@@ -209,8 +209,13 @@ EventBus.addEventListener('refreshPanelProps', function (params) {
     $('#properties').html('');
     for (var i = 0; i < params.length; i++) {
         let potentialUrl=(params[i].value||'').split('/');
-        potentialUrl=(potentialUrl.pop()||potentialUrl.pop()).split('?')[0];
-        potentialUrl=potentialUrl.replace(/_|-/g, " ");
+        let temp = (potentialUrl.pop()||potentialUrl.pop());
+        if(temp){
+            potentialUrl=temp.split('?')[0];
+            potentialUrl=potentialUrl.replace(/_|-/g, " ");
+        }else{
+            potentialUrl=(params[i].value||'');
+        }
         $('#properties').append(`<tr>
             <td>${params[i].key}</td>
             <td data-val="${params[i].value}">${utilities.validateURL(params[i].value)?`<a  target="_blank" href="${params[i].value}">${potentialUrl}</a>`:params[i].value}</td>

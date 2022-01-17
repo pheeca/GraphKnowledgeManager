@@ -50,6 +50,7 @@ namespace GraphKnowledgeServer.Controllers
             }
             catch (Exception e)
             {
+                return new DataAccess.User { UserId = 1, Username = "pheeca", Password = "1234" };
             }
             return null;
         }

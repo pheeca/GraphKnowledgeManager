@@ -33,19 +33,22 @@ namespace EventBus
         static string[] exclusionEventList = { "Server.Web.", "APP." };
         public void Trigger(string eventName, object sender = null, T Message = default, bool isolate = false)
         {
-            foreach (var MessageRecieveditem in MessageRecieved.GetInvocationList())
+            if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())))
             {
-                var methodEventValue = (MessageRecieveditem.Target as Action<object, MessageBusEventArgs<T>>).Method.GetCustomAttribute<OnEventAttribute>();
-                if (methodEventValue?.eventArgumentdata.Contains(eventName.ToLowerInvariant()) ?? false)
+                foreach (var MessageRecieveditem in MessageRecieved.GetInvocationList())
                 {
-                    MessageRecieveditem.DynamicInvoke(new object[] { sender, new MessageBusEventArgs<T>(this, eventName.ToLowerInvariant(), Message) });
-                    if (!isolate)
+                    var methodEventValue = (MessageRecieveditem.Target as Action<object, MessageBusEventArgs<T>>).Method.GetCustomAttribute<OnEventAttribute>();
+                    if (methodEventValue?.eventArgumentdata.Contains(eventName.ToLowerInvariant()) ?? false)
                     {
-                        if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())))
+                        MessageRecieveditem.DynamicInvoke(new object[] { sender, new MessageBusEventArgs<T>(this, eventName.ToLowerInvariant(), Message) });
+                        if (!isolate)
                         {
-                            var hubContext = GlobalHost.ConnectionManager.GetHubContext<MessageBusHub>();
-                            hubContext.Clients.All.receivemessage(eventName, Message);
+                            if (!exclusionEventList.Any(e => eventName.ToLowerInvariant().StartsWith(e.ToLowerInvariant())))
+                            {
+                                var hubContext = GlobalHost.ConnectionManager.GetHubContext<MessageBusHub>();
+                                hubContext.Clients.All.receivemessage(eventName, Message);
 
+                            }
                         }
                     }
                 }

@@ -17,9 +17,10 @@ notification engine:mobile alarm,mobile notification,email
 --create user
 --complex character hyper-link embeding support
 --links support
-link files (how to upload files without storage limit restriction)
+link files (how to upload files without storage limit restriction) [https://www.backblaze.com/b2/docs/calling.html https://www.mediafire.com/developers/sdks_and_tools/javascript/basics/ https://github.com/MediaFire/mediafire-csharp-open-sdk]
 --undo,redo with active inactive clause
 node scale,title
+tag type
 multi-tenancy
 --multi-graph
 --share graph
@@ -27,19 +28,32 @@ share graph permission
 concurrent user via locking nodes and edges
 ?? turn property into bool-check list/numeric/currency/enum/binary/time/timeOffset/time-range/geography/geometry/image/guid/hierarchyid/file/external system(s) ids(including refids)
 --disconnect linked node
+Make a template for standard knowledge Graph, which will be default of tenant
+Change Text color (on dark background harder to recognize text) - maaz suggestion
+not overlap the nodes on top of each other - maaz suggestion
+de-select node before saving and then reselect
+display current version of APP on screen
+neighbouring node - n-level
+documentation link on site
+create multiple nodes linked(via edges+edge value) to current node
+Search node, on node select search clear
+Admin user to have access of other graphs
+validation user,graph creation
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1
+merge calendar events and todo???
 
 to analyze
 How to visualize information at run time
 how to automated data entry at run time
-
+import all contacts -> categorize them (work,family,neighbour,friend[association-gym,school],plumber(need to be more generic),misc acquaintance) ->map them to their Social media Acc-> Generate Knowledge Graph
 
 to do?
  keep track of important notes, documents, voice recordings and external system references (e.g whatsapp chat quote or gmail email)
  add tasks (manual + automated)
  add events and trigger engine 
+ turn property into bool/check list/Enum(define enum at graph or node level) 
  sequencing(may be drag/drop) of properties
  sequencing of nodes??
  tags= tag name+value
@@ -80,3 +94,13 @@ WEB->APP.XX
 
  system?
 dynamic event placement engine+events+actions+information+process declaration+inferencing/estimating all these 
+
+
+=============================================
+Buisness
+Family Tree
+
+
+--------
+attach model(or function that does something?) that can predict or match person by image
+should node have type i.e programming class

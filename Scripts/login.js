@@ -5,7 +5,12 @@ EventBus.removeEventListener("UI.Web.App.UI.Login");
 EventBus.removeEventListener("UI.Web.App.UI.CreateUser");
 EventBus.removeEventListener("UI.Web.App.UI.Login.LoadUserInfo");
 EventBus.removeEventListener("UI.Web.App.UI.Login.schemaSelect");
-
+$('form input').keypress(function (e) {
+    if (e.which == 13) {
+        EventBus.dispatch('UI.Web.App.UI.Login');
+      return false;    //<---- Add this line
+    }
+  });
 
 
 EventBus.addEventListener('UI.Web.App.UI.Login', function (params) {

@@ -98,7 +98,7 @@ namespace GraphKnowledgeServer.Controllers
                           .FirstOrDefault();
 
                     var SchemaInformationTo = ctx.SchemaInformations.Where(f => f.UserSchemaId == id && f.Status == Constants.InActive
-                    && f.Id > SchemaInformationFrom.Id).OrderByDescending(p => p.CreationDate)
+                    && f.Id > SchemaInformationFrom.Id).OrderBy(p => p.CreationDate)
                           .FirstOrDefault();
 
                     if (SchemaInformationFrom == null || SchemaInformationTo == null)
