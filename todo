@@ -21,7 +21,8 @@
 --de-select node before saving and then reselect
 --display current version of APP on screen
 --neighbouring node - n-level
-documentation link on site
+--neighbouring node - n-level -UI fix
+--documentation link on site
 create multiple nodes linked(via edges+edge value) to current node
 Search node, on node select search clear
 validation user,graph creation

@@ -30,7 +30,7 @@ Date: 2/5/2021 2:37:21 AM
 ## Navigating to Site
 
 Open website https://graphknowledge.pheeca.com in browser (Chrome, Firefox) on PC Desktop/Laptop (Not available on other devices right now)
-<img src="img/MainPage.PNG" width="100%" />
+<img src="Img/MainPage.PNG" width="100%" />
 
 
 ## Create a new user
@@ -40,7 +40,7 @@ If you do not already have a user, you can create it.
 2. Add Password
 3. Click **User Create**
 
-<img src="img/MainPage_UserCreate.PNG" width="100%" />
+<img src="Img/MainPage_UserCreate.PNG" width="100%" />
 
 ## Login/Logout
 
@@ -51,12 +51,12 @@ In order to login,
 3. Click **Login**
 4. Select graph
 
-<img src="img/MainPage_Login.PNG" width="100%" />
+<img src="Img/MainPage_Login.PNG" width="100%" />
 
 Once logged in, you can click **Logout** to signout
 
 
-<img src="img/MainPage_Logout.PNG" width="100%" />
+<img src="Img/MainPage_Logout.PNG" width="100%" />
 
 ## Create a new graph/Open existing Graph
 In order to open graph(after login),
@@ -66,7 +66,7 @@ In order to open graph(after login),
 3. Click **Login**
 4. Select graph
 
-<img src="img/MainPage_Login.PNG" width="100%" />
+<img src="Img/MainPage_Login.PNG" width="100%" />
 
 For creating graph,
 
@@ -75,12 +75,12 @@ For creating graph,
 3. Click **Login**
 4. Click **Add Graph**
 
-<img src="img/MainPage_CreateGraph1.PNG" width="100%" />
+<img src="Img/MainPage_CreateGraph1.PNG" width="100%" />
 
 5. Add Graph Name
 6. Click **Add**
 
-<img src="img/MainPage_CreateGraph2.PNG" width="100%" />
+<img src="Img/MainPage_CreateGraph2.PNG" width="100%" />
 
 ## Graph Panel
 
@@ -92,7 +92,7 @@ Buttons **4** to move screen right,left,top,buttom, alternatively arrow keys can
 
 Select node (see **5** in image) by clicking on it, you can also hold it and drag. You may see selecting a node opens up a side panel.
 
-<img src="img/MainPage_GraphPanel.PNG" width="100%" />
+<img src="Img/MainPage_GraphPanel.PNG" width="100%" />
 Nodes can have different shapes, colors and they can connect to each other by edge.
 
 ## Nodes and edges - connecting node, create new node, edit/delete node, create new edge, edit/delete edge

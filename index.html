@@ -19,7 +19,15 @@
     <link href="Content/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css" />
     <link href="Content/fstdropdown.min.css" rel="stylesheet" type="text/css" />
 </head>
-<body>
+<body><div class="card text-white bg-info mb-12">
+  
+  <div class="card-body"><button type="button" class="close" aria-label="Close" onclick="$(this).parent().parent().hide()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  
+    <p class="card-text">See Documentation <a class="text-secondary" href="https://github.com/pheeca/GraphKnowledgeManager/tree/master/Documentation">Here</a>.</p>
+  </div>
+</div>
     <div id="pageSection">
     </div>
     <script type="text/javascript" src="Scripts/app.js"></script>
