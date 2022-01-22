@@ -2,6 +2,12 @@ var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
 var AppConfig = AppConfig || {};
 var utilities = utilities || {};
+var services = services || {};
+
+services.client = services.client ||{};
+services.client.dataservice = services.client.dataservice ||{};
+
+
 graphExplorer.ctx = graphExplorer.ctx || {};
 
 graphExplorer.graphConfig = {
@@ -27,8 +33,8 @@ EventBus.addEventListener('selectNode', function (params) {
 
 EventBus.removeEventListener('deselectNode');
 EventBus.addEventListener('deselectNode', function () {
-    graphExplorer.data.selectedNode = null;
-    graphExplorer.data.currentProperty = null;
+    services.client.dataservice.deselectCurrentNode();
+    services.client.dataservice.deselectCurrentProperty();
     if (graphExplorer.onlyNeighbour) {
         setTimeout(() => {
             if (!graphExplorer.data.selectedNode) {
@@ -45,7 +51,7 @@ EventBus.addEventListener('refreshPanel', function () {
     $('#panel,#generalpanel').hide();
     if (graphExplorer.data.selectedNode) {
         $('#panel').show();
-        let localProps = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {}).Properties || [];
+        let localProps = services.client.dataservice.getNode(graphExplorer.data.selectedNode,false).Properties || [];
         EventBus.dispatch('refreshPanelProps', localProps);
         EventBus.dispatch('refreshPanelGraphEditor');
         EventBus.dispatch('refreshPanelCustomize');
@@ -57,7 +63,7 @@ EventBus.addEventListener('refreshPanel', function () {
 
 EventBus.removeEventListener('refreshPanelAdvanceAction');
 EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
-    var _node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
+    var _node = services.client.dataservice.getNode(graphExplorer.data.selectedNode,false);
     //for async, taking over half second on 1k nodes
     var optionNodes = graphExplorer.data.nodes;
     var _html = `<option value="">Select</option>` + optionNodes.map(e => createOption(e)).reduce((a, b) => a + b, '');
@@ -97,7 +103,7 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
 
 EventBus.removeEventListener('refreshPanelCustomize');
 EventBus.addEventListener('refreshPanelCustomize', function (params) {
-    var node = (graphExplorer.data.nodes.filter(node => node.id == graphExplorer.data.selectedNode)[0] || {});
+    var node = services.client.dataservice.getNode(graphExplorer.data.selectedNode,false);
     //Reference:https://www.jqueryscript.net/form/Bootstrap-4-Tag-Input-Plugin-jQuery.html
     var tagsTextbox = $('#tags').tagsinput()[$('#tags').tagsinput().length - 1];
     tagsTextbox.removeAll();
@@ -113,7 +119,7 @@ EventBus.addEventListener('refreshPanelGraphEditor', function (params) {
         var connectedNodeId = _edges[i].to == graphExplorer.data.selectedNode ? _edges[i].from : _edges[i].to;
         $('#edges').append(`<tr data-id='${JSON.stringify(_edges[i])}'>
             <td>${_edges[i].label || ''}</td>
-            <td>${(graphExplorer.data.nodes.filter(e => e.id == connectedNodeId)[0] || {}).label || ''}</td>
+            <td>${(services.client.dataservice.getNode(connectedNodeId,false)).label || ''}</td>
             <td> <button type="button" class="btn btn-danger" onclick=EventBus.dispatch("deleteEdge",'${JSON.stringify(_edges[i])}')>Delete</button></td>
           </tr>`);
     }
@@ -134,7 +140,7 @@ EventBus.addEventListener('readEdge', function (e) {
         edgeVal = $(e.target.currentTarget).data('id').label || '';
         graphExplorer.data.currentEdge = e.target.currentTarget;
     }
-    var siblingNodes = graphExplorer.data.nodes.filter(f => f.id != graphExplorer.data.selectedNode && f.id != graphExplorer.data.selectedNode && (f.parentId || 0) == (graphExplorer.data.parentNode || 0));
+    var siblingNodes = services.client.dataservice.getCurrentSiblingNodes();
     $('#Edge').html(siblingNodes.map(e => createOptionToSiblings(e, siblingNodes)).reduce((a, b) => a + b, ''));
     $('#Edge').val(connectedNodeId);
     $('#EdgeValue').val(edgeVal);
@@ -147,33 +153,57 @@ EventBus.addEventListener('readEdge', function (e) {
     // });
 });
 
+EventBus.removeEventListener('addNewNodesEdges');
+EventBus.addEventListener('addNewNodesEdges', function (e) {
+
+    $('#myModal5').modal("show");
+    if (e.target) {
+        if ($(e.target.target).is('button')) {
+            $('#myModal5').modal("hide");
+            return;
+        }
+    }
+    $('#BulkNodes').on('change',function(){
+        var _html ="";
+        $('#BulkNodes').val().split(',').forEach(function(v,i){
+            _html +=`<tr>
+            <th scope="row">${i+1}</th>
+            <td><input  class="form-control nodeItem" value="${v}" /></td>
+            <td><input  class="form-control edgeItem" value="" /></td>
+          </tr>`;
+        });
+        $('#BulkNodesTable').html(_html);
+        
+    });
+});
+
+
+EventBus.removeEventListener('SubmitAddNewNodesEdges');
+EventBus.addEventListener('SubmitAddNewNodesEdges', function (e) {
+         $('#myModal5').modal("hide");
+         var nodeItems = $('.nodeItem').toArray().map(e=>$(e).val());
+         var edgeItems = $('.edgeItem').toArray().map(e=>$(e).val());
+         if(nodeItems.length!=edgeItems.length)
+         {
+             alert("oops something went wrong!");
+         }
+         nodeItems.forEach(function(nodeLabel,i){
+            var node =services.client.dataservice.createUpdateNode(nodeLabel,null, graphExplorer.data.parentNode);
+            var edgeVal=edgeItems[i];
+            services.client.dataservice.createUpdateEdgeFromCurrentNode(node.id,null,edgeVal,null);
+        });
+        EventBus.dispatch('graphUpdated');            
+});
 
 EventBus.removeEventListener('addEdge');
 EventBus.addEventListener('addEdge', function (e) {
-    if (!graphExplorer.data.currentEdge) {
-        graphExplorer.data.edges[graphExplorer.data.edges.length] = { id: uuidv4(), to: graphExplorer.data.selectedNode, from: parseInt($('#Edge').val()), label: $('#EdgeValue').val() };
-    } else {
-        var oldEdgeJSON = JSON.stringify($(graphExplorer.data.currentEdge).data('id'));
-        for (var i = 0; i < graphExplorer.data.edges.length; i++) {
-            if (JSON.stringify(graphExplorer.data.edges[i]) == oldEdgeJSON) {
-                var edge = graphExplorer.data.edges[i];
-                if (($('#Edge').val() || $('#EdgeValue').val())) {
-                    if (graphExplorer.data.currentEdge) {
-                        if (edge.to == graphExplorer.data.selectedNode) {
-                            edge.from = parseInt($('#Edge').val());
-                        } else {
-                            edge.to = parseInt($('#Edge').val());
-                        }
-                        edge.label = $('#EdgeValue').val();
-                    }
-                }
-                graphExplorer.data.edges[i] = edge;
-            }
-        }
-    }
+
+   services.client.dataservice.createUpdateEdgeFromCurrentNode($('#Edge').val(),graphExplorer.data.currentEdge,$('#EdgeValue').val(),JSON.stringify($(graphExplorer.data.currentEdge).data('id')));
+    
     $('#myModal3').modal('hide');
     $('#myModal3 input').val('');
-    graphExplorer.data.currentEdge = null;
+    
+    services.client.dataservice.deselectCurrentEdge();
     EventBus.dispatch('graphUpdated');
 });
 
@@ -261,7 +291,7 @@ EventBus.addEventListener('addPropperty', function () {
     EventBus.dispatch('refreshPanelProps', props);
     $(graphExplorer.graphConfig.modal.property).modal('hide');
     $(graphExplorer.graphConfig.modal.property + ' input').val('');
-    graphExplorer.data.currentProperty = null;
+    services.client.dataservice.deselectCurrentProperty();
 });
 
 
@@ -276,7 +306,7 @@ EventBus.removeEventListener('closeNode');
 EventBus.addEventListener('closeNode', function () {
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
     if (graphExplorer.data.parentNode && routeParams.NodeId != graphExplorer.data.parentNode) {
-        graphExplorer.data.parentNode = ((graphExplorer.data.nodes.filter(e => e.id == graphExplorer.data.parentNode)[0] || {}).parentId || null);
+        graphExplorer.data.parentNode = (services.client.dataservice.getNode( graphExplorer.data.parentNode,false).parentId || null);
 
         EventBus.dispatch('graphUpdated');
     }
@@ -286,22 +316,14 @@ EventBus.addEventListener('closeNode', function () {
 EventBus.removeEventListener('readNode');
 EventBus.addEventListener('readNode', function () {
     $('#myModal4').modal("show");
-    $('#NodeName').val(((graphExplorer.data.nodes.filter(f => f.id == graphExplorer.data.selectedNode)[0] || {}).label || ''));
+    
+    $('#NodeName').val(((services.client.dataservice.getCurrentNode(false)).label || ''));
     EventBus.dispatch('graphUpdated');
 });
 
 EventBus.removeEventListener('addNode');
 EventBus.addEventListener('addNode', function (params) {
-    if (graphExplorer.data.selectedNode) {
-        for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
-            if (graphExplorer.data.nodes[i].id == graphExplorer.data.selectedNode) {
-                graphExplorer.data.nodes[i].label = $('#NodeName').val();
-            }
-        }
-    } else {
-        graphExplorer.data.nodes[graphExplorer.data.nodes.length] = { id: (graphExplorer.data.nodes[graphExplorer.data.nodes.length - 1].id + 1), label: $('#NodeName').val(), parentId: graphExplorer.data.parentNode };
-
-    }
+    services.client.dataservice.createUpdateCurrentNode($('#NodeName').val());
     EventBus.dispatch('graphUpdated');
     $('#myModal4').modal("hide");
 });
@@ -446,9 +468,9 @@ EventBus.addEventListener('changeparent', function (params) {
 
 EventBus.removeEventListener('linkNode');
 EventBus.addEventListener('linkNode', function (params) {
-    var item = graphExplorer.data.nodes.filter(item => item.id == graphExplorer.data.selectedNode)[0];
+    var item = services.client.dataservice.getCurrentNode();
     var linkId = parseInt($(graphExplorer.graphConfig.linkNodes).val());
-    var linkedNode = graphExplorer.data.nodes.filter(e => e.id == linkId)[0];
+    var linkedNode = services.client.dataservice.getNode(linkId);
     var expectedNodeUnit = (linkedNode || {}).nodeUnit || item.nodeUnit || uuidv4();
     graphExplorer.data.nodes.forEach(function (_node) {
         if (!linkedNode && _node.id == item.id) {
@@ -680,14 +702,14 @@ function createOptionToSiblings(e, siblingNodes) {
         try {
 
             if (toedges.length > 0) {
-                let edgeNode = graphExplorer.data.nodes.filter(f => f.id == toedges[0].from)[0];
+                let edgeNode = services.client.dataservice.getNode(toedges[0].from);
                 if (edgeNode) {
                     extralabel = " (" + toedges[0].label + ' - ' + edgeNode.label + ")";
                 } else {
                     console.log('missing node ', toedges[0]);
                 }
             } else if (fromedges.length > 0) {
-                let edgeNode = graphExplorer.data.nodes.filter(f => f.id == fromedges[0].to)[0];
+                let edgeNode = services.client.dataservice.getNode(fromedges[0].to) ;
                 if (edgeNode) {
                     extralabel = " (" + fromedges[0].label + ' - ' + edgeNode.label + ")";
                 } else {
@@ -706,7 +728,7 @@ function createOption(e) {
     let extralabel = '';
     if (e && e.id) {
         try {
-            let edgeNode = graphExplorer.data.nodes.filter(f => f.id == e.parentId)[0];
+            let edgeNode = services.client.dataservice.getNode(e.parentId);
             if (edgeNode) {
                 extralabel = " (" + edgeNode.label + (e.nodeUnit ? ('|' + e.nodeUnit) : '') + ")";
             }
@@ -717,6 +739,6 @@ function createOption(e) {
     return `<option value="${e.id}" >${e.label}${extralabel}</option>`;
 }
 $(graphExplorer.graphConfig.modal.property).on('hidden.bs.modal', function () {
-    graphExplorer.data.currentProperty = null;
+    services.client.dataservice.deselectCurrentProperty();
     EventBus.dispatch('refreshPanel');
 });

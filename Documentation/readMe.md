@@ -95,7 +95,7 @@ Select node (see **5** in image) by clicking on it, you can also hold it and dra
 <img src="Img/MainPage_GraphPanel.PNG" width="100%" />
 Nodes can have different shapes, colors and they can connect to each other by edge.
 
-## Nodes and edges - connecting node, create new node, edit/delete node, create new edge, edit/delete edge
+## Nodes and edges - connecting node, create new node, edit/delete node, create new edge, edit/delete edge,create multiple nodes
 ## entering into Child Node and Parent Node
 ## Save Graph
 ## Undo/Redo

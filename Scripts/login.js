@@ -16,6 +16,7 @@ $('form input').keypress(function (e) {
 EventBus.addEventListener('UI.Web.App.UI.Login', function (params) {
     var email = $('#email').val();
     var password = $('#password').val();
+    if (email && password) {
     $.ajax({
         url: AppConfig.domain + '/api/UserAuth',
         type: "POST",
@@ -36,7 +37,9 @@ EventBus.addEventListener('UI.Web.App.UI.Login', function (params) {
             alert("Sorry, there was a problem!");
         }
     });
-
+    }else{
+        alert("please enter email/pass");
+    }
 });
 
 EventBus.addEventListener('UI.Web.App.UI.Login.LoadUserInfo', function (params) {
@@ -83,6 +86,7 @@ EventBus.addEventListener('UI.Web.App.UI.Login.schemaSelect', function (params) 
 EventBus.addEventListener('UI.Web.App.UI.Login.schemaAdd', function (params) {
     var graphName=$('#graphname').val();
     var userId = sessionStorage.getItem("UserId");
+    
     if(graphName){
         $.ajax({
             url: AppConfig.domain + '/api/UserSchema',
@@ -104,31 +108,37 @@ EventBus.addEventListener('UI.Web.App.UI.Login.schemaAdd', function (params) {
                 alert("Sorry, there was a problem!");
             }
         });
+    }else{
+        alert("please enter graph name");
     }
        
 });
 EventBus.addEventListener('UI.Web.App.UI.CreateUser', function (params) {
     var email = $('#email').val();
     var password = $('#password').val();
-    $.ajax({
-        url: AppConfig.domain + '/api/User',
-        type: "POST",
-        data: {
-            username: email,
-            password: password,
-        },
-        success: function (data) {
-            if (data) {
-                alert('success')
-                EventBus.dispatch('UI.Web.App.UI.Login');
-            }else{
-                alert('user already exists');
+    if (email && password) {
+        $.ajax({
+            url: AppConfig.domain + '/api/User',
+            type: "POST",
+            data: {
+                username: email,
+                password: password,
+            },
+            success: function (data) {
+                if (data) {
+                    alert('success')
+                    EventBus.dispatch('UI.Web.App.UI.Login');
+                } else {
+                    alert('user already exists');
+                }
+            },
+            error: function (xhr, status) {
+                console.log(xhr, status);
+                alert("Sorry, there was a problem!");
             }
-        },
-        error: function (xhr, status) {
-            console.log(xhr, status);
-            alert("Sorry, there was a problem!");
-        }
-    });
+        });
+    } else { 
+        alert("please enter email/pass")
+    }
 
 });

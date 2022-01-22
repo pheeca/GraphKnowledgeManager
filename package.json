@@ -1,6 +1,6 @@
 {
   "name": "graphknowledgemanager",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A web-app tool to help organize your life. With 3-D Graph structure store even the most complex information with incredible ease of use",
   "main": "index.js",
   "scripts": {
