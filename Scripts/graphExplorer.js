@@ -17,6 +17,7 @@ graphExplorer.graphConfig = {
     changeparent: '#changeparent',
     linkNodes: '#linkNodes',
     searchmode:'#searchmode',
+    representationstyle:'#representationstyle',
     modal: {
         property: '#myModal'
     }
@@ -519,6 +520,7 @@ EventBus.addEventListener('graphUpdated', function (params) {
             EventBus.dispatch('openNode');
         });
     } else {
+        graphExplorer.network.setOptions(graphExplorer.options);
         var nLevelNeighbouringNode = $('#nLevelNeighbouringNode').val();
         var tagFilter = $(graphExplorer.graphConfig.searchtag).val() || '';
         var tagContextGlobal = $(graphExplorer.graphConfig.tagContextGlobal).is(':checked');
@@ -623,7 +625,9 @@ function uuidv4() {
 
 function initialize(_rawData) {
     graphExplorer.container = graphExplorer.container || document.getElementById('mynetwork');
-    graphExplorer.options = graphExplorer.options || {
+    graphExplorer.options = graphExplorer.options ;
+    graphExplorer.ctx.representationstyle={};
+    graphExplorer.ctx.representationstyle.graph ={
         autoResize: true,
         interaction: {
             navigationButtons: true,
@@ -634,7 +638,25 @@ function initialize(_rawData) {
                 iterations: 10
             }
         }
-    };
+    }
+    graphExplorer.ctx.representationstyle.hierarchical=Object.assign({},graphExplorer.ctx.representationstyle.graph,{ edges: {
+        smooth: {
+          type: 'cubicBezier',
+          forceDirection: 'vertical',
+          roundness: 1
+        },
+        color: 'lightgray'
+      },  layout: {
+        hierarchical: {
+          direction: 'UD',
+          nodeSpacing: 150
+        }
+      },
+      interaction: {dragNodes :false},
+     physics:false});
+     
+     graphExplorer.options=$(graphExplorer.graphConfig.representationstyle).val()=='hierarchical'?graphExplorer.ctx.representationstyle.hierarchical:graphExplorer.options;
+     graphExplorer.options=$(graphExplorer.graphConfig.representationstyle).val()=='graph'?graphExplorer.ctx.representationstyle.graph:graphExplorer.options;
 
     //var _rawData = localStorage.getItem('graphExplorer.data');
 

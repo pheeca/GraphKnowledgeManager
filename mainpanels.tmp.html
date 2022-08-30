@@ -1,10 +1,15 @@
 <div class="container-fluid" id="mainpanelgroup">
     <div class="row h-25">
-        <div class="col-sm-1">version 1.0.5</div>
-        <p id="updatemsg" class="col-sm-11">
-            Create a simple network with some nodes and edges.
-        </p>
-        <div class="col-sm-6 col-md-4">
+        <div class="col-sm-12 col-md-12">
+            <div class="row">
+            <p class="col-sm-1 col-md-2">version 1.0.5</p>
+            <p id="updatemsg" class="col-sm-11 col-md-10">
+                Create a simple network with some nodes and edges.
+            </p>
+        </div>
+        </div>
+        
+        <div class="col-sm-6 col-md-2">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group mr-2 mt-2" role="group">
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
@@ -25,7 +30,7 @@
                 
             </div>
         </div>
-        <div class="col-sm-6 col-md-2 ">
+        <div class="col-sm-6 col-md-3">
 
             <div class="input-group">
                 <input class="form-control py-2 border-right-0 border" type="search" id="search" placeholder="search" >
@@ -45,7 +50,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-sm-12  col-md-4">
+        <div class="col-sm-12  col-md-3">
             <div class="row">
                 <input type="number" id="nLevelNeighbouringNode" onclick="EventBus.dispatch('graphUpdated')" class="form-control col-sm-4" value="1" min="1" max="10" placeholder="nLevel">
                 <label class="col-sm-8" for="nLevelNeighbouringNode">N-Level Neighbouring</label>
@@ -54,6 +59,16 @@
                 <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
                 <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
                     Nodes</label>
+            </div>
+        </div>
+        <div class="col-sm-12  col-md-4">
+            <div class="row">
+                <select id="representationstyle" onchange="EventBus.dispatch('loadGraph')">
+                    <option selected>graph</option>
+                    <option >hierarchical</option>
+                </select>
+                
+                <label class="col-sm-8" for="representationstyle">Representation Style</label>
             </div>
         </div>
     </div>
