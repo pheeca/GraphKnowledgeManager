@@ -92,9 +92,12 @@ EventBus.addEventListener('UI.Web.App.UiChanged', function (params) {
                     }
                 }
                 if (isAllowed) {
+                    
                     $(AppConfig.pageSection).html(s);
                     $('title').text(`${currentRoute.title||AppConfig.title} | ${AppConfig.title}`);
                     EventBus.dispatch(currentRoute.event);
+                    
+                    
                 }
             },
             error: function (xhr, status) {

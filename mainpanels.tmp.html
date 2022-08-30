@@ -1,6 +1,6 @@
 <div class="container-fluid" id="mainpanelgroup">
     <div class="row h-25">
-        <div class="col-sm-1">version 1.0.4</div>
+        <div class="col-sm-1">version 1.0.5</div>
         <p id="updatemsg" class="col-sm-11">
             Create a simple network with some nodes and edges.
         </p>
@@ -27,11 +27,22 @@
         </div>
         <div class="col-sm-6 col-md-2 ">
 
-            
-            <input type="text" id="searchtag" class="form-control  col-sm-12" placeholder="search tag">
+            <div class="input-group">
+                <input class="form-control py-2 border-right-0 border" type="search" id="search" placeholder="search" >
+                <span class="input-group-append">
+                    <button class="btn btn-outline-secondary border-left-0 border bg-transparent" type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </span>
+          </div>
             <div class="custom-control custom-switch  col-sm-12">
-                <input type="checkbox" class="custom-control-input" id="tagContextGlobal" value="false">
-                <label class="custom-control-label" for="tagContextGlobal">Global</label>
+                <input type="checkbox" class="custom-control-input" id="ContextGlobal" value="false">
+                <label class="custom-control-label" for="ContextGlobal">Global</label>
+                <select multiple id="searchmode">
+                    <option>tag</option>
+                    <option selected>node</option>
+                    <option>properties</option>
+                </select>
             </div>
         </div>
         <div class="col-sm-12  col-md-4">
@@ -330,8 +341,14 @@
         border: 1px solid lightgray; */
     }
 </style>
+<script src="Scripts/bootstrap-select.min.js"></script>
+<link rel="stylesheet" href="Content/bootstrap-select.css" />
+
 <script>
     $(document).ready(function () {
         $('#mynetwork').height(Math.floor(($(window).height() / 100) * 85));
-    })
+    });
+    $(window).load(function(){
+        
+    });
 </script>

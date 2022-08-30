@@ -23,21 +23,27 @@
 --neighbouring node - n-level
 --neighbouring node - n-level -UI fix
 --documentation link on site
-->create multiple nodes linked(via edges+edge value) to current node
-Add Clientside Pipeline to manipulate graph - CRUD Node,Properties,Edges etc
-Search node, on node select search clear
+--create multiple nodes linked(via edges+edge value) to current node
+->Add Clientside Pipeline to manipulate graph - CRUD Node,Properties,Edges etc
+--Search node, on node select search clear
 --validation user,graph creation
+--must not do action(save undo redo etc), that will cause everything to be InActive
 node scale,title
 tag type
 multi-tenancy
 share graph permission 
 concurrent user via locking nodes and edges
 ?? turn property into bool-check list/numeric/currency/enum/binary/time/timeOffset/time-range/geography/geometry/image/guid/hierarchyid/file/external system(s) ids(including refids)
+??{
+          "key": "val",
+          "value": "3",
+          "date": ""
+        }
 link files (how to upload files without storage limit restriction) [https://www.backblaze.com/b2/docs/calling.html https://www.mediafire.com/developers/sdks_and_tools/javascript/basics/ https://github.com/MediaFire/mediafire-csharp-open-sdk]
 --disconnect linked node
 Make a template for standard knowledge Graph, which will be default of tenant
 Change Text color (on dark background harder to recognize text) - maaz suggestion
-not overlap the nodes on top of each other - maaz suggestion
+not overlap the nodes and edges on top of each other(may be elbow shaped edge) - maaz suggestion-https://visjs.github.io/vis-network/examples/network/layout/hierarchicalLayoutOverlapAvoidance.html
 Admin user to have access of other graphs
 convert to mobile (https://auth0.com/blog/converting-your-web-app-to-mobile/)
 notification engine:mobile alarm,mobile notification,email

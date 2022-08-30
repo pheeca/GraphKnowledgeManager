@@ -12,10 +12,11 @@ graphExplorer.ctx = graphExplorer.ctx || {};
 
 graphExplorer.graphConfig = {
     defaultNodeColor: '#97c2fc',
-    searchtag: '#searchtag',
-    tagContextGlobal: '#tagContextGlobal',
+    searchtag: '#search',
+    tagContextGlobal: '#ContextGlobal',
     changeparent: '#changeparent',
     linkNodes: '#linkNodes',
+    searchmode:'#searchmode',
     modal: {
         property: '#myModal'
     }
@@ -396,6 +397,7 @@ function getCurrentNodes(_data) {
 
     var tagFilter = $(graphExplorer.graphConfig.searchtag).val() || null;
     var tagContextGlobal = $(graphExplorer.graphConfig.tagContextGlobal).is(':checked');
+    var searchmode = $(graphExplorer.graphConfig.searchmode).val() || [];
 
     var _tempNodes = [];
     if (!tagContextGlobal) {
@@ -409,7 +411,18 @@ function getCurrentNodes(_data) {
         _tempNodes = _data.nodes;
     }
     if (tagFilter) {
-        _tempNodes = _tempNodes.filter(e => (e.tags || []).filter(t => t.indexOf(tagFilter) > -1).length > 0);
+        
+        if(searchmode.includes('tag')){
+            _tempNodes = _tempNodes.filter(e => (e.tags || []).filter(t => t.indexOf(tagFilter) > -1).length > 0);
+        }
+        if(searchmode.includes('node')){
+            
+            _tempNodes = _tempNodes.filter(e => e.label.toLocaleLowerCase().trim().indexOf(tagFilter.toLocaleLowerCase().trim())  > -1);
+        }
+        if(searchmode.includes('properties')){
+            _tempNodes = _tempNodes.filter(e => (e.Properties||[]).filter(p=>((p.key||'')+(p.value||'')).toLocaleLowerCase().trim().indexOf(tagFilter.toLocaleLowerCase().trim())  > -1));
+        }
+        _tempNodes = [...new Map(_tempNodes.map(item => [item['id'], item])).values()]; 
     }
     for (var i = 0; i < _tempNodes.length; i++) {
         if (_data.nodes.map(e => e.parentId).filter(e => e).indexOf(_tempNodes[i].id) > -1) {
@@ -542,11 +555,13 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     }
     graphExplorer.url = AppConfig.domain + '/api/Values/' + UserSchemaId;
     EventBus.dispatch('loadGraph');
+    $('select[multiple]').selectpicker();
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
     $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
-    $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal).on('change', (e) => EventBus.dispatch('graphUpdated', e));
+    //+ ',' + graphExplorer.graphConfig.searchmode
+    $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal ).on('change', (e) => EventBus.dispatch('graphUpdated', e));
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
     $(graphExplorer.graphConfig.changeparent).on('change', (e) => EventBus.dispatch('changeparent'));
     $(graphExplorer.graphConfig.linkNodes).on('change', (e) => EventBus.dispatch('linkNode'));

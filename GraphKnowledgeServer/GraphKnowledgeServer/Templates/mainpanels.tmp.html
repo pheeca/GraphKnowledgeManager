@@ -1,9 +1,10 @@
 <div class="container-fluid" id="mainpanelgroup">
     <div class="row h-25">
-        <p id='updatemsg' class="col-sm-12">
+        <div class="col-sm-1">version 1.0.5</div>
+        <p id="updatemsg" class="col-sm-11">
             Create a simple network with some nodes and edges.
         </p>
-        <div class="col-sm-6 col-md-2">
+        <div class="col-sm-6 col-md-4">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group mr-2 mt-2" role="group">
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
@@ -18,23 +19,38 @@
                 <div class="btn-group mr-2 mt-2" role="group">
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Undo')">Undo</button>
                 </div>
-                <div class="btn-group mr-2 mt-2" role="group" >
+                <div class="btn-group mr-2 mt-2" role="group">
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Redo')">Redo</button>
                 </div>
                 
             </div>
         </div>
-        <div class="col-sm-6 col-md-2">
+        <div class="col-sm-6 col-md-2 ">
 
-            <span class="fa fa-search form-control-feedback col-sm-1"></span>
-            <input type="text" id="searchtag" class="form-control  col-sm-5" placeholder="search tag">
-            <div class="custom-control custom-switch  col-sm-6">
-                <input type="checkbox" class="custom-control-input" id="tagContextGlobal" value="false">
-                <label class="custom-control-label" for="tagContextGlobal">Global</label>
+            <div class="input-group">
+                <input class="form-control py-2 border-right-0 border" type="search" id="search" placeholder="search" >
+                <span class="input-group-append">
+                    <button class="btn btn-outline-secondary border-left-0 border bg-transparent" type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </span>
+          </div>
+            <div class="custom-control custom-switch  col-sm-12">
+                <input type="checkbox" class="custom-control-input" id="ContextGlobal" value="false">
+                <label class="custom-control-label" for="ContextGlobal">Global</label>
+                <select multiple id="searchmode">
+                    <option>tag</option>
+                    <option selected>node</option>
+                    <option>properties</option>
+                </select>
             </div>
         </div>
-        <div class="col-sm-12  col-md-3">
-            <div class="custom-control custom-switch">
+        <div class="col-sm-12  col-md-4">
+            <div class="row">
+                <input type="number" id="nLevelNeighbouringNode" onclick="EventBus.dispatch('graphUpdated')" class="form-control col-sm-4" value="1" min="1" max="10" placeholder="nLevel">
+                <label class="col-sm-8" for="nLevelNeighbouringNode">N-Level Neighbouring</label>
+            </div>
+            <div class="col-sm-12 custom-control custom-switch">
                 <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
                 <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
                     Nodes</label>
@@ -90,7 +106,8 @@
                         Node</button>
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readEdge')">+ Add
                         Relation</button>
-
+                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addNewNodesEdges')">+ Add
+                            Nodes/Edges</button>
                     <table class="table">
                         <thead>
                             <tr>
@@ -241,6 +258,7 @@
     </div>
 </div>
 <!-- Modal -->
+
 <!-- Modal End-->
 <div class="modal fade" id="myModal4" role="dialog">
     <div class="modal-dialog modal-sm">
@@ -266,8 +284,49 @@
     </div>
 </div>
 <!-- Modal End-->
+<!-- Modal -->
+<div id="myModal5" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Add Nodes/Edges</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div  class="form-group">
+                        <input data-role="tagsinput" id="BulkNodes" value="">
+                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Node</th>
+                            <th scope="col">Edge</th>
+                          </tr>
+                        </thead>
+                        <tbody id="BulkNodesTable">
+                          
+                        </tbody>
+                      </table>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('SubmitAddNewNodesEdges')">+ Add
+                    Nodes</button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Modal -->
 <link href="Content/tagsinput.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="Scripts/tagsinput.js"></script>
+<script type="text/javascript" src="Scripts/services.js"></script>
 <script type="text/javascript" src="Scripts/graphExplorer.js"></script>
 <style>
     .bootstrap-tagsinput .badge {
@@ -282,8 +341,14 @@
         border: 1px solid lightgray; */
     }
 </style>
+<script src="Scripts/bootstrap-select.min.js"></script>
+<link rel="stylesheet" href="Content/bootstrap-select.css" />
+
 <script>
     $(document).ready(function () {
         $('#mynetwork').height(Math.floor(($(window).height() / 100) * 85));
-    })
+    });
+    $(window).load(function(){
+        
+    });
 </script>
