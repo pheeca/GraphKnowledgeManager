@@ -28,6 +28,9 @@
 --Search node, on node select search clear
 --validation user,graph creation
 --must not do action(save undo redo etc), that will cause everything to be InActive
+property link,form
+hierarchy
+Templates[child nodes,sibling node,color,properties,links,tags,hierarchy]
 node scale,title
 tag type
 multi-tenancy
