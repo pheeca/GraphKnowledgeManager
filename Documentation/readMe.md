@@ -95,6 +95,138 @@ Select node (see **5** in image) by clicking on it, you can also hold it and dra
 <img src="Img/MainPage_GraphPanel.PNG" width="100%" />
 Nodes can have different shapes, colors and they can connect to each other by edge.
 
+## creating new node
+<img src="Img/MainPage_creatingnewnode.PNG" width="100%" />
+select +add button & put name of node in textbox.
+
+1. Add Node.
+2. add Node name to textbox.
+3. Edit Node.
+
+## edit/delete node
+<img src="Img/MainPage_editdelete.PNG" width="100%" />
+click to +edit button if you rename value or change value depend on your node name & if you delete node click to delete node button then delete your node
+
+1. Edit button.
+2. Delete node.
+
+## create new multiple Nodes and edges at same time
+<img src="Img/MainPage_creatednodeedges.PNG" width="100%" />
+Click +Add/Edit Edge button write names of Nodes seperated by comma.
+
+1. click add node/edge.
+2. write names of Nodes seperated by comma.
+3. write names of all edges on corresponding node.
+4. click to below button +add node then save.
+
+
+## create new edge
+<img src="Img/MainPage_creatededges.PNG" width="100%" />
+Click +Add Relations button choose Node.
+
+## delete edge
+
+
+<img src="Img/MainPage_deleteEdge.PNG" width="100%" />
+click select already created node & click delete button in relation list under graph editor.
+
+1. select already created node.
+2. find relation under graph editor.
+3. delete button.
+
+
+## entering into Child Node and Parent Node
+select created node & double click on node & click right up side parent node button click to out side in node.
+
+<img src="Img/MainPage_Childnode1.PNG" width="100%" />
+
+ there are two ways to enter into the child node 
+
+1. Double click to enter in node.
+the 2nd way is
+1. right side bar click to property.
+2. click open.
+
+<img src="Img/MainPage_Childnode2.PNG" width="100%" />
+
+after enter to node.
+1. node.
+2. parent.
+
+## Save Graph
+<img src="Img/MainPage_savegraph.PNG" width="100%" />
+click to left up side save button & save not automaticly its manual so click save to save after every work.
+
+1. click to save.
+
+## Undo/Redo
+
+<img src="Img/MainPage_undoredo.PNG" width="100%" />
+Click to undo button all work back work again return & Click Redo button work also next return.
+
+1. click to undo.
+2. click to redo.
+
+## Tags & Search (tagtype:tag)
+
+Used to up side search bar & put tags then search your values.
+<img src="Img/MainPage_sreachtag.PNG" width="100%" />
+
+1. click to up side serach and put tag.
+
+## set node color
+Click to any already created node then see your right side click to node customize button & Select your favorite color.
+
+<img src="Img/MainPage_colour.PNG" width="100%" />
+
+1. click to node customize.
+2. click to colour then select.
+3. click to update button.
+
+## Neighboring Model
+see upside circle option to click on of button Display Only Neighbouring Nodes. if you choose any number of node.
+
+<img src="Img/MainPage_modelnode.PNG" width="100%" />
+
+1. click to change number to node .
+2. click to select on off button to explore your node.
+
+## Nested Nodes & Global Mode
+click to left upside Global button on off option click to expore your child node.
+
+<img src="Img/MainPage_nestednode.PNG" width="100%" />
+
+1. click to global button.
+
+## Storing information on node/properties of node
+node are simple save your information platfoum this is easy to used about your data & click to right side properties of node click to +Add button then put your values in the colum.
+
+<img src="Img/MainPage_property.PNG" width="100%" />
+
+
+1. click Property.
+2. click Add.
+3. property.
+4. value.
+5. date.
+6. add property.
+
+
+## Move node/Change parent
+Click' to node hold on 'click button' move to any where & click' to change parent change node location.
+
+<img src="Img/MainPage_movenode.PNG" width="100%" />
+
+1. click to advance property button.
+2. click to change parent & select your choice.
+
+
+## Join nodes as same under different context, redirect
+Double click to already created node enter to node & More node created in one by one.
+
+## Graph Sharing
+click to any node & see right side bar show advance action click button now you can see shareing option use it now share other nodes.
+
 ## Nodes and edges - connecting node, create new node, edit/delete node, create new edge, edit/delete edge,create multiple nodes
 ## entering into Child Node and Parent Node
 ## Save Graph
