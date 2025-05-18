@@ -1,3 +1,71 @@
+- [User Manual](#user-manual)
+- [About](#about)
+- [Versions](#versions)
+- [Getting Started](#getting-started)
+	- [Navigating to Site](#navigating-to-site)
+	- [Create a new user](#create-a-new-user)
+	- [Login/Logout](#loginlogout)
+	- [Create a new graph/Open existing Graph](#create-a-new-graphopen-existing-graph)
+	- [Graph Panel](#graph-panel)
+	- [creating new node](#creating-new-node)
+	- [edit/delete node](#editdelete-node)
+	- [create new multiple Nodes and edges at same time](#create-new-multiple-nodes-and-edges-at-same-time)
+	- [create new edge](#create-new-edge)
+	- [delete edge](#delete-edge)
+	- [entering into Child Node and Parent Node](#entering-into-child-node-and-parent-node)
+	- [Save Graph](#save-graph)
+	- [Undo/Redo](#undoredo)
+	- [Tags \& Search (tagtype:tag)](#tags--search-tagtypetag)
+	- [set node color](#set-node-color)
+	- [Neighboring Model](#neighboring-model)
+	- [Nested Nodes \& Global Mode](#nested-nodes--global-mode)
+	- [Storing information on node/properties of node](#storing-information-on-nodeproperties-of-node)
+	- [Move node/Change parent](#move-nodechange-parent)
+	- [Mark nodes as same, but under different context, redirect \[incomplete\]](#mark-nodes-as-same-but-under-different-context-redirect-incomplete)
+	- [Graph Sharing \[incomplete\]](#graph-sharing-incomplete)
+	- [Nodes and edges - connecting node\[incomplete\]](#nodes-and-edges---connecting-nodeincomplete)
+- [Developer Manual](#developer-manual)
+	- [System Requirement](#system-requirement)
+	- [Technology Stack](#technology-stack)
+			- [Database](#database)
+			- [Server side:](#server-side)
+			- [FrontEnd](#frontend)
+		- [Pre Requisites](#pre-requisites)
+		- [Repository](#repository)
+		- [Project Structure](#project-structure)
+		- [Data Restore (DB)](#data-restore-db)
+	- [Configuration](#configuration)
+		- [Setting Up Dev Environment](#setting-up-dev-environment)
+		- [Server Side Dev](#server-side-dev)
+		- [Client Side Dev](#client-side-dev)
+		- [Engine Dev \[Improper\]](#engine-dev-improper)
+			- [Front End](#front-end)
+			- [Server](#server)
+	- [Dev Problems](#dev-problems)
+- [Conceptual Model Analysis Manual](#conceptual-model-analysis-manual)
+	- [Conceptual Problems](#conceptual-problems)
+	- [Notes:](#notes)
+	- [Switch to another file](#switch-to-another-file)
+	- [Rename a file](#rename-a-file)
+	- [Delete a file](#delete-a-file)
+	- [Export a file](#export-a-file)
+- [Synchronization](#synchronization)
+	- [Open a file](#open-a-file)
+	- [Save a file](#save-a-file)
+	- [Synchronize a file](#synchronize-a-file)
+	- [Manage file synchronization](#manage-file-synchronization)
+- [Publication](#publication)
+	- [Publish a File](#publish-a-file)
+	- [Update a publication](#update-a-publication)
+	- [Manage file publication](#manage-file-publication)
+- [Markdown extensions](#markdown-extensions)
+	- [SmartyPants](#smartypants)
+	- [KaTeX](#katex)
+	- [UML diagrams](#uml-diagrams)
+
+
+
+
 # User Manual
 
 The software - knowledge graph represents a collection of interlinked descriptions and properties of entities – objects, events or concepts. Knowledge graph put data in context via linking and semantic metadata and this way provide a framework for data integration, unification, analytics and sharing. Simply put, software depicts ***knowledge*** in terms of entities and their relationships and facilitate self organization.
@@ -221,27 +289,65 @@ Click' to node hold on 'click button' move to any where & click' to change paren
 2. click to change parent & select your choice.
 
 
-## Join nodes as same under different context, redirect
-Double click to already created node enter to node & More node created in one by one.
+## Mark nodes as same, but under different context, redirect [incomplete]
 
-## Graph Sharing
-click to any node & see right side bar show advance action click button now you can see shareing option use it now share other nodes.
+**Purpose**  
+Allows users to mark multiple nodes as representing the same entity but under different contexts. This enables redirection between such nodes, improving semantic clarity in complex graphs.
 
-## Nodes and edges - connecting node, create new node, edit/delete node, create new edge, edit/delete edge,create multiple nodes
-## entering into Child Node and Parent Node
-## Save Graph
-## Undo/Redo
-## Tags & Search (tagtype:tag)
-## set node color
-## Neighboring Model
-## Nested Nodes & Global Mode
-## Storing information on node/properties of node
-## Move node/Change parent
-## Join nodes as same under different context, redirect
-## Graph Sharing
+**How To Use**  
+1. Double-click an already created node.  
+2. Enter into that node's detail view.  
+3. Select or create another node that represents the same entity in a different context.  
+4. The system will link them as the same under different contexts and redirect appropriately.
+
+**Use Case Example**  
+A person node in "Project A" and the same person in "Project B" may serve different roles but represent the same individual. Use this feature to link them contextually.
+
+
+## Graph Sharing [incomplete]
+
+**Purpose**  
+Allows sharing of individual nodes or graph subsets for collaboration, embedding, or referencing.
+
+**How To Use**  
+1. Click on any node.  
+2. Look at the right-side bar — the **Advance Actions** section appears.  
+3. Click the **share** button now visible.  
+4. A unique shareable link will be generated to access that node or graph subset.
+
+**Features**  
+- Share selected nodes without exposing the full graph.  
+- Supports contextual sharing with relationships preserved.  
+- Links can be used in external platforms or documentation.
+
+**Use Case Example**  
+Share a knowledge node with a colleague to discuss without needing to export the full graph structure.
+
+## Nodes and edges - connecting node[incomplete]
+
 
 # Developer Manual
 ## System Requirement
+
+🌐 Client Requirements
+
+| Requirement           | Specification                            |
+| --------------------- | ---------------------------------------- |
+| **Browser**           | Latest versions of Chrome, Firefox, Edge |
+| **JavaScript**        | Enabled                                  |
+| **Screen Resolution** | 1366×768 or higher                       |
+
+⚙️ Server Requirements
+
+| Component            | Specification                                     |
+| -------------------- | ------------------------------------------------- |
+| **Operating System** | Windows Server 2012 R2, 2016, 2019, or newer      |
+| **.NET Framework**   | .NET Framework 4.7.2 or higher                    |
+| **Web Server**       | IIS 8.0 or higher (with ASP.NET role enabled)     |
+| **Disk Storage**     | Minimum 1 GB free (SSD preferred for performance) |
+| **RAM**              | Minimum 2 GB (4+ GB recommended)                  |
+| **CPU**              | Dual-core (Quad-core recommended)                 |
+
 ## Technology Stack
 #### Database
 ![Microsoft Sql Server](https://img.shields.io/badge/-Sql%20Server-CC2927?style=flat-square&logo=microsoft-sql-server&logoColor=ffffff)
@@ -259,14 +365,102 @@ click to any node & see right side bar show advance action click button now you 
 ![jQuery](https://img.shields.io/badge/-jQuery-0769AD?style=flat-square&logo=jquery)
 
 ### Pre Requisites
-### Repository
-### Project Structure
-### Data Restore (DB)
-### Setting Up Dev Environment
-### Server Side Dev
-### Client Side Dev
-### Engine Dev
+- **Software/Tools**:  
+  - Visual Studio 2019+ (with ASP.NET and web development workload)  
+  - Node.js v14+ and npm  
+  - Microsoft SQL Server 2018+ (or Azure SQL Database)  
+  - Git  
+- **Accounts**:  
+  - Azure DevOps/GitHub access for repository (credentials provided by the team)  
+  - SQL Server credentials with read/write permissions  
+- **Frameworks**:  
+  - .NET Framework 4.6.1  
+  - SignalR Core  
+  - Entity Framework 6+  
 
+### Repository
+- **URL**: `https://github.com/pheeca/GraphKnowledgeManager` (private repository)  
+- **Branch Strategy**:  
+  - `main`: Production-ready code  
+  - `dev`: Active development branch  
+  - Feature branches: `feature/<feature-name>`  
+- **Commit Guidelines**:  
+  - Follow Conventional Commits (e.g., `feat: add node creation API`).  
+  - Include JIRA ticket ID in commit messages (e.g., `GK-123: Fix undo-redo bug`).  
+
+### Project Structure
+```plaintext
+Solution 'GraphKnowledgeServer'  
+├── DataAccess             // Database models, Entity Framework mappings  
+├── Database               // SQL scripts, migrations, and backup files  
+├── EventBus               // SignalR hubs, message bus implementation  
+├── GraphKnowledgeServer   // MVC Web Application (UI and Controllers)  
+└── Shared                 // Common utilities, DTOs, and interfaces  
+```
+### Data Restore (DB)
+
+Create db in mssql and compare Database project with newly created database, transfer changes to your database
+
+## Configuration  
+Connection String: Update Web.config or appsettings.json: property "GraphKnowledgeEntities"
+
+
+### Setting Up Dev Environment
+Clone the repository:
+
+```bash
+git clone https://github.com/pheeca/GraphKnowledgeManager  
+```
+restore database (see Data Restore section)
+### Server Side Dev
+Tech Stack: ASP.NET MVC, WebAPI, SignalR
+
+Key Files:
+
+HubStartup.cs: SignalR configuration
+
+MessageBus.cs: Event handling logic
+
+Debugging:
+
+Use Postman to test APIs.
+
+
+### Client Side Dev
+Tech Stack: jQuery, Bootstrap, HTML5 Canvas (for graph rendering)
+
+Key Files:
+
+graph.js: Handles node/edge interactions
+
+main.css: Styling for graph panel and UI elements
+
+### Engine Dev [Improper]
+Front End
+Event Handling:
+
+```javascript
+window.EventBus.listeners["nodeCreated"] = (data) => {  
+  messagebushub.trigger("updateGraph", data);  
+}; 
+``` 
+Integration: Use SignalR client to connect to server hubs.
+
+Server
+Event Registration:
+```csharp
+MessageBus<object>.Instance.RegisterService(new SampleEventService());  
+```
+Service Implementation:
+
+```csharp
+public class CoreEventService : IEventService {  
+    [OnEvent("nodeCreated")]  
+    public void HandleNodeCreation(EventContext context) {  
+        // Logic here  
+    }  
+}  
+```
 
 #### Front End
 window.EventBus.listeners
