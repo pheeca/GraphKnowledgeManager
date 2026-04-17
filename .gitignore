@@ -22,3 +22,5 @@ Packages/
 GraphKnowledgeServer/Database/Database.dbmdl
 GraphKnowledgeServer/Database/Database.jfm
 GraphKnowledgeServer/Database/Database.jfm
+*.jfm
+*.jfm
