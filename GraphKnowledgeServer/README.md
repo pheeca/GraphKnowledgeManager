@@ -46,6 +46,10 @@ dotnet user-secrets list
 
 ### 3. Run
 ```bash
+# Copy frontend assets to wwwroot (run from repo root)
+npm start
+
+# Run API server
 cd GK.Server
 dotnet run
 ```
