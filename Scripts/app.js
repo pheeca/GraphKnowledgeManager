@@ -75,11 +75,12 @@ EventBus.addEventListener('UI.Web.App.UiChanged', function (params) {
         }
     });
     if (currentRoute) {
-        let requestUrl =AppConfig.domain + '/Home/template?Templatename=' + currentRoute.file;
+        let requestUrl =AppConfig.domain + '/Home/template?Templatename=' + currentRoute.file + '&_=' + Date.now();
         $.ajax({
             url: requestUrl,
             dataType: "html",
             type: "GET",
+            cache: false,
             success: function (s) {
                 var isAllowed = !currentRoute.isAuthenticated;
                 sessionStorage.setItem('routeParams',JSON.stringify(routeParams));
