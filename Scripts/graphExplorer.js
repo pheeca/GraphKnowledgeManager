@@ -235,25 +235,75 @@ EventBus.addEventListener('customizeNode', function (e) {
     EventBus.dispatch('graphUpdated');
 });
 
+var _propsPageSize = 20;
+function _buildPropRow(item, index) {
+    var potentialUrl = (item.value || '').split('/');
+    var temp = (potentialUrl.pop() || potentialUrl.pop());
+    if (temp) {
+        potentialUrl = temp.split('?')[0];
+        potentialUrl = potentialUrl.replace(/_|-/g, ' ');
+    } else {
+        potentialUrl = (item.value || '');
+    }
+    return `<tr data-propindex="${index}">
+        <td>${item.key}</td>
+        <td data-val="${item.value}">${utilities.validateURL(item.value) ? `<a target="_blank" href="${item.value}">${potentialUrl}</a>` : item.value}</td>
+        <td>${item.date}</td>
+    </tr>`;
+}
+function _renderPropChunk(allProps, fromIndex) {
+    var end = Math.min(fromIndex + _propsPageSize, allProps.length);
+    var html = '';
+    for (var i = fromIndex; i < end; i++) {
+        html += _buildPropRow(allProps[i], i);
+    }
+    $('#properties').append(html);
+    $('#properties').data('propsRendered', end);
+}
+function _getFilteredProps() {
+    var all = $('#properties').data('allProps') || [];
+    var q = ($('#props-search').val() || '').toLowerCase().trim();
+    if (!q) return all;
+    return all.filter(function (p) {
+        return (p.key || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.value || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.date || '').toLowerCase().indexOf(q) !== -1;
+    });
+}
+function _applyPropsFilter() {
+    var $tbody = $('#properties');
+    $tbody.html('');
+    $tbody.data('propsRendered', 0);
+    var filtered = _getFilteredProps();
+    $tbody.data('propsFiltered', filtered);
+    _renderPropChunk(filtered, 0);
+}
 EventBus.removeEventListener('refreshPanelProps');
 EventBus.addEventListener('refreshPanelProps', function (params) {
     params = params.target || [];
-    $('#properties').html('');
-    for (var i = 0; i < params.length; i++) {
-        let potentialUrl=(params[i].value||'').split('/');
-        let temp = (potentialUrl.pop()||potentialUrl.pop());
-        if(temp){
-            potentialUrl=temp.split('?')[0];
-            potentialUrl=potentialUrl.replace(/_|-/g, " ");
-        }else{
-            potentialUrl=(params[i].value||'');
+    var $tbody = $('#properties');
+    $tbody.html('');
+    $tbody.data('allProps', params);
+    $tbody.data('propsRendered', 0);
+    $('#props-search').val('');
+    var filtered = params;
+    $tbody.data('propsFiltered', filtered);
+    _renderPropChunk(filtered, 0);
+    // search input
+    $('#props-search').off('input.lazyprops').on('input.lazyprops', function () {
+        _applyPropsFilter();
+        $('#properties-scroll-wrap').scrollTop(0);
+    });
+    // bind scroll on the wrapper (once per refresh)
+    var $wrap = $('#properties-scroll-wrap');
+    $wrap.off('scroll.lazyprops').on('scroll.lazyprops', function () {
+        var rendered = $tbody.data('propsRendered') || 0;
+        var filtered = $tbody.data('propsFiltered') || [];
+        if (rendered >= filtered.length) return;
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 40) {
+            _renderPropChunk(filtered, rendered);
         }
-        $('#properties').append(`<tr>
-            <td>${params[i].key}</td>
-            <td data-val="${params[i].value}">${utilities.validateURL(params[i].value)?`<a  target="_blank" href="${params[i].value}">${potentialUrl}</a>`:params[i].value}</td>
-            <td>${params[i].date}</td>
-          </tr>`);
-    }
+    });
 });
 
 EventBus.removeEventListener('readPropperty');
@@ -278,10 +328,11 @@ EventBus.addEventListener('addPropperty', function () {
             props = graphExplorer.data.nodes[i].Properties || [];
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
-                if (graphExplorer.data.currentProperty && props[$(graphExplorer.data.currentProperty).prevAll().length]) {
-                    props[$(graphExplorer.data.currentProperty).prevAll().length].key = $('#Property').val() || '';
-                    props[$(graphExplorer.data.currentProperty).prevAll().length].value = $('#Value').val() || '';
-                    props[$(graphExplorer.data.currentProperty).prevAll().length].date = $('#Date').val() || '';
+                var propIdx = graphExplorer.data.currentProperty ? parseInt($(graphExplorer.data.currentProperty).data('propindex')) : -1;
+                if (graphExplorer.data.currentProperty && props[propIdx] !== undefined) {
+                    props[propIdx].key = $('#Property').val() || '';
+                    props[propIdx].value = $('#Value').val() || '';
+                    props[propIdx].date = $('#Date').val() || '';
                 } else {
                     p = { key: $('#Property').val() || '', value: $('#Value').val() || '', date: $('#Date').val() || '' };
                     props.push(p);

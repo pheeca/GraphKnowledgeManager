@@ -99,7 +99,9 @@
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="proppanel" role="tabpanel" aria-labelledby="proppanel-tab">
 
-                    <table class="table">
+                    <input id="props-search" type="text" class="form-control form-control-sm mb-1" placeholder="Search properties…">
+                    <div id="properties-scroll-wrap" style="max-height:220px;overflow-y:auto;">
+                    <table class="table table-sm mb-0">
                         <thead>
                             <tr>
                                 <th scope="col">Property</th>
@@ -109,6 +111,7 @@
                         </thead>
                         <tbody id="properties"></tbody>
                     </table>
+                    </div>
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">+
                         Add</button>

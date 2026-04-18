@@ -403,7 +403,7 @@
   #mk-canvas-host.legacy-refined .mk-breadcrumb .mk-bc-item.current { background: #eef2f8; color: #000; }
 
   /* ======== Full legacy-mode overlay (entire UI) ======== */
-  #mk-legacy-ui { position: fixed; inset: 0; background: #ffffff; color: #1a2332; z-index: 1000; display: none; font-family: Arial, Helvetica, sans-serif; flex-direction: column; }
+  #mk-legacy-ui { position: fixed; inset: 0; background: #ffffff; color: #1a2332; z-index: 1060; display: none; font-family: Arial, Helvetica, sans-serif; flex-direction: column; }
   #mk-legacy-ui.open { display: flex; }
   .mk-lg-topbar { background: #2b7ce9; color: white; padding: 8px 14px; display: flex; align-items: center; gap: 12px; font-size: 13px; }
   .mk-lg-topbar button { background: white; color: #2b7ce9; border: 1px solid white; padding: 4px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; }
@@ -2251,6 +2251,25 @@
         // loads of tagsinput.js, services.js, graphExplorer.js, bootstrap-select
         // will run in order. After that graphExplorer wires its events.
         $(host).html(html);
+        // Bootstrap 4 appends .modal-backdrop to <body>, which is outside
+        // #mk-legacy-ui's stacking context (z-index:1060). The backdrop then
+        // paints over everything inside the overlay. Fix: move the backdrop
+        // into #mk-legacy-ui after Bootstrap creates it, so it shares the same
+        // stacking context as the modal (modal z-1050 > backdrop z-1040). ✓
+        // Bootstrap holds a direct reference to the element, so moving it in
+        // the DOM doesn't break its own cleanup.
+        $(document).on('show.bs.modal', '#mk-lg-host .modal', function(){
+          // give Bootstrap a tick to append the backdrop, then relocate it
+          setTimeout(function(){
+            var $bd = $('body > .modal-backdrop');
+            if ($bd.length) $bd.appendTo('#mk-legacy-ui');
+          }, 0);
+        });
+        $(document).on('hide.bs.modal', '#mk-lg-host .modal', function(){
+          // move back before Bootstrap tries to remove it
+          var $bd = $('#mk-legacy-ui > .modal-backdrop');
+          if ($bd.length) $bd.appendTo('body');
+        });
         if (statusEl) statusEl.textContent = 'Legacy UI loaded · bootstrapping graph…';
         // Fire the same event app.js fires on the /Graph route so graphExplorer
         // runs its session check + loadGraph pipeline.
