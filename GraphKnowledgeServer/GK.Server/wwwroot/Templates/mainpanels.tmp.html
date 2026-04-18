@@ -1,369 +1,1517 @@
-<div class="container-fluid" id="mainpanelgroup">
-    <div class="row h-25">
-        <div class="col-sm-12 col-md-12">
-            <div class="row">
-            <p class="col-sm-1 col-md-2">version 1.0.5</p>
-            <p id="updatemsg" class="col-sm-11 col-md-10">
-                Create a simple network with some nodes and edges.
-            </p>
-        </div>
-        </div>
-        
-        <div class="col-sm-6 col-md-2">
-            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
-                </div>
-                <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add
-                        Node</button>
-                </div>
-                <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.Logout')">Logout</button>
-                </div>
-                <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Undo')">Undo</button>
-                </div>
-                <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Redo')">Redo</button>
-                </div>
-                
-            </div>
-        </div>
-        <div class="col-sm-6 col-md-3">
+<!--
+  ============================================================================
+   GraphKnowledgeManager — Phase 8 UI Mockup
+  ============================================================================
+   This file is a VISUAL-ONLY mockup showing the target UI after all phases.
+   It is self-contained (no backend calls). No real event wiring — every
+   interactive element either toggles a class via inline JS or is static.
 
-            <div class="input-group">
-                <input class="form-control py-2 border-right-0 border" type="search" id="search" placeholder="search" >
-                <span class="input-group-append">
-                    <button class="btn btn-outline-secondary border-left-0 border bg-transparent" type="button">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </span>
-          </div>
-            <div class="custom-control custom-switch  col-sm-12">
-                <input type="checkbox" class="custom-control-input" id="ContextGlobal" value="false">
-                <label class="custom-control-label" for="ContextGlobal">Global</label>
-                <select multiple id="searchmode">
-                    <option>tag</option>
-                    <option selected>node</option>
-                    <option>properties</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-sm-12  col-md-3">
-            <div class="row">
-                <input type="number" id="nLevelNeighbouringNode" onclick="EventBus.dispatch('graphUpdated')" class="form-control col-sm-4" value="1" min="1" max="10" placeholder="nLevel">
-                <label class="col-sm-8" for="nLevelNeighbouringNode">N-Level Neighbouring</label>
-            </div>
-            <div class="col-sm-12 custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="neighbouringNodesSwitch">
-                <label class="custom-control-label" for="neighbouringNodesSwitch">Display Only Neighbouring
-                    Nodes</label>
-            </div>
-        </div>
-        <div class="col-sm-12  col-md-4">
-            <div class="row">
-                <select id="representationstyle" onchange="EventBus.dispatch('loadGraph')">
-                    <option selected>graph</option>
-                    <option >hierarchical</option>
-                </select>
-                
-                <label class="col-sm-8" for="representationstyle">Representation Style</label>
-            </div>
-        </div>
-    </div>
-    <div class="row h-75 border">
-        <div class="col-sm-12 col-md-9  h-100">
+   To see: open index.html with ?route=mockup (or include this file directly).
+   Loaded into #pageSection like the existing *.tmp.html templates.
 
-            <div id="mynetwork"></div>
-        </div>
-        <div class="col-sm-12 col-md-3 border" id="panel">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="proppanel-tab" data-toggle="tab" href="#proppanel" role="tab"
-                        aria-controls="proppanel" aria-selected="true">Properties</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="grapheditorpanel-tab" data-toggle="tab" href="#grapheditorpanel" role="tab"
-                        aria-controls="grapheditorpanel" aria-selected="false">Graph Editor</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="customize-tab" data-toggle="tab" href="#customize" role="tab"
-                        aria-controls="customize" aria-selected="false">Node Customize</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="advancedactions-tab" data-toggle="tab" href="#advancedactions" role="tab"
-                        aria-controls="advancedactions" aria-selected="false">Advance Actions</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active" id="proppanel" role="tabpanel" aria-labelledby="proppanel-tab">
+   Covered concepts:
+   - Phase 0/1: save status, export validation indicator, version banner
+   - Phase 2  : typed property renderers (bool / enum / currency / geo / file / time-range / link)
+   - Phase 3  : multi-view switcher, command bar, searchable relation dropdown, dark theme readability
+   - Phase 4  : templates, n-dim table view, timeline view
+   - Phase 5  : multi-graph switcher, share, user presence avatars, node lock badge
+   - Phase 6  : activity state chip, due date + overdue, scheduler peek, notification center
+   - Phase 7  : attachments panel (file / voice / external ref), AI assistant panel
+   - Phase 8  : real-time activity feed, event-type filter, sub-system event namespaces
+  ============================================================================
+-->
 
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Property</th>
-                                <th scope="col">Value</th>
-                                <th scope="col">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="properties"></tbody>
-                    </table>
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">+
-                        Add</button>
-                </div>
-                <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel" aria-labelledby="grapheditorpanel-tab">
-
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal2">Delete
-                        Node</button>
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Edit
-                        Node</button>
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readEdge')">+ Add
-                        Relation</button>
-                        <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addNewNodesEdges')">+ Add
-                            Nodes/Edges</button>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Relation</th>
-                                <th scope="col">To</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="edges"></tbody>
-                    </table>
-                </div>
-                <div class="tab-pane fade" id="customize" role="tabpanel" aria-labelledby="customize-tab">
-
-                    Select your favorite color: <input type="color" id="customizecolor" name="favcolor"
-                        value="#ff0000"><br>
-                    Tags: <input data-role="tagsinput" id="tags" value=""><br><br>
-                    <button type="button" class="btn btn-success"
-                        onclick="EventBus.dispatch('customizeNode')">Update</button>
-                </div>
-                <div class="tab-pane fade" id="advancedactions" role="tabpanel" aria-labelledby="advancedactions-tab">
-
-                    <div class="form-group">
-                        <label for="changeparent">Change Parent:</label>
-                        <select class="form-control fstdropdown-select" id="changeparent"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="linkNodes">Link Far Nodes:</label>
-                        <select class="form-control fstdropdown-select" id="linkNodes"></select>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Related Node</th>
-                                    <th scope="col">Context</th>
-                                    <th scope="col">id</th>
-                                    <th scope="col"><button type="button" class="btn btn-warning" id="deleteLinkNode" onclick="EventBus.dispatch('deleteLinkNode')">Delete Link</button></th>
-                                </tr>
-                            </thead>
-                            <tbody id="linkNodesInfo"></tbody>
-                        </table>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" id="sharelinkbtn" class="btn btn-warning">Share</button>
-                        <input id="sharelink" value="">
-                    </div>
-                    <br><br>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-12 col-md-3" id="generalpanel">
-            <button type="button" class="btn btn-success" onclick="EventBus.dispatch('closeNode')">Go to Parent</button>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add/Edit Property</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="Property">Property:</label>
-                        <input type="Property" class="form-control" id="Property">
-                    </div>
-                    <div class="form-group">
-                        <label for="Value">Value:</label>
-                        <input type="Value" class="form-control" id="Value">
-                    </div>
-                    <div class="form-group">
-                        <label for="Date">Date:</label>
-                        <input type="text" data-date-format="yyyy-MM-dd" class="form-control" id="Date">
-                    </div>
-                    <!--<div class="checkbox">
-                    <label><input type="checkbox"> Remember me</label>
-                  </div>-->
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success"
-                    onclick="EventBus.dispatch('addPropperty')">addProperty</button>
-
-            </div>
-        </div>
-
-    </div>
-</div>
-<!-- Modal End-->
-<div class="modal fade" id="myModal2" role="dialog">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Confirm Delete</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p>This can not be undo, Are you sure to delete this node?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('removeNode')">Delete
-                    Node</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div id="myModal3" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add/Edit Edge</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="Edge">Edge:</label>
-                        <!--<input class="form-control" id="Edge">-->
-                        <select class="form-control fstdropdown-select" id="Edge"></select>
-                    </div>
-                    <div class="form-group ui-widget">
-                        <label for="EdgeValue">EdgeValue:</label>
-                        <input class="form-control" id="EdgeValue">
-                    </div>
-                    <!--<div class="checkbox">
-                    <label><input type="checkbox"> Remember me</label>
-                  </div>-->
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addEdge')">+ Add
-                    Edge</button>
-
-            </div>
-        </div>
-
-    </div>
-</div>
-<!-- Modal -->
-
-<!-- Modal End-->
-<div class="modal fade" id="myModal4" role="dialog">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Edit Node</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="NodeName">Node:</label>
-                        <input type="Value" class="form-control" id="NodeName">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('addNode')">Edit
-                    Node</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal End-->
-<!-- Modal -->
-<div id="myModal5" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Add Nodes/Edges</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div  class="form-group">
-                        <input data-role="tagsinput" id="BulkNodes" value="">
-                    </div>
-                    <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Node</th>
-                            <th scope="col">Edge</th>
-                          </tr>
-                        </thead>
-                        <tbody id="BulkNodesTable">
-                          
-                        </tbody>
-                      </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('SubmitAddNewNodesEdges')">+ Add
-                    Nodes</button>
-
-            </div>
-        </div>
-
-    </div>
-</div>
-<!-- Modal -->
-<link href="Content/tagsinput.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="Scripts/tagsinput.js"></script>
-<script type="text/javascript" src="Scripts/services.js"></script>
-<script type="text/javascript" src="Scripts/graphExplorer.js"></script>
 <style>
-    .bootstrap-tagsinput .badge {
-        margin-left: 2px;
-        margin-right: 2px;
-        font-size: 17px;
-    }
+  /* ------- Design tokens ------- */
+  :root {
+    --bg-0: #0f1115;
+    --bg-1: #151821;
+    --bg-2: #1c2030;
+    --bg-3: #242a3d;
+    --border: #2a3045;
+    --text-1: #e6e8ef;
+    --text-2: #a1a7bd;
+    --text-3: #6a7089;
+    --accent: #5b8cff;
+    --accent-soft: rgba(91, 140, 255, 0.15);
+    --good: #35c28e;
+    --warn: #f0b44a;
+    --bad: #ef5c6b;
+    --lane-active: #35c28e;
+    --lane-wait: #f0b44a;
+    --lane-done: #6a7089;
+    --lane-new: #5b8cff;
+  }
 
-    #mynetwork {
-        width: 100%;
-        /* height: 600px;
-        border: 1px solid lightgray; */
-    }
+  #mockup-root, #mockup-root * { box-sizing: border-box; }
+  #mockup-root {
+    position: fixed; inset: 0;
+    background: var(--bg-0);
+    color: var(--text-1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px; line-height: 1.45;
+    display: grid;
+    grid-template-columns: 240px 1fr 380px;
+    grid-template-rows: 48px 1fr 28px;
+    grid-template-areas:
+      "topbar topbar topbar"
+      "leftnav main rightpanel"
+      "statusbar statusbar statusbar";
+  }
+
+  /* ------- Top bar ------- */
+  .mk-topbar {
+    grid-area: topbar;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 12px; gap: 12px;
+  }
+  .mk-logo { font-weight: 600; letter-spacing: 0.3px; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+  .mk-logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .mk-version { font-size: 11px; color: var(--text-3); background: var(--bg-2); padding: 2px 6px; border-radius: 10px; }
+
+  .mk-cmdbar {
+    flex: 1; max-width: 640px; margin: 0 auto;
+    background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;
+    display: flex; align-items: center; padding: 6px 10px; gap: 8px; cursor: text;
+  }
+  .mk-cmdbar input {
+    flex: 1; background: transparent; border: none; outline: none; color: var(--text-1); font-size: 13px;
+  }
+  .mk-cmdbar .kbd { font-size: 10px; color: var(--text-3); border: 1px solid var(--border); padding: 1px 5px; border-radius: 4px; }
+
+  .mk-topbar-right { display: flex; align-items: center; gap: 10px; }
+  .mk-icon-btn {
+    background: transparent; border: none; color: var(--text-2); cursor: pointer;
+    width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .mk-icon-btn:hover { background: var(--bg-2); color: var(--text-1); }
+  .mk-icon-btn .mk-badge-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--bad); border-radius: 50%; border: 2px solid var(--bg-1); }
+  .mk-avatar-group { display: flex; }
+  .mk-avatar {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--bg-3); color: var(--text-1);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600;
+    border: 2px solid var(--bg-1); margin-left: -6px;
+  }
+  .mk-avatar:first-child { margin-left: 0; }
+  .mk-avatar.you { background: var(--accent); }
+  .mk-avatar.u2 { background: #c47bff; }
+  .mk-avatar.u3 { background: #4fd1c5; }
+
+  /* ------- Left nav ------- */
+  .mk-leftnav {
+    grid-area: leftnav;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 10px 0;
+  }
+  .mk-nav-group { padding: 4px 12px 8px; }
+  .mk-nav-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-3);
+    padding: 6px 8px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .mk-nav-label button { background: transparent; border: none; color: var(--text-3); cursor: pointer; font-size: 14px; }
+  .mk-nav-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    color: var(--text-2); font-size: 13px;
+  }
+  .mk-nav-item:hover { background: var(--bg-2); color: var(--text-1); }
+  .mk-nav-item.active { background: var(--accent-soft); color: var(--accent); }
+  .mk-nav-item .mk-count { margin-left: auto; font-size: 11px; color: var(--text-3); background: var(--bg-2); padding: 0 6px; border-radius: 10px; }
+  .mk-nav-item.active .mk-count { background: transparent; color: var(--accent); }
+  .mk-graph-switch {
+    margin: 6px 12px; padding: 8px 10px; background: var(--bg-2);
+    border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mk-graph-switch:hover { border-color: var(--accent); }
+  .mk-graph-switch .title { font-weight: 600; color: var(--text-1); font-size: 13px; }
+  .mk-graph-switch .sub { font-size: 11px; color: var(--text-3); }
+
+  /* ------- Main area ------- */
+  .mk-main {
+    grid-area: main;
+    background: var(--bg-0);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .mk-view-tabs {
+    display: flex; padding: 6px 16px 0; gap: 2px; border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+  .mk-view-tab {
+    padding: 8px 14px; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 12px; color: var(--text-2);
+    display: flex; align-items: center; gap: 6px; border-bottom: 2px solid transparent;
+  }
+  .mk-view-tab:hover { color: var(--text-1); }
+  .mk-view-tab.active { color: var(--text-1); border-bottom-color: var(--accent); background: var(--bg-0); }
+
+  .mk-toolbar {
+    display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+    background: var(--bg-1); border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .mk-btn {
+    background: var(--bg-2); color: var(--text-1); border: 1px solid var(--border);
+    padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .mk-btn:hover { border-color: var(--accent); }
+  .mk-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .mk-btn.primary:hover { background: #4a7aef; }
+  .mk-btn.danger { background: var(--bg-2); border-color: var(--bad); color: var(--bad); }
+  .mk-btn.ghost { background: transparent; }
+  .mk-btn.sm { padding: 3px 8px; font-size: 11px; }
+
+  .mk-chip {
+    background: var(--bg-2); border: 1px solid var(--border); padding: 3px 8px;
+    border-radius: 14px; font-size: 11px; color: var(--text-2); cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .mk-chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .mk-chip .x { cursor: pointer; opacity: 0.5; }
+  .mk-chip .x:hover { opacity: 1; }
+
+  .mk-toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .mk-toolbar-spacer { flex: 1; }
+
+  /* View content area */
+  .mk-view-content { flex: 1; position: relative; overflow: hidden; }
+  .mk-view-pane { position: absolute; inset: 0; display: none; overflow: auto; }
+  .mk-view-pane.active { display: block; }
+
+  /* ------- Canvas view ------- */
+  .mk-canvas {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(91, 140, 255, 0.08), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(196, 123, 255, 0.05), transparent 40%),
+      var(--bg-0);
+    background-size: 30px 30px, 30px 30px, auto;
+  }
+  .mk-canvas::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .mk-node {
+    position: absolute; padding: 8px 12px; background: var(--bg-2); border: 2px solid var(--border);
+    border-radius: 10px; font-size: 12px; color: var(--text-1); cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    min-width: 110px; text-align: center;
+  }
+  .mk-node:hover { border-color: var(--accent); }
+  .mk-node.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), 0 4px 12px rgba(0,0,0,0.25); }
+  .mk-node.state-active { border-left: 4px solid var(--lane-active); }
+  .mk-node.state-wait   { border-left: 4px solid var(--lane-wait); }
+  .mk-node.state-done   { border-left: 4px solid var(--lane-done); opacity: 0.75; }
+  .mk-node.state-new    { border-left: 4px solid var(--lane-new); }
+  .mk-node.locked::after {
+    content: '🔒'; position: absolute; top: -8px; right: -8px; font-size: 11px;
+    background: var(--bg-3); border-radius: 50%; padding: 2px 4px;
+  }
+  .mk-node .mk-node-title { font-weight: 600; }
+  .mk-node .mk-node-meta  { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+  .mk-node-overdue { color: var(--bad) !important; }
+
+  .mk-edge-line {
+    position: absolute; height: 2px; background: var(--border);
+    transform-origin: 0 0; pointer-events: none;
+  }
+
+  .mk-canvas-controls {
+    position: absolute; bottom: 16px; right: 16px;
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .mk-canvas-controls button {
+    background: transparent; border: none; color: var(--text-2); padding: 8px; cursor: pointer;
+    border-bottom: 1px solid var(--border); width: 36px;
+  }
+  .mk-canvas-controls button:last-child { border-bottom: none; }
+  .mk-canvas-controls button:hover { color: var(--text-1); background: var(--bg-2); }
+
+  .mk-minimap {
+    position: absolute; bottom: 16px; left: 16px;
+    width: 160px; height: 110px; background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px; font-size: 10px; color: var(--text-3);
+  }
+  .mk-minimap-canvas { width: 100%; height: 80px; background: var(--bg-2); border-radius: 4px; position: relative; overflow: hidden; }
+  .mk-minimap-dot { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+  .mk-minimap-view { position: absolute; border: 1px solid var(--accent); background: rgba(91,140,255,0.1); border-radius: 2px; }
+
+  /* ------- Table view ------- */
+  .mk-table-wrap { padding: 16px; }
+  .mk-table {
+    width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px;
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .mk-table th, .mk-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .mk-table th {
+    background: var(--bg-2); font-weight: 600; color: var(--text-2); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0;
+  }
+  .mk-table tr:last-child td { border-bottom: none; }
+  .mk-table tr:hover td { background: var(--bg-2); }
+
+  /* ------- Timeline view ------- */
+  .mk-timeline { padding: 16px; }
+  .mk-tl-months { display: flex; border-bottom: 1px solid var(--border); padding-bottom: 6px; font-size: 11px; color: var(--text-3); margin-bottom: 12px; }
+  .mk-tl-month { flex: 1; text-align: center; }
+  .mk-tl-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+  .mk-tl-row-label { width: 160px; font-size: 12px; color: var(--text-2); flex-shrink: 0; }
+  .mk-tl-track { flex: 1; height: 26px; background: var(--bg-1); border-radius: 4px; position: relative; }
+  .mk-tl-bar {
+    position: absolute; top: 3px; bottom: 3px; background: var(--accent); border-radius: 3px;
+    color: white; font-size: 10px; padding: 0 6px; display: flex; align-items: center;
+  }
+  .mk-tl-bar.done { background: var(--lane-done); }
+  .mk-tl-bar.warn { background: var(--warn); color: var(--bg-0); }
+  .mk-tl-bar.bad  { background: var(--bad); }
+
+  /* ------- Dashboard view ------- */
+  .mk-dashboard { padding: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mk-card {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+  }
+  .mk-card-h { font-size: 11px; text-transform: uppercase; color: var(--text-3); letter-spacing: 0.5px; margin-bottom: 8px; }
+  .mk-card-big { font-size: 28px; font-weight: 600; color: var(--text-1); }
+  .mk-card-delta { font-size: 11px; color: var(--good); }
+  .mk-card-delta.bad { color: var(--bad); }
+  .mk-sparkline { display: flex; align-items: flex-end; gap: 3px; height: 40px; margin-top: 6px; }
+  .mk-sparkline span { flex: 1; background: var(--accent); border-radius: 2px 2px 0 0; opacity: 0.7; }
+
+  .mk-progress { height: 6px; background: var(--bg-2); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+  .mk-progress-fill { height: 100%; background: var(--good); border-radius: 3px; }
+
+  /* ------- Feed view ------- */
+  .mk-feed { padding: 16px; max-width: 720px; margin: 0 auto; }
+  .mk-feed-row {
+    display: flex; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border);
+  }
+  .mk-feed-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .mk-feed-body { flex: 1; }
+  .mk-feed-body b { color: var(--text-1); }
+  .mk-feed-meta { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .mk-event-tag {
+    display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 3px;
+    background: var(--bg-2); color: var(--text-3); margin-right: 4px;
+    font-family: "SF Mono", Monaco, monospace;
+  }
+  .mk-event-tag.ui { background: rgba(91,140,255,0.15); color: var(--accent); }
+  .mk-event-tag.server { background: rgba(53,194,142,0.15); color: var(--good); }
+  .mk-event-tag.app { background: rgba(196,123,255,0.15); color: #c47bff; }
+
+  /* ------- Right panel (node detail) ------- */
+  .mk-rightpanel {
+    grid-area: rightpanel; background: var(--bg-1); border-left: 1px solid var(--border);
+    overflow-y: auto; display: flex; flex-direction: column;
+  }
+  .mk-rp-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
+  .mk-rp-title-row { display: flex; align-items: flex-start; gap: 8px; }
+  .mk-rp-color {
+    width: 14px; height: 14px; border-radius: 50%; background: #ff80ff; flex-shrink: 0; margin-top: 4px;
+    cursor: pointer; border: 2px solid var(--bg-1); box-shadow: 0 0 0 1px var(--border);
+  }
+  .mk-rp-title { flex: 1; font-size: 16px; font-weight: 600; color: var(--text-1); }
+  .mk-rp-type {
+    display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px;
+    background: var(--bg-2); color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .mk-rp-breadcrumb { font-size: 11px; color: var(--text-3); margin-top: 6px; }
+  .mk-rp-breadcrumb a { color: var(--text-2); text-decoration: none; }
+
+  .mk-rp-statusrow { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .mk-state-chip {
+    font-size: 11px; padding: 3px 10px; border-radius: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .mk-state-chip.intended { background: rgba(91,140,255,0.15); color: var(--lane-new); }
+  .mk-state-chip.started  { background: rgba(53,194,142,0.15); color: var(--lane-active); }
+  .mk-state-chip.unverif  { background: rgba(240,180,74,0.15); color: var(--lane-wait); }
+  .mk-state-chip.done     { background: rgba(106,112,137,0.2); color: var(--lane-done); }
+
+  .mk-rp-tabs {
+    display: flex; padding: 0 16px; border-bottom: 1px solid var(--border); gap: 4px;
+  }
+  .mk-rp-tab {
+    padding: 8px 10px; font-size: 12px; color: var(--text-2); cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .mk-rp-tab.active { color: var(--text-1); border-bottom-color: var(--accent); }
+
+  .mk-rp-body { padding: 12px 16px; }
+
+  /* Typed property rows */
+  .mk-prop {
+    display: grid; grid-template-columns: 90px 1fr; gap: 6px; padding: 6px 0; align-items: center;
+    border-bottom: 1px dashed var(--border); font-size: 12px;
+  }
+  .mk-prop-key { color: var(--text-3); font-size: 11px; display: flex; align-items: center; gap: 4px; }
+  .mk-prop-key .mk-type-icon { color: var(--text-3); font-size: 10px; opacity: 0.6; }
+  .mk-prop-val input, .mk-prop-val select, .mk-prop-val textarea {
+    width: 100%; background: transparent; border: 1px solid transparent; color: var(--text-1);
+    padding: 2px 4px; border-radius: 4px; font-size: 12px; font-family: inherit;
+  }
+  .mk-prop-val input:hover, .mk-prop-val:hover input { border-color: var(--border); }
+  .mk-prop-val input:focus { border-color: var(--accent); outline: none; background: var(--bg-2); }
+
+  .mk-toggle { width: 30px; height: 16px; background: var(--bg-3); border-radius: 10px; position: relative; cursor: pointer; }
+  .mk-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-2); transition: all 0.15s; }
+  .mk-toggle.on { background: var(--good); }
+  .mk-toggle.on::after { left: 16px; background: white; }
+
+  .mk-checklist li { list-style: none; padding: 3px 0; display: flex; align-items: center; gap: 6px; }
+  .mk-checklist input { accent-color: var(--accent); }
+  .mk-checklist li.done span { text-decoration: line-through; color: var(--text-3); }
+
+  .mk-money { font-weight: 600; color: var(--good); }
+  .mk-geo-pill {
+    display: inline-flex; align-items: center; gap: 4px; background: var(--bg-2);
+    border: 1px solid var(--border); border-radius: 12px; padding: 2px 8px; font-size: 11px;
+  }
+  .mk-file-pill {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--bg-2);
+    border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 11px;
+  }
+  .mk-ext-link {
+    color: var(--accent); text-decoration: none; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+  }
+
+  .mk-section-h {
+    font-size: 10px; text-transform: uppercase; color: var(--text-3); letter-spacing: 0.6px;
+    margin: 14px 0 6px; display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .mk-related-row {
+    display: flex; justify-content: space-between; align-items: center; padding: 6px 0;
+    border-bottom: 1px dashed var(--border); font-size: 12px;
+  }
+  .mk-related-row .rel { color: var(--text-3); font-size: 11px; }
+  .mk-related-row .target { color: var(--text-1); }
+  .mk-related-row:hover .target { color: var(--accent); cursor: pointer; }
+
+  /* ------- Status bar ------- */
+  .mk-statusbar {
+    grid-area: statusbar; background: var(--bg-1); border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px; padding: 0 12px; font-size: 11px; color: var(--text-3);
+  }
+  .mk-status-good { color: var(--good); }
+  .mk-status-warn { color: var(--warn); }
+  .mk-status-bad { color: var(--bad); }
+  .mk-status-spacer { flex: 1; }
+
+  /* ------- Modals ------- */
+  .mk-modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .mk-modal-backdrop.open { display: flex; }
+  .mk-modal {
+    background: var(--bg-1); border: 1px solid var(--border); border-radius: 10px;
+    width: 520px; max-width: 90vw; max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .mk-modal.lg { width: 720px; }
+  .mk-modal-h { padding: 16px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .mk-modal-h h4 { margin: 0; font-size: 14px; font-weight: 600; }
+  .mk-modal-b { padding: 16px 18px; }
+  .mk-modal-f { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  .mk-typegrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+  .mk-typebtn {
+    padding: 10px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; text-align: center; font-size: 11px; color: var(--text-2);
+  }
+  .mk-typebtn:hover { border-color: var(--accent); color: var(--text-1); }
+  .mk-typebtn .icon { font-size: 18px; display: block; margin-bottom: 3px; }
+
+  .mk-form-row { margin-bottom: 12px; }
+  .mk-form-row label { display: block; font-size: 11px; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .mk-form-row input, .mk-form-row select, .mk-form-row textarea {
+    width: 100%; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1);
+    padding: 8px 10px; border-radius: 6px; font-size: 13px; font-family: inherit;
+  }
+  .mk-form-row input:focus, .mk-form-row select:focus, .mk-form-row textarea:focus { outline: none; border-color: var(--accent); }
+
+  /* ------- Command palette ------- */
+  .mk-palette {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    width: 580px; max-width: 90vw; background: var(--bg-1); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); z-index: 200; display: none;
+  }
+  .mk-palette.open { display: block; }
+  .mk-palette-input { width: 100%; background: transparent; border: none; padding: 16px; color: var(--text-1); font-size: 15px; outline: none; border-bottom: 1px solid var(--border); }
+  .mk-palette-list { max-height: 340px; overflow-y: auto; padding: 6px; }
+  .mk-palette-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .mk-palette-item:hover, .mk-palette-item.active { background: var(--bg-2); }
+  .mk-palette-item .kind { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: var(--bg-3); color: var(--text-3); }
+  .mk-palette-item .title { flex: 1; }
+  .mk-palette-item .hint { font-size: 11px; color: var(--text-3); }
+  .mk-palette-group { font-size: 10px; text-transform: uppercase; color: var(--text-3); padding: 8px 10px 4px; letter-spacing: 0.6px; }
+
+  /* ------- AI assistant drawer ------- */
+  .mk-ai-drawer {
+    position: fixed; right: -420px; top: 48px; bottom: 28px; width: 420px;
+    background: var(--bg-1); border-left: 1px solid var(--border); z-index: 150;
+    transition: right 0.2s; display: flex; flex-direction: column;
+  }
+  .mk-ai-drawer.open { right: 0; }
+  .mk-ai-h { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .mk-ai-body { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  .mk-ai-msg { margin-bottom: 12px; }
+  .mk-ai-msg.user { text-align: right; }
+  .mk-ai-bubble {
+    display: inline-block; padding: 8px 12px; border-radius: 10px;
+    background: var(--bg-2); max-width: 85%; font-size: 12px; text-align: left;
+  }
+  .mk-ai-msg.user .mk-ai-bubble { background: var(--accent); color: white; }
+  .mk-ai-action { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+  .mk-ai-action a { color: var(--accent); text-decoration: none; }
+  .mk-ai-input { padding: 12px 16px; border-top: 1px solid var(--border); }
+  .mk-ai-input textarea { width: 100%; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1); padding: 8px; border-radius: 6px; resize: none; font-size: 12px; font-family: inherit; }
+
+  /* ------- Notification panel ------- */
+  .mk-notif-panel {
+    position: absolute; top: 44px; right: 12px; width: 340px; background: var(--bg-1);
+    border: 1px solid var(--border); border-radius: 8px; z-index: 180; display: none;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+  .mk-notif-panel.open { display: block; }
+  .mk-notif-h { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 12px; }
+  .mk-notif-list { max-height: 380px; overflow-y: auto; }
+  .mk-notif-row { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; display: flex; gap: 10px; cursor: pointer; }
+  .mk-notif-row:hover { background: var(--bg-2); }
+  .mk-notif-row.unread { background: var(--accent-soft); }
+  .mk-notif-row .meta { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+
+  /* ------- Helpers ------- */
+  .hidden { display: none !important; }
+  .mk-muted { color: var(--text-3); }
+  .mk-good { color: var(--good); }
+  .mk-warn { color: var(--warn); }
+  .mk-bad { color: var(--bad); }
 </style>
-<script src="Scripts/bootstrap-select.min.js"></script>
-<link rel="stylesheet" href="Content/bootstrap-select.css" />
+
+<div id="mockup-root">
+
+  <!-- ======================= TOP BAR ======================= -->
+  <div class="mk-topbar">
+    <div class="mk-logo">
+      <span class="mk-logo-dot"></span>
+      <span>GraphKnowledge</span>
+      <span class="mk-version">v2.0.0-alpha</span>
+    </div>
+
+    <!-- Command bar (Ctrl+K) -->
+    <div class="mk-cmdbar" onclick="mkTogglePalette()">
+      <span>🔍</span>
+      <input type="text" placeholder="Search nodes, tags, properties, or type a command…" readonly>
+      <span class="kbd">Ctrl K</span>
+    </div>
+
+    <div class="mk-topbar-right">
+      <!-- Live collaborators -->
+      <div class="mk-avatar-group" title="3 users online">
+        <span class="mk-avatar you">YU</span>
+        <span class="mk-avatar u2">MZ</span>
+        <span class="mk-avatar u3">SK</span>
+      </div>
+      <!-- AI assistant toggle -->
+      <button class="mk-icon-btn" onclick="mkToggleAI()" title="AI Assistant">✨</button>
+      <!-- Notifications -->
+      <button class="mk-icon-btn" onclick="mkToggleNotifs()" title="Notifications">
+        🔔
+        <span class="mk-badge-dot"></span>
+      </button>
+      <!-- Share -->
+      <button class="mk-btn primary sm" onclick="mkOpenModal('share')">Share</button>
+      <!-- User menu -->
+      <span class="mk-avatar you" style="margin-left: 4px;">YU</span>
+    </div>
+  </div>
+
+  <!-- ======================= LEFT NAV ======================= -->
+  <div class="mk-leftnav">
+
+    <!-- Graph switcher -->
+    <div class="mk-graph-switch" onclick="mkOpenModal('graphs')">
+      <div style="width: 8px; height: 8px; border-radius: 50%; background: #ff80ff;"></div>
+      <div style="flex: 1;">
+        <div class="title">Personal Knowledge</div>
+        <div class="sub">2,070 nodes · 2,252 edges</div>
+      </div>
+      <span style="color: var(--text-3);">⏷</span>
+    </div>
+
+    <div class="mk-nav-group">
+      <div class="mk-nav-label">Views</div>
+      <div class="mk-nav-item active" onclick="mkSelectView('canvas')">🕸️ Canvas <span class="mk-count">Map</span></div>
+      <div class="mk-nav-item" onclick="mkSelectView('table')">📊 Table</div>
+      <div class="mk-nav-item" onclick="mkSelectView('timeline')">📅 Timeline</div>
+      <div class="mk-nav-item" onclick="mkSelectView('dashboard')">📈 Dashboard</div>
+      <div class="mk-nav-item" onclick="mkSelectView('feed')">⚡ Activity Feed</div>
+    </div>
+
+    <div class="mk-nav-group">
+      <div class="mk-nav-label">
+        <span>Saved Views</span>
+        <button title="New saved view">+</button>
+      </div>
+      <div class="mk-nav-item">🔥 Overdue tasks <span class="mk-count">7</span></div>
+      <div class="mk-nav-item">⭐ High priority <span class="mk-count">12</span></div>
+      <div class="mk-nav-item">🎯 In progress <span class="mk-count">23</span></div>
+      <div class="mk-nav-item">📥 Unsorted <span class="mk-count">149</span></div>
+      <div class="mk-nav-item">🕒 Recently edited</div>
+    </div>
+
+    <div class="mk-nav-group">
+      <div class="mk-nav-label">
+        <span>Node Types</span>
+        <button title="Manage types">⚙</button>
+      </div>
+      <div class="mk-nav-item">👤 Person <span class="mk-count">412</span></div>
+      <div class="mk-nav-item">🏢 Organization <span class="mk-count">86</span></div>
+      <div class="mk-nav-item">💼 Project <span class="mk-count">73</span></div>
+      <div class="mk-nav-item">📋 Task <span class="mk-count">284</span></div>
+      <div class="mk-nav-item">📖 Note <span class="mk-count">901</span></div>
+      <div class="mk-nav-item">🌍 Place <span class="mk-count">54</span></div>
+    </div>
+
+    <div class="mk-nav-group">
+      <div class="mk-nav-label">
+        <span>Templates</span>
+        <button title="Manage templates" onclick="mkOpenModal('templates')">+</button>
+      </div>
+      <div class="mk-nav-item">👥 Contact card</div>
+      <div class="mk-nav-item">🚀 Project scaffold</div>
+      <div class="mk-nav-item">🏛️ Bureaucracy checklist</div>
+      <div class="mk-nav-item">🌳 Family tree branch</div>
+    </div>
+  </div>
+
+  <!-- ======================= MAIN AREA ======================= -->
+  <div class="mk-main">
+
+    <!-- View tabs -->
+    <div class="mk-view-tabs">
+      <div class="mk-view-tab active" onclick="mkSelectView('canvas')">🕸️ Canvas</div>
+      <div class="mk-view-tab" onclick="mkSelectView('table')">📊 Table</div>
+      <div class="mk-view-tab" onclick="mkSelectView('timeline')">📅 Timeline</div>
+      <div class="mk-view-tab" onclick="mkSelectView('dashboard')">📈 Dashboard</div>
+      <div class="mk-view-tab" onclick="mkSelectView('feed')">⚡ Feed</div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="mk-toolbar">
+      <button class="mk-btn primary" onclick="mkOpenModal('newnode')">＋ New Node</button>
+      <button class="mk-btn" onclick="mkOpenModal('relation')">🔗 New Relation</button>
+      <button class="mk-btn" onclick="mkOpenModal('template')">📋 From Template</button>
+      <div class="mk-toolbar-sep"></div>
+      <button class="mk-btn ghost" title="Undo (Ctrl+Z)">↶ Undo</button>
+      <button class="mk-btn ghost" title="Redo (Ctrl+Y)">↷ Redo</button>
+      <div class="mk-toolbar-sep"></div>
+
+      <!-- Filter chips -->
+      <span class="mk-chip active">State: Started <span class="x">×</span></span>
+      <span class="mk-chip">Type: Project</span>
+      <span class="mk-chip">Tag: Priority:High</span>
+      <span class="mk-chip ghost">＋ Filter</span>
+
+      <div class="mk-toolbar-spacer"></div>
+
+      <!-- Canvas-specific controls (visible only on canvas view) -->
+      <span class="mk-chip" id="mk-ctrl-neighbours">Neighbours: 2 levels</span>
+      <select class="mk-btn" style="appearance: none;">
+        <option>Layout: Force-directed</option>
+        <option>Layout: Hierarchical</option>
+        <option>Layout: Radial</option>
+        <option>Layout: Concentric</option>
+      </select>
+    </div>
+
+    <!-- View content -->
+    <div class="mk-view-content">
+
+      <!-- ========== CANVAS VIEW ========== -->
+      <div class="mk-view-pane active" id="mk-pane-canvas">
+        <div class="mk-canvas">
+          <!-- Fake edges -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+            <defs>
+              <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#2a3045"/>
+              </marker>
+            </defs>
+            <line x1="260" y1="120" x2="180" y2="240" stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="260" y1="120" x2="400" y2="220" stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="260" y1="120" x2="460" y2="80"  stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="400" y1="220" x2="520" y2="330" stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="180" y1="240" x2="120" y2="380" stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+            <line x1="400" y1="220" x2="320" y2="380" stroke="#2a3045" stroke-width="2" marker-end="url(#arr)"/>
+          </svg>
+
+          <!-- Nodes -->
+          <div class="mk-node selected state-active" style="left: 200px; top: 90px;">
+            <div class="mk-node-title">GraphKnowledge v2</div>
+            <div class="mk-node-meta">💼 Project · 🟢 Started</div>
+          </div>
+          <div class="mk-node state-new" style="left: 120px; top: 220px;">
+            <div class="mk-node-title">Export validation</div>
+            <div class="mk-node-meta">📋 Task · ⚠️ overdue 2d</div>
+          </div>
+          <div class="mk-node state-wait locked" style="left: 340px; top: 200px;" title="Locked by MZ">
+            <div class="mk-node-title">Rich properties</div>
+            <div class="mk-node-meta">📋 Task · 🟡 UnVerified</div>
+          </div>
+          <div class="mk-node state-done" style="left: 420px; top: 50px;">
+            <div class="mk-node-title">.NET 9 migration</div>
+            <div class="mk-node-meta">💼 Project · ✓ Done</div>
+          </div>
+          <div class="mk-node state-new" style="left: 470px; top: 310px;">
+            <div class="mk-node-title">Typed properties UI</div>
+            <div class="mk-node-meta">📋 Task · 🔵 Intended</div>
+          </div>
+          <div class="mk-node state-active" style="left: 50px; top: 360px;">
+            <div class="mk-node-title">Password hashing</div>
+            <div class="mk-node-meta">🔴 Critical · 🟢 Started</div>
+          </div>
+          <div class="mk-node state-new" style="left: 270px; top: 360px;">
+            <div class="mk-node-title">State machine</div>
+            <div class="mk-node-meta">📋 Task · 🔵 Intended</div>
+          </div>
+
+          <!-- Minimap -->
+          <div class="mk-minimap">
+            <div>Minimap · 2,070 nodes</div>
+            <div class="mk-minimap-canvas">
+              <div class="mk-minimap-dot" style="top: 20%; left: 30%;"></div>
+              <div class="mk-minimap-dot" style="top: 40%; left: 55%;"></div>
+              <div class="mk-minimap-dot" style="top: 60%; left: 40%;"></div>
+              <div class="mk-minimap-dot" style="top: 30%; left: 70%;"></div>
+              <div class="mk-minimap-dot" style="top: 80%; left: 25%;"></div>
+              <div class="mk-minimap-view" style="top: 20%; left: 25%; width: 40%; height: 50%;"></div>
+            </div>
+          </div>
+
+          <!-- Zoom controls -->
+          <div class="mk-canvas-controls">
+            <button title="Zoom in">＋</button>
+            <button title="Zoom out">－</button>
+            <button title="Fit">⛶</button>
+            <button title="Re-layout">⟳</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== TABLE VIEW ========== -->
+      <div class="mk-view-pane" id="mk-pane-table">
+        <div class="mk-table-wrap">
+          <div style="margin-bottom: 10px; color: var(--text-3); font-size: 12px;">
+            Showing <b style="color: var(--text-1)">47</b> of 284 tasks · columns: custom
+            <button class="mk-btn sm" style="float: right;">＋ Add Column</button>
+            <button class="mk-btn sm" style="float: right; margin-right: 6px;">⤓ Export CSV</button>
+          </div>
+          <table class="mk-table">
+            <thead>
+              <tr>
+                <th style="width: 24px;"><input type="checkbox"></th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>State</th>
+                <th>Due</th>
+                <th>Priority</th>
+                <th>Assignee</th>
+                <th>Parent</th>
+                <th>Last modified</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><input type="checkbox"></td><td>Export validation</td><td>📋 Task</td><td><span class="mk-state-chip started">🟢 Started</span></td><td class="mk-bad">Apr 16 (overdue)</td><td>🔴 High</td><td>YU</td><td>GraphKnowledge v2</td><td>2h ago</td></tr>
+              <tr><td><input type="checkbox"></td><td>Rich properties</td><td>📋 Task</td><td><span class="mk-state-chip unverif">🟡 UnVerified</span></td><td>Apr 24</td><td>🔴 High</td><td>MZ</td><td>GraphKnowledge v2</td><td>5h ago</td></tr>
+              <tr><td><input type="checkbox"></td><td>.NET 9 migration</td><td>💼 Project</td><td><span class="mk-state-chip done">✓ Done</span></td><td>Mar 30</td><td>🟡 Medium</td><td>YU</td><td>—</td><td>3d ago</td></tr>
+              <tr><td><input type="checkbox"></td><td>Password hashing</td><td>📋 Task</td><td><span class="mk-state-chip started">🟢 Started</span></td><td>Apr 20</td><td>🔴 High</td><td>YU</td><td>Security</td><td>1h ago</td></tr>
+              <tr><td><input type="checkbox"></td><td>Typed properties UI</td><td>📋 Task</td><td><span class="mk-state-chip intended">🔵 Intended</span></td><td>May 01</td><td>🟡 Medium</td><td>—</td><td>Rich properties</td><td>yesterday</td></tr>
+              <tr><td><input type="checkbox"></td><td>State machine enforcement</td><td>📋 Task</td><td><span class="mk-state-chip intended">🔵 Intended</span></td><td>May 15</td><td>🟡 Medium</td><td>—</td><td>GraphKnowledge v2</td><td>yesterday</td></tr>
+              <tr><td><input type="checkbox"></td><td>Scheduler integration</td><td>📋 Task</td><td><span class="mk-state-chip intended">🔵 Intended</span></td><td>Jun 01</td><td>🟢 Low</td><td>—</td><td>GraphKnowledge v2</td><td>2d ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== TIMELINE VIEW ========== -->
+      <div class="mk-view-pane" id="mk-pane-timeline">
+        <div class="mk-timeline">
+          <div style="margin-bottom: 12px; color: var(--text-3); font-size: 12px;">
+            <b style="color: var(--text-1)">Q2 2026</b> · grouped by project
+            <span style="float: right;"><button class="mk-btn sm">Today</button> <button class="mk-btn sm">Week</button> <button class="mk-btn sm primary">Month</button> <button class="mk-btn sm">Quarter</button></span>
+          </div>
+          <div class="mk-tl-months">
+            <span class="mk-tl-month">Apr</span>
+            <span class="mk-tl-month">May</span>
+            <span class="mk-tl-month">Jun</span>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">Export validation</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar bad" style="left: 2%; width: 12%;">🔴 overdue</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">Password hashing</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar" style="left: 4%; width: 10%;">🟢 in progress</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">Rich properties</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar warn" style="left: 8%; width: 20%;">🟡 UnVerified</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">Typed properties UI</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar" style="left: 28%; width: 18%; opacity: 0.5;">🔵 planned</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">State machine</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar" style="left: 44%; width: 22%; opacity: 0.5;">🔵 planned</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">Scheduler</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar" style="left: 64%; width: 30%; opacity: 0.5;">🔵 planned</div></div>
+          </div>
+          <div class="mk-tl-row">
+            <div class="mk-tl-row-label">.NET 9 migration</div>
+            <div class="mk-tl-track"><div class="mk-tl-bar done" style="left: 0%; width: 8%;">✓ done</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== DASHBOARD VIEW ========== -->
+      <div class="mk-view-pane" id="mk-pane-dashboard">
+        <div class="mk-dashboard">
+          <div class="mk-card">
+            <div class="mk-card-h">Active tasks</div>
+            <div class="mk-card-big">23</div>
+            <div class="mk-card-delta">+4 this week</div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Overdue</div>
+            <div class="mk-card-big mk-bad">7</div>
+            <div class="mk-card-delta bad">+2 this week</div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Completed this month</div>
+            <div class="mk-card-big mk-good">41</div>
+            <div class="mk-card-delta">↑ on pace</div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Nodes by state</div>
+            <div style="font-size: 11px; color: var(--text-2);">
+              <div style="margin: 4px 0;">🔵 Intended <span style="float: right;">148</span></div>
+              <div style="margin: 4px 0;">🟢 Started <span style="float: right;">23</span></div>
+              <div style="margin: 4px 0;">🟡 UnVerified <span style="float: right;">12</span></div>
+              <div style="margin: 4px 0;">⚫ Completed <span style="float: right;">890</span></div>
+            </div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Nodes by type</div>
+            <div class="mk-sparkline">
+              <span style="height: 60%;"></span>
+              <span style="height: 80%;"></span>
+              <span style="height: 45%;"></span>
+              <span style="height: 90%;"></span>
+              <span style="height: 30%;"></span>
+              <span style="height: 70%;"></span>
+              <span style="height: 55%;"></span>
+            </div>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 4px;">Person · Org · Project · Note · Place · Task · Other</div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Graph health</div>
+            <div style="font-size: 12px; color: var(--text-2); margin: 4px 0;">Export validation</div>
+            <div class="mk-progress"><div class="mk-progress-fill" style="width: 100%;"></div></div>
+            <div style="font-size: 12px; color: var(--text-2); margin: 10px 0 4px;">Schema normalization</div>
+            <div class="mk-progress"><div class="mk-progress-fill" style="width: 60%; background: var(--warn);"></div></div>
+            <div style="font-size: 12px; color: var(--text-2); margin: 10px 0 4px;">Empty property keys</div>
+            <div class="mk-progress"><div class="mk-progress-fill" style="width: 85%; background: var(--bad);"></div></div>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 4px;">149 empty keys need cleanup</div>
+          </div>
+          <div class="mk-card" style="grid-column: span 2;">
+            <div class="mk-card-h">Upcoming this week</div>
+            <div style="font-size: 12px;">
+              <div class="mk-related-row"><span class="target">📋 Password hashing</span><span class="rel">due Apr 20</span></div>
+              <div class="mk-related-row"><span class="target">📋 Rich properties review</span><span class="rel">due Apr 24</span></div>
+              <div class="mk-related-row"><span class="target">🎂 Birthday reminder · SK</span><span class="rel">Apr 22</span></div>
+              <div class="mk-related-row"><span class="target">📋 Typed properties UI</span><span class="rel">due May 01</span></div>
+            </div>
+          </div>
+          <div class="mk-card">
+            <div class="mk-card-h">Workspace size</div>
+            <div class="mk-card-big">411 KB</div>
+            <div class="mk-muted" style="font-size: 11px;">2,070 nodes · 788 distinct property keys · 24 subgraph units</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== FEED VIEW ========== -->
+      <div class="mk-view-pane" id="mk-pane-feed">
+        <div class="mk-feed">
+          <div style="margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="mk-chip active">All events</span>
+            <span class="mk-chip">UI.Web.*</span>
+            <span class="mk-chip">Server.Web.*</span>
+            <span class="mk-chip">APP.*</span>
+            <span class="mk-chip">Notifications</span>
+            <span class="mk-chip">Triggers</span>
+            <span class="mk-chip">Today</span>
+            <span class="mk-chip">Last 7 days</span>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">✏️</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag server">Server.Web.Node.Updated</span>
+              <b>MZ</b> changed property <b>Priority</b> on <b>Rich properties</b> from <em>Medium</em> to <em>High</em>
+              <div class="mk-feed-meta">12 minutes ago · schema v1.0.5</div>
+            </div>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">🔔</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag app">APP.Scheduler.Fired</span>
+              Reminder: <b>SK's birthday</b> is in 4 days
+              <div class="mk-feed-meta">1 hour ago · triggered by node <b>SK</b></div>
+            </div>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">🤖</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag app">APP.Agent.Suggestion</span>
+              AI assistant proposed linking <b>LinkedIn · Maaz</b> → existing node <b>MZ</b> <br>
+              <div class="mk-feed-meta">2h ago · <a href="#" class="mk-ext-link">Review</a> · <a href="#" class="mk-ext-link">Dismiss</a></div>
+            </div>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">➕</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag ui">UI.Web.Node.Created</span>
+              <b>You</b> created <b>Typed properties UI</b> under <em>Rich properties</em>
+              <div class="mk-feed-meta">yesterday, 17:42</div>
+            </div>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">🔒</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag ui">UI.Web.Node.Locked</span>
+              <b>MZ</b> opened <b>Rich properties</b> for editing — node locked
+              <div class="mk-feed-meta">5h ago · lock held 22 min</div>
+            </div>
+          </div>
+          <div class="mk-feed-row">
+            <div class="mk-feed-icon">⬇️</div>
+            <div class="mk-feed-body">
+              <span class="mk-event-tag server">Server.Web.Export.Validated</span>
+              Export validated — 2,070 nodes serialized successfully (JSON.parse OK)
+              <div class="mk-feed-meta">yesterday · 411 KB · checksum a81fe0…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /view-content -->
+  </div> <!-- /main -->
+
+  <!-- ======================= RIGHT PANEL — NODE DETAIL ======================= -->
+  <div class="mk-rightpanel">
+    <div class="mk-rp-head">
+      <div class="mk-rp-title-row">
+        <div class="mk-rp-color" title="Change color"></div>
+        <div style="flex: 1;">
+          <div class="mk-rp-title" contenteditable="false">GraphKnowledge v2</div>
+          <div class="mk-rp-breadcrumb">
+            <a href="#">Personal</a> / <a href="#">Projects</a> / <a href="#">Active</a>
+          </div>
+        </div>
+        <span class="mk-rp-type">Project</span>
+      </div>
+
+      <div class="mk-rp-statusrow">
+        <span class="mk-state-chip started">🟢 Started</span>
+        <span class="mk-chip">Due May 15</span>
+        <span class="mk-chip">👤 YU</span>
+        <span class="mk-chip">🏷️ Priority:High</span>
+        <span class="mk-chip">🏷️ PersonContext:Main</span>
+        <span class="mk-chip ghost">＋</span>
+      </div>
+    </div>
+
+    <div class="mk-rp-tabs">
+      <div class="mk-rp-tab active">Properties</div>
+      <div class="mk-rp-tab">Relations</div>
+      <div class="mk-rp-tab">Attachments</div>
+      <div class="mk-rp-tab">History</div>
+    </div>
+
+    <div class="mk-rp-body">
+
+      <!-- Typed properties -->
+      <div class="mk-section-h">
+        <span>Properties</span>
+        <button class="mk-btn sm ghost" onclick="mkOpenModal('addprop')">＋ Add typed property</button>
+      </div>
+
+      <!-- bool -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">☑</span> isBlocked</div>
+        <div class="mk-prop-val"><span class="mk-toggle" onclick="this.classList.toggle('on')"></span></div>
+      </div>
+
+      <!-- enum -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">☰</span> phase</div>
+        <div class="mk-prop-val">
+          <select>
+            <option>Planning</option>
+            <option selected>Build</option>
+            <option>Review</option>
+            <option>Shipped</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- checklist -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">✓</span> checklist</div>
+        <div class="mk-prop-val">
+          <ul class="mk-checklist" style="padding: 0; margin: 0;">
+            <li class="done"><input type="checkbox" checked><span>.NET 9 migration</span></li>
+            <li class="done"><input type="checkbox" checked><span>Copilot instructions</span></li>
+            <li><input type="checkbox"><span>Export validation</span></li>
+            <li><input type="checkbox"><span>Password hashing</span></li>
+            <li><input type="checkbox"><span>Typed properties</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- currency -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">$</span> budget</div>
+        <div class="mk-prop-val"><span class="mk-money">$ 0.00</span> <span class="mk-muted">(self-funded)</span></div>
+      </div>
+
+      <!-- time-range -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">⏱</span> timeline</div>
+        <div class="mk-prop-val">Apr 01 2026 → May 15 2026 <span class="mk-muted">(27d left)</span></div>
+      </div>
+
+      <!-- number -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">#</span> progress</div>
+        <div class="mk-prop-val">
+          <div class="mk-progress"><div class="mk-progress-fill" style="width: 60%;"></div></div>
+          <span class="mk-muted" style="font-size: 11px;">60% — 41 of 67 tasks</span>
+        </div>
+      </div>
+
+      <!-- geography -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">📍</span> location</div>
+        <div class="mk-prop-val"><span class="mk-geo-pill">📍 Karachi, PK</span></div>
+      </div>
+
+      <!-- URL / external -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">🔗</span> repo</div>
+        <div class="mk-prop-val"><a class="mk-ext-link" href="#">github.com/pheeca/GraphKnowledgeManager ↗</a></div>
+      </div>
+
+      <!-- external id -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">⧉</span> linearId</div>
+        <div class="mk-prop-val"><a class="mk-ext-link" href="#">LIN-482 ↗</a></div>
+      </div>
+
+      <!-- file -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">📎</span> specDoc</div>
+        <div class="mk-prop-val">
+          <span class="mk-file-pill">📄 architecture.md · 12 KB</span>
+        </div>
+      </div>
+
+      <!-- text -->
+      <div class="mk-prop">
+        <div class="mk-prop-key"><span class="mk-type-icon">T</span> notes</div>
+        <div class="mk-prop-val"><input value="Dogfood before productizing. Phase 0-1 gate everything."></div>
+      </div>
+
+      <!-- Relations -->
+      <div class="mk-section-h">
+        <span>Relations · 6</span>
+        <button class="mk-btn sm ghost" onclick="mkOpenModal('relation')">＋ Add relation</button>
+      </div>
+      <div class="mk-related-row"><span class="target">📋 Export validation</span><span class="rel">depends on</span></div>
+      <div class="mk-related-row"><span class="target">📋 Rich properties</span><span class="rel">depends on</span></div>
+      <div class="mk-related-row"><span class="target">📋 Password hashing</span><span class="rel">depends on</span></div>
+      <div class="mk-related-row"><span class="target">💼 .NET 9 migration</span><span class="rel">succeeded by</span></div>
+      <div class="mk-related-row"><span class="target">👤 MZ</span><span class="rel">collaborator</span></div>
+      <div class="mk-related-row"><span class="target">🏢 pheeca.com</span><span class="rel">hosted at</span></div>
+
+      <!-- Attachments -->
+      <div class="mk-section-h">
+        <span>Attachments</span>
+        <button class="mk-btn sm ghost">＋ Attach</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <span class="mk-file-pill">📄 architecture.md</span>
+        <span class="mk-file-pill">🎙 planning-call.m4a</span>
+        <span class="mk-file-pill">💬 Slack: #graphkm-dev</span>
+      </div>
+
+      <!-- Activity -->
+      <div class="mk-section-h">
+        <span>Recent activity</span>
+        <a class="mk-ext-link" href="#" onclick="mkSelectView('feed');return false;">View all</a>
+      </div>
+      <div style="font-size: 11px; color: var(--text-3);">
+        <div style="padding: 4px 0;">✏️ MZ changed <b>Priority</b> · 12m ago</div>
+        <div style="padding: 4px 0;">➕ You added relation to <b>Password hashing</b> · 1h ago</div>
+        <div style="padding: 4px 0;">🟢 State changed: Intended → Started · yesterday</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================= STATUS BAR ======================= -->
+  <div class="mk-statusbar">
+    <span class="mk-status-good">● Connected</span>
+    <span>Schema v1.0.5</span>
+    <span>Last saved <b style="color: var(--text-2);">2 min ago</b></span>
+    <span class="mk-status-good">✓ Export valid</span>
+    <span>🔒 1 locked node</span>
+    <div class="mk-status-spacer"></div>
+    <span>2,070 nodes · 2,252 edges</span>
+    <span>Selection: <b style="color: var(--text-2);">GraphKnowledge v2</b></span>
+    <span>⌘K for commands</span>
+  </div>
+
+  <!-- ======================= COMMAND PALETTE ======================= -->
+  <div class="mk-palette" id="mk-palette">
+    <input class="mk-palette-input" placeholder="Ask AI, search nodes, or type a command…" value="">
+    <div class="mk-palette-list">
+      <div class="mk-palette-group">Suggested</div>
+      <div class="mk-palette-item active">
+        <span class="kind">AI</span>
+        <span class="title">Ask: "What contacts did I meet at conferences in 2025?"</span>
+        <span class="hint">Enter</span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">AI</span>
+        <span class="title">Summarize: selected node and its subtree</span>
+      </div>
+
+      <div class="mk-palette-group">Nodes (3)</div>
+      <div class="mk-palette-item">
+        <span class="kind">Node</span>
+        <span class="title">📋 Password hashing <span class="mk-muted">— Task · Started</span></span>
+        <span class="hint">↵ Open</span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">Node</span>
+        <span class="title">📋 Rich properties <span class="mk-muted">— Task · UnVerified</span></span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">Node</span>
+        <span class="title">💼 GraphKnowledge v2 <span class="mk-muted">— Project · Started</span></span>
+      </div>
+
+      <div class="mk-palette-group">Commands</div>
+      <div class="mk-palette-item">
+        <span class="kind">Cmd</span>
+        <span class="title">＋ New node from template…</span>
+        <span class="hint">Ctrl N</span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">Cmd</span>
+        <span class="title">Switch graph…</span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">Cmd</span>
+        <span class="title">Export and validate</span>
+      </div>
+      <div class="mk-palette-item">
+        <span class="kind">Cmd</span>
+        <span class="title">Find nodes with empty property keys</span>
+      </div>
+
+      <div class="mk-palette-group">Prolog query</div>
+      <div class="mk-palette-item">
+        <span class="kind">?-</span>
+        <span class="title" style="font-family: 'SF Mono', monospace; font-size: 12px;">related(X, 'Maaz'), type(X, person).</span>
+        <span class="hint">Run</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= AI ASSISTANT DRAWER ======================= -->
+  <div class="mk-ai-drawer" id="mk-ai">
+    <div class="mk-ai-h">
+      <div><b>✨ Graph Assistant</b> <span class="mk-muted" style="font-size: 11px;">grounded on your graph</span></div>
+      <button class="mk-icon-btn" onclick="mkToggleAI()">×</button>
+    </div>
+    <div class="mk-ai-body">
+      <div class="mk-ai-msg user"><div class="mk-ai-bubble">What tasks are blocking the v2 release?</div></div>
+      <div class="mk-ai-msg">
+        <div class="mk-ai-bubble">
+          Four Phase 0 tasks are marked <b>Critical</b> and still open:
+          <ol style="margin: 6px 0 0 18px; padding: 0; font-size: 12px;">
+            <li>Fix export validation — 🔴 overdue 2 days</li>
+            <li>Hash passwords</li>
+            <li>Remove hardcoded fallback user</li>
+            <li>Restrict CORS</li>
+          </ol>
+        </div>
+        <div class="mk-ai-action">
+          <a href="#">📌 Pin as filter</a> · <a href="#">📊 Show on timeline</a> · <a href="#">📋 Create a release milestone</a>
+        </div>
+      </div>
+      <div class="mk-ai-msg user"><div class="mk-ai-bubble">Any duplicate contacts I should merge?</div></div>
+      <div class="mk-ai-msg">
+        <div class="mk-ai-bubble">
+          I found 3 likely duplicate clusters (same email or phone):
+          <div style="margin: 6px 0; font-size: 12px;">
+            • <b>Maaz Khan</b> ⟷ <b>M. Khan</b> — shared phone<br>
+            • <b>SK</b> ⟷ <b>Saad Khan</b> — shared LinkedIn<br>
+            • 3 acquaintance nodes with identical empty label
+          </div>
+        </div>
+        <div class="mk-ai-action">
+          <a href="#">Review merges</a> · <a href="#">Ignore</a>
+        </div>
+      </div>
+    </div>
+    <div class="mk-ai-input">
+      <textarea rows="2" placeholder="Ask anything about your graph…"></textarea>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 11px; color: var(--text-3);">
+        <span>Scope: <b style="color: var(--text-2);">current subtree</b></span>
+        <button class="mk-btn primary sm">Send ↵</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= NOTIFICATION PANEL ======================= -->
+  <div class="mk-notif-panel" id="mk-notifs">
+    <div class="mk-notif-h">
+      <b>Notifications</b>
+      <a href="#" class="mk-ext-link">Mark all read</a>
+    </div>
+    <div class="mk-notif-list">
+      <div class="mk-notif-row unread">
+        <div>🔴</div>
+        <div style="flex: 1;">
+          <b>Export validation</b> is overdue by 2 days
+          <div class="meta">System · 1h ago</div>
+        </div>
+      </div>
+      <div class="mk-notif-row unread">
+        <div>🎂</div>
+        <div style="flex: 1;">
+          Birthday reminder: <b>SK</b> in 4 days
+          <div class="meta">Scheduler · 1h ago</div>
+        </div>
+      </div>
+      <div class="mk-notif-row">
+        <div>✏️</div>
+        <div style="flex: 1;">
+          <b>MZ</b> changed priority on <b>Rich properties</b>
+          <div class="meta">Real-time · 12m ago</div>
+        </div>
+      </div>
+      <div class="mk-notif-row">
+        <div>🤖</div>
+        <div style="flex: 1;">
+          AI found 3 possible duplicate contacts
+          <div class="meta">Agent · 2h ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= MODALS ======================= -->
+
+  <!-- Add typed property -->
+  <div class="mk-modal-backdrop" id="mk-modal-addprop" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal">
+      <div class="mk-modal-h">
+        <h4>Add Property</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <div class="mk-form-row">
+          <label>Key</label>
+          <input type="text" placeholder="e.g. budget, dueDate, location">
+        </div>
+        <div class="mk-form-row">
+          <label>Type</label>
+          <div class="mk-typegrid">
+            <div class="mk-typebtn"><span class="icon">T</span>Text</div>
+            <div class="mk-typebtn"><span class="icon">#</span>Number</div>
+            <div class="mk-typebtn"><span class="icon">☑</span>Bool</div>
+            <div class="mk-typebtn"><span class="icon">☰</span>Enum</div>
+            <div class="mk-typebtn"><span class="icon">✓</span>Checklist</div>
+            <div class="mk-typebtn"><span class="icon">$</span>Currency</div>
+            <div class="mk-typebtn"><span class="icon">⏱</span>Time</div>
+            <div class="mk-typebtn"><span class="icon">⏲</span>Range</div>
+            <div class="mk-typebtn"><span class="icon">📍</span>Geo</div>
+            <div class="mk-typebtn"><span class="icon">🔗</span>URL</div>
+            <div class="mk-typebtn"><span class="icon">📎</span>File</div>
+            <div class="mk-typebtn"><span class="icon">⧉</span>External ID</div>
+          </div>
+        </div>
+        <div class="mk-form-row">
+          <label>Default value</label>
+          <input type="text">
+        </div>
+        <div class="mk-form-row">
+          <label><input type="checkbox"> Apply to all nodes of this type</label>
+        </div>
+      </div>
+      <div class="mk-modal-f">
+        <button class="mk-btn" onclick="mkCloseModal()">Cancel</button>
+        <button class="mk-btn primary" onclick="mkCloseModal()">Add Property</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New node -->
+  <div class="mk-modal-backdrop" id="mk-modal-newnode" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal">
+      <div class="mk-modal-h">
+        <h4>New Node</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <div class="mk-form-row">
+          <label>Label</label>
+          <input type="text" autofocus placeholder="Node label…">
+        </div>
+        <div class="mk-form-row">
+          <label>Type</label>
+          <select><option>👤 Person</option><option>🏢 Organization</option><option selected>📋 Task</option><option>💼 Project</option><option>📖 Note</option><option>🌍 Place</option></select>
+        </div>
+        <div class="mk-form-row">
+          <label>Parent (optional)</label>
+          <input type="text" value="GraphKnowledge v2" placeholder="search…">
+        </div>
+        <div class="mk-form-row">
+          <label>Use template</label>
+          <select><option>— none —</option><option>Contact card</option><option selected>Project scaffold</option><option>Bureaucracy checklist</option></select>
+        </div>
+        <div class="mk-form-row">
+          <label>Tags</label>
+          <input type="text" placeholder="type a tag and press Enter">
+        </div>
+      </div>
+      <div class="mk-modal-f">
+        <button class="mk-btn" onclick="mkCloseModal()">Cancel</button>
+        <button class="mk-btn primary" onclick="mkCloseModal()">Create Node</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New relation -->
+  <div class="mk-modal-backdrop" id="mk-modal-relation" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal">
+      <div class="mk-modal-h">
+        <h4>New Relation</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <div class="mk-form-row">
+          <label>From</label>
+          <input type="text" value="GraphKnowledge v2" readonly style="opacity: 0.7;">
+        </div>
+        <div class="mk-form-row">
+          <label>Relation type</label>
+          <select>
+            <option>depends on</option>
+            <option>blocks</option>
+            <option>relates to</option>
+            <option>part of</option>
+            <option>authored by</option>
+            <option>succeeded by</option>
+            <option>custom…</option>
+          </select>
+        </div>
+        <div class="mk-form-row">
+          <label>To (searchable)</label>
+          <input type="text" placeholder="🔍 search any node, by label / tag / type…">
+        </div>
+        <div class="mk-form-row">
+          <label><input type="checkbox" checked> Link as single logical unit (nodeUnit)</label>
+        </div>
+      </div>
+      <div class="mk-modal-f">
+        <button class="mk-btn" onclick="mkCloseModal()">Cancel</button>
+        <button class="mk-btn primary" onclick="mkCloseModal()">Create Relation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share -->
+  <div class="mk-modal-backdrop" id="mk-modal-share" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal">
+      <div class="mk-modal-h">
+        <h4>Share Graph</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <div class="mk-form-row">
+          <label>Invite by email</label>
+          <input type="text" placeholder="name@domain.com">
+        </div>
+        <div class="mk-form-row">
+          <label>Permission</label>
+          <select><option>Viewer (read only)</option><option selected>Editor</option><option>Admin</option></select>
+        </div>
+        <div class="mk-form-row">
+          <label>Scope</label>
+          <select><option>Full graph</option><option selected>Only subtree "GraphKnowledge v2"</option><option>Specific nodeUnit…</option></select>
+        </div>
+        <div class="mk-section-h">People with access</div>
+        <div class="mk-related-row"><span class="target">👤 YU (you)</span><span class="rel">Owner</span></div>
+        <div class="mk-related-row"><span class="target">👤 MZ</span><span class="rel">Editor · subtree</span></div>
+        <div class="mk-related-row"><span class="target">👤 SK</span><span class="rel">Viewer</span></div>
+      </div>
+      <div class="mk-modal-f">
+        <button class="mk-btn" onclick="mkCloseModal()">Done</button>
+        <button class="mk-btn primary" onclick="mkCloseModal()">Send Invite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graph switcher -->
+  <div class="mk-modal-backdrop" id="mk-modal-graphs" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal">
+      <div class="mk-modal-h">
+        <h4>Switch Graph</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <input type="text" placeholder="Search graphs…" style="width: 100%; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-1); padding: 8px; border-radius: 6px; margin-bottom: 10px;">
+        <div class="mk-related-row"><span class="target">🟣 Personal Knowledge <span class="mk-muted">(active)</span></span><span class="rel">2,070 nodes</span></div>
+        <div class="mk-related-row"><span class="target">🔵 Work — pheeca.com</span><span class="rel">428 nodes</span></div>
+        <div class="mk-related-row"><span class="target">🟢 Family Tree</span><span class="rel">61 nodes</span></div>
+        <div class="mk-related-row"><span class="target">🟠 Research — AI assistants</span><span class="rel">215 nodes</span></div>
+        <div class="mk-related-row"><span class="target">⚪ Shared with me: MZ's workspace</span><span class="rel">Viewer</span></div>
+      </div>
+      <div class="mk-modal-f">
+        <button class="mk-btn" onclick="mkCloseModal()">Cancel</button>
+        <button class="mk-btn primary" onclick="mkCloseModal()">＋ New Graph</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <div class="mk-modal-backdrop" id="mk-modal-templates" onclick="if(event.target===this)mkCloseModal()">
+    <div class="mk-modal lg">
+      <div class="mk-modal-h">
+        <h4>Templates</h4>
+        <button class="mk-icon-btn" onclick="mkCloseModal()">×</button>
+      </div>
+      <div class="mk-modal-b">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <div class="mk-card" style="cursor: pointer;">
+            <b>👥 Contact card</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              Child nodes: Phone, Email, LinkedIn, CV, Notes<br>
+              Color: Blue · Tags: PersonContext
+            </div>
+          </div>
+          <div class="mk-card" style="cursor: pointer;">
+            <b>🚀 Project scaffold</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              Properties: phase, due, budget, repo, progress<br>
+              Sibling templates for Task children
+            </div>
+          </div>
+          <div class="mk-card" style="cursor: pointer;">
+            <b>🏛️ Bureaucracy checklist</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              5-step checklist · Attachments mandatory · State:Started
+            </div>
+          </div>
+          <div class="mk-card" style="cursor: pointer;">
+            <b>🌳 Family tree branch</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              Parent-child relation · Birth/death date range
+            </div>
+          </div>
+          <div class="mk-card" style="cursor: pointer;">
+            <b>📖 Research note</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              URL, quote, date, related-to edge
+            </div>
+          </div>
+          <div class="mk-card" style="cursor: pointer; border-style: dashed;">
+            <b>＋ Create template</b>
+            <div class="mk-muted" style="font-size: 11px; margin-top: 6px;">
+              Build from selected node or blank
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <script>
-    $(document).ready(function () {
-        $('#mynetwork').height(Math.floor(($(window).height() / 100) * 85));
+  // Minimal interactivity purely for mockup demonstration
+  function mkSelectView(name) {
+    document.querySelectorAll('#mockup-root .mk-view-pane').forEach(el => el.classList.remove('active'));
+    var pane = document.getElementById('mk-pane-' + name);
+    if (pane) pane.classList.add('active');
+    document.querySelectorAll('#mockup-root .mk-view-tab').forEach(el => {
+      el.classList.toggle('active', el.textContent.toLowerCase().includes(name));
     });
-    $(window).load(function(){
-        
+    document.querySelectorAll('#mockup-root .mk-leftnav .mk-nav-item').forEach(el => {
+      var firstWord = el.textContent.trim().toLowerCase();
+      el.classList.toggle('active', firstWord.includes(name));
     });
+    // Canvas-specific controls
+    var ctrl = document.getElementById('mk-ctrl-neighbours');
+    if (ctrl) ctrl.style.display = (name === 'canvas') ? '' : 'none';
+  }
+  function mkOpenModal(key) {
+    var m = document.getElementById('mk-modal-' + key);
+    if (m) m.classList.add('open');
+  }
+  function mkCloseModal() {
+    document.querySelectorAll('#mockup-root .mk-modal-backdrop').forEach(el => el.classList.remove('open'));
+  }
+  function mkTogglePalette() {
+    var p = document.getElementById('mk-palette');
+    p.classList.toggle('open');
+    if (p.classList.contains('open')) {
+      setTimeout(() => p.querySelector('input').focus(), 50);
+    }
+  }
+  function mkToggleAI() {
+    document.getElementById('mk-ai').classList.toggle('open');
+  }
+  function mkToggleNotifs() {
+    document.getElementById('mk-notifs').classList.toggle('open');
+  }
+  // Keyboard shortcut
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      mkTogglePalette();
+    }
+    if (e.key === 'Escape') {
+      mkCloseModal();
+      document.getElementById('mk-palette').classList.remove('open');
+    }
+  });
 </script>
