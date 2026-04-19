@@ -553,7 +553,7 @@ function getCurrentNodes(_data) {
             _tempNodes = _tempNodes.filter(e => e.label.toLocaleLowerCase().trim().indexOf(tagFilter.toLocaleLowerCase().trim())  > -1);
         }
         if(searchmode.includes('properties')){
-            _tempNodes = _tempNodes.filter(e => (e.Properties||[]).filter(p=>((p.key||'')+(p.value||'')).toLocaleLowerCase().trim().indexOf(tagFilter.toLocaleLowerCase().trim())  > -1));
+            _tempNodes = _tempNodes.filter(e => (e.Properties||[]).filter(p=>((p.key||'')+(p.value||'')).toLocaleLowerCase().trim().indexOf(tagFilter.toLocaleLowerCase().trim())  > -1).length > 0);
         }
         _tempNodes = [...new Map(_tempNodes.map(item => [item['id'], item])).values()]; 
     }
@@ -638,8 +638,18 @@ EventBus.addEventListener('graphUpdated', function (params) {
     _data.edges = new vis.DataSet(_data.edges.filter(e => _tempNodes.map(_d => _d.id).indexOf(e.from) != -1 && _tempNodes.map(_d => _d.id).indexOf(e.to) != -1));
     let currentHash = null;
 
+    // Track representation style to detect layout changes
+    var currentRepStyle = $(graphExplorer.graphConfig.representationstyle).val();
+    var styleChanged = graphExplorer.currentRepStyle !== currentRepStyle;
+    graphExplorer.currentRepStyle = currentRepStyle;
 
-    if (!graphExplorer.network) {
+    if (!graphExplorer.network || styleChanged) {
+        // Destroy old network if switching layout styles
+        if (graphExplorer.network) {
+            graphExplorer.network.destroy();
+            graphExplorer.network = null;
+        }
+        
         graphExplorer.network = new vis.Network(graphExplorer.container, _data, graphExplorer.options);
 
         graphExplorer.network.on("selectNode", function (params) {
@@ -697,6 +707,12 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
     //+ ',' + graphExplorer.graphConfig.searchmode
     $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal ).on('change', (e) => EventBus.dispatch('graphUpdated', e));
+    // Handle Enter key in search input
+    $('#search').on('keypress', function(e) {
+        if (e.which == 13) { // Enter key
+            EventBus.dispatch('graphUpdated');
+        }
+    });
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
     $(graphExplorer.graphConfig.changeparent).on('change', (e) => EventBus.dispatch('changeparent'));
     $(graphExplorer.graphConfig.linkNodes).on('change', (e) => EventBus.dispatch('linkNode'));
@@ -806,11 +822,17 @@ function initialize(_rawData) {
       },  layout: {
         hierarchical: {
           direction: 'UD',
-          nodeSpacing: 150
+          sortMethod: 'directed'
         }
       },
       interaction: {dragNodes :false},
-     physics:false});
+      physics: {
+        enabled: true,
+        hierarchicalRepulsion: {
+          avoidOverlap: 1
+        }
+      }
+     });
      
      graphExplorer.options=$(graphExplorer.graphConfig.representationstyle).val()=='hierarchical'?graphExplorer.ctx.representationstyle.hierarchical:graphExplorer.options;
      graphExplorer.options=$(graphExplorer.graphConfig.representationstyle).val()=='graph'?graphExplorer.ctx.representationstyle.graph:graphExplorer.options;
