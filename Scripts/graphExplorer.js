@@ -99,6 +99,7 @@ EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
     var linkUrl = location.origin + '/#' + AppConfig.GraphUrl + '/' + sessionStorage.getItem("UserSchemaId") + '/' + graphExplorer.data.selectedNode;
     linkUrl += '/' + window.btoa(linkUrl);
     $('#sharelink').val(linkUrl);
+    // Note: the "Generate Link" button (#gk-create-share-btn) is wired in onGraphEnabled
 
 
 });
@@ -398,6 +399,27 @@ EventBus.addEventListener('modifyNode', function (params) {
 
 EventBus.removeEventListener('saveGraph');
 EventBus.addEventListener('saveGraph', function () {
+    // Share mode: route save to the share endpoint
+    if (graphExplorer.shareConfig && graphExplorer.shareConfig.shareId) {
+        if (graphExplorer.shareConfig.accessMode !== 'ReadWrite') return; // silent block for ro
+        var clone = JSON.parse(JSON.stringify(graphExplorer.data));
+        clone.selectedNode = null;
+        clone.currentEdge = null;
+        clone.currentProperty = null;
+        $.ajax({
+            url: AppConfig.domain + '/api/share/' + graphExplorer.shareConfig.shareId,
+            type: 'POST',
+            data: {
+                SchemaInfo: JSON.stringify(clone),
+                ModifiedBy: sessionStorage.getItem("UserId") || 0
+            },
+            success: function (data) {
+                if (data) $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
+            }
+        });
+        return;
+    }
+
     if (graphExplorer.isOffline) {
         localStorage.setItem('graphExplorer.data', JSON.stringify(graphExplorer.data));
         $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
@@ -638,7 +660,31 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
                 $('#sharelinkbtn').tooltip('hide');
             }, 1000);
         }
-    })
+    });
+
+    // Generate backend share link for selected node
+    $('#gk-create-share-btn').on('click', function () {
+        var nodeId = graphExplorer.data.selectedNode;
+        if (!nodeId) { alert('Please select a node first.'); return; }
+        var mode = $('#gk-share-mode').val() || 'ReadOnly';
+        $.ajax({
+            url: AppConfig.domain + '/api/share',
+            type: 'POST',
+            data: {
+                UserSchemaId: sessionStorage.getItem("UserSchemaId"),
+                RootNodeId: nodeId,
+                AccessMode: mode,
+                CreatedBy: sessionStorage.getItem("UserId")
+            },
+            success: function (shareId) {
+                var shareUrl = location.origin + '/#/Share/' + shareId;
+                $('#sharelink').val(shareUrl);
+            },
+            error: function () {
+                alert('Failed to create share link.');
+            }
+        });
+    });
     // $('#customize input').on('change',(e) => {
     //     if($('#customizecolor').val()){
     //         EventBus.dispatch('customizeNode')
@@ -830,3 +876,66 @@ $(graphExplorer.graphConfig.modal.property).on('hidden.bs.modal', function () {
     services.client.dataservice.deselectCurrentProperty();
     EventBus.dispatch('refreshPanel');
 });
+
+// ── Share mode ───────────────────────────────────────────────────────────────
+
+graphExplorer.shareConfig = null;
+
+EventBus.removeEventListener('onShareEnabled');
+EventBus.addEventListener('onShareEnabled', function () {
+    EventBus.removeEventListener('onShareEnabled');
+
+    setFstDropdown();
+    graphExplorer.isOffline = false;
+    graphExplorer.shareConfig = null;
+
+    var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
+    var shareId = routeParams && routeParams.shareId;
+    if (!shareId) {
+        EventBus.dispatch('UI.Web.App.Redirect', '/Login');
+        return;
+    }
+
+    graphExplorer.shareConfig = { shareId: shareId, accessMode: null };
+
+    // Bind standard read-safe UI events
+    $('select[multiple]').selectpicker();
+    $('#Date').datepicker();
+    $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e));
+    $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e));
+    $('#neighbouringNodesSwitch').on('change', (e) => EventBus.dispatch('onlyNeighbourToggle', e));
+    $(graphExplorer.graphConfig.searchtag + ',' + graphExplorer.graphConfig.tagContextGlobal)
+        .on('change', (e) => EventBus.dispatch('graphUpdated', e));
+
+    $.ajax({
+        url: AppConfig.domain + '/api/share/' + shareId,
+        type: 'GET',
+        success: function (data) {
+            if (!data) {
+                alert('Share link is invalid or has expired.');
+                return;
+            }
+            graphExplorer.shareConfig.accessMode = data.AccessMode;
+            initialize(data.SchemaInfo);
+            applyShareUIMode(data.AccessMode);
+        },
+        error: function () {
+            alert('Share link is invalid or has expired.');
+        }
+    });
+});
+
+function applyShareUIMode(accessMode) {
+    // Never show share-creation UI to a share viewer
+    $('#gk-share-section').hide();
+    // Always disable undo/redo in share mode (they target full schema version history)
+    $('#gk-undo-btn, #gk-redo-btn').closest('.btn-group').hide();
+
+    if (accessMode === 'ReadOnly') {
+        $('#gk-save-btn, #gk-addnode-btn').closest('.btn-group').hide();
+        $('a[href="#grapheditorpanel"]').closest('li').hide();
+        $(AppConfig.messageBox).text('Viewing shared graph (Read Only)');
+    } else {
+        $(AppConfig.messageBox).text('Viewing shared graph (Read & Write)');
+    }
+}

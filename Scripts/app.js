@@ -14,8 +14,9 @@ var AppConfig = {
     title:'Graph Knowledge'
 };
 var AppRoutes = [
-    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html' },
-    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html', title:'Graph Explorer' },
+    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp1.html' },
+    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp1.html', title:'Graph Explorer' },
+    { path: '/Share/:shareId', isAuthenticated: false, event: 'UI.Web.App.Route.Share', file: 'mainpanels.tmp1.html', title: 'Shared Graph' },
     { path: AppConfig.loginUrl , isAuthenticated: false, event: 'UI.Web.App.Route.Login', file: 'loginpanels.tmp.html' , title:'Login' },
 ];
 
@@ -39,6 +40,11 @@ $(document).ready(() => {
 EventBus.removeEventListener('UI.Web.App.Route.Main');
 EventBus.addEventListener('UI.Web.App.Route.Main', function (params) {
     EventBus.dispatch('onGraphEnabled');
+});
+
+EventBus.removeEventListener('UI.Web.App.Route.Share');
+EventBus.addEventListener('UI.Web.App.Route.Share', function () {
+    EventBus.dispatch('onShareEnabled');
 });
 
 EventBus.removeEventListener('UI.Web.App.Route.Login');

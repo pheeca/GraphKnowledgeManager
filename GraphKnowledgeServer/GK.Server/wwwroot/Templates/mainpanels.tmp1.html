@@ -12,20 +12,20 @@
         <div class="col-sm-6 col-md-2">
             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
+                    <button type="button" id="gk-save-btn" class="btn btn-success" onclick="EventBus.dispatch('saveGraph')">Save</button>
                 </div>
                 <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add
+                    <button type="button" id="gk-addnode-btn" class="btn btn-success" onclick="EventBus.dispatch('readNode')">+ Add
                         Node</button>
                 </div>
                 <div class="btn-group mr-2 mt-2" role="group">
                     <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.Logout')">Logout</button>
                 </div>
                 <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Undo')">Undo</button>
+                    <button type="button" id="gk-undo-btn" class="btn btn-success" onclick="EventBus.dispatch('Undo')">Undo</button>
                 </div>
                 <div class="btn-group mr-2 mt-2" role="group">
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('Redo')">Redo</button>
+                    <button type="button" id="gk-redo-btn" class="btn btn-success" onclick="EventBus.dispatch('Redo')">Redo</button>
                 </div>
                 
             </div>
@@ -166,9 +166,21 @@
                             <tbody id="linkNodesInfo"></tbody>
                         </table>
                     </div>
-                    <div class="form-group">
-                        <button type="button" id="sharelinkbtn" class="btn btn-warning">Share</button>
-                        <input id="sharelink" value="">
+                    <div class="form-group" id="gk-share-section">
+                        <label>Share this node's subtree:</label>
+                        <div class="d-flex mb-2">
+                            <select id="gk-share-mode" class="form-control mr-2">
+                                <option value="ReadOnly">Read Only</option>
+                                <option value="ReadWrite">Read &amp; Write</option>
+                            </select>
+                            <button type="button" id="gk-create-share-btn" class="btn btn-warning">Generate Link</button>
+                        </div>
+                        <div class="input-group">
+                            <input id="sharelink" class="form-control" value="" placeholder="Generated link will appear here" readonly>
+                            <div class="input-group-append">
+                                <button type="button" id="sharelinkbtn" class="btn btn-warning">Copy</button>
+                            </div>
+                        </div>
                     </div>
                     <br><br>
                 </div>

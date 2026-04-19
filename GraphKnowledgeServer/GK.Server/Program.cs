@@ -10,6 +10,7 @@ builder.Services.AddSingleton<IDbConnectionFactory>(new SqlConnectionFactory(con
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserSchemaRepository, UserSchemaRepository>();
 builder.Services.AddScoped<ISchemaInformationRepository, SchemaInformationRepository>();
+builder.Services.AddScoped<ISchemaShareRepository, SchemaShareRepository>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = null);
