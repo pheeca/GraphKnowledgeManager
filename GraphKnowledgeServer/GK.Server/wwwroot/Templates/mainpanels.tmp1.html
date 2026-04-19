@@ -6,6 +6,7 @@
             <p id="updatemsg" class="col-sm-11 col-md-10">
                 Create a simple network with some nodes and edges.
             </p>
+            <div id="gk-node-breadcrumb" class="col-sm-12 mb-1"></div>
         </div>
         </div>
         
@@ -112,8 +113,8 @@
                         <tbody id="properties"></tbody>
                     </table>
                     </div>
-                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
-                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">+
+                    <button type="button" id="gk-open-node-btn" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
+                    <button type="button" id="gk-property-add-btn" class="btn btn-success" data-toggle="modal" data-target="#myModal">+
                         Add</button>
                 </div>
                 <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel" aria-labelledby="grapheditorpanel-tab">
@@ -223,7 +224,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success"
+                <button type="button" id="gk-property-save-btn" class="btn btn-success"
                     onclick="EventBus.dispatch('addPropperty')">addProperty</button>
 
             </div>

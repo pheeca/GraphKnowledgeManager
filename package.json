@@ -9,7 +9,7 @@
     "start": "npm run copyjs && npm run copycss && npm run copytemplate && npm run copyIndex",
     "copyjs": "copy \"Scripts\\*.*\" \"GraphKnowledgeServer\\GK.Server\\wwwroot\\Scripts\" /Y",
     "copycss": "copy \"Content\\*.*\" \"GraphKnowledgeServer\\GK.Server\\wwwroot\\Content\" /Y",
-    "copytemplate": "copy \"*.tmp.html\" \"GraphKnowledgeServer\\GK.Server\\wwwroot\\Templates\" /Y",
+    "copytemplate": "copy \"*.tmp.html\" \"GraphKnowledgeServer\\GK.Server\\wwwroot\\Templates\" /Y && copy \"mainpanels.tmp1.html\" \"GraphKnowledgeServer\\GK.Server\\wwwroot\\Templates\\mainpanels.tmp1.html\" /Y",
     "copyIndex": "copy index.html \"GraphKnowledgeServer\\GK.Server\\wwwroot\\index.html\" /Y"
   },
   "repository": {

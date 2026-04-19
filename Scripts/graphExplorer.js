@@ -50,6 +50,7 @@ EventBus.addEventListener('deselectNode', function () {
 
 EventBus.removeEventListener('refreshPanel');
 EventBus.addEventListener('refreshPanel', function () {
+    updateNodeBreadcrumb();
     $('#panel,#generalpanel').hide();
     if (graphExplorer.data.selectedNode) {
         $('#panel').show();
@@ -62,6 +63,64 @@ EventBus.addEventListener('refreshPanel', function () {
         $('#generalpanel').show();
     }
 });
+
+function updateNodeBreadcrumb() {
+    var $breadcrumb = $('#gk-node-breadcrumb');
+    if (!$breadcrumb.length || !graphExplorer.data || !graphExplorer.data.nodes) return;
+
+    var nodes = graphExplorer.data.nodes;
+    var byId = {};
+    nodes.forEach(function (n) { byId[n.id] = n; });
+
+    var contextNodeId = graphExplorer.data.parentNode || null;
+    var selectedNodeId = graphExplorer.data.selectedNode || null;
+
+    var chain = [];
+    var cursor = contextNodeId;
+    var safety = 0;
+    while (cursor && byId[cursor] && safety < 2000) {
+        chain.push({ id: byId[cursor].id, label: byId[cursor].label || ('Node ' + cursor) });
+        cursor = byId[cursor].parentId || null;
+        safety++;
+    }
+    chain.reverse();
+
+    var segments = [{ id: '', label: 'Root' }].concat(chain);
+    var html = '<div class="d-flex align-items-center flex-wrap px-2 py-1" style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:6px;min-height:34px;">';
+    html += '<span class="text-muted mr-2" style="font-size:12px;">Context:</span>';
+
+    segments.forEach(function (segment, index) {
+        if (index > 0) {
+            html += '<span class="text-muted mx-1">&rsaquo;</span>';
+        }
+        html += '<button type="button" class="btn btn-link btn-sm p-0 gk-crumb-link" data-nodeid="' + segment.id + '" style="font-size:12px;">' + segment.label + '</button>';
+    });
+
+    if (selectedNodeId && byId[selectedNodeId]) {
+        html += '<span class="text-muted mx-2">|</span>';
+        html += '<span class="badge badge-secondary" style="font-size:11px;">Selected: ' + (byId[selectedNodeId].label || ('Node ' + selectedNodeId)) + '</span>';
+    }
+
+    html += '</div>';
+    $breadcrumb.html(html);
+}
+
+function bindBreadcrumbNavigation() {
+    $('#gk-node-breadcrumb')
+        .off('click.gkbreadcrumb')
+        .on('click.gkbreadcrumb', '.gk-crumb-link', function (e) {
+            e.preventDefault();
+            var raw = $(this).attr('data-nodeid');
+            var nodeId = parseInt(raw, 10);
+            if (!raw || isNaN(nodeId)) {
+                graphExplorer.data.parentNode = null;
+            } else {
+                graphExplorer.data.parentNode = nodeId;
+            }
+            graphExplorer.data.selectedNode = null;
+            EventBus.dispatch('graphUpdated');
+        });
+}
 
 EventBus.removeEventListener('refreshPanelAdvanceAction');
 EventBus.addEventListener('refreshPanelAdvanceAction', function (params) {
@@ -631,6 +690,7 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
     graphExplorer.url = AppConfig.domain + '/api/Values/' + UserSchemaId;
     EventBus.dispatch('loadGraph');
     $('select[multiple]').selectpicker();
+    bindBreadcrumbNavigation();
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
     $('#properties').on('click', 'tr', (e) => EventBus.dispatch('readPropperty', e))
     $('#edges').on('click', 'tr', (e) => EventBus.dispatch('readEdge', e))
@@ -886,6 +946,7 @@ EventBus.addEventListener('onShareEnabled', function () {
     EventBus.removeEventListener('onShareEnabled');
 
     setFstDropdown();
+    bindBreadcrumbNavigation();
     graphExplorer.isOffline = false;
     graphExplorer.shareConfig = null;
 
@@ -934,6 +995,13 @@ function applyShareUIMode(accessMode) {
     if (accessMode === 'ReadOnly') {
         $('#gk-save-btn, #gk-addnode-btn').closest('.btn-group').hide();
         $('a[href="#grapheditorpanel"]').closest('li').hide();
+        $('a[href="#customize"]').closest('li').hide();
+        $('a[href="#advancedactions"]').closest('li').hide();
+        $('#gk-open-node-btn, #gk-property-add-btn, #gk-property-save-btn').hide();
+        $('#myModal .modal-footer .btn-success').hide();
+        if ($('#proppanel-tab').length) {
+            $('#proppanel-tab').tab('show');
+        }
         $(AppConfig.messageBox).text('Viewing shared graph (Read Only)');
     } else {
         $(AppConfig.messageBox).text('Viewing shared graph (Read & Write)');
