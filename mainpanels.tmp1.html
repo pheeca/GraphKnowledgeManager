@@ -96,12 +96,16 @@
                     <a class="nav-link" id="advancedactions-tab" data-toggle="tab" href="#advancedactions" role="tab"
                         aria-controls="advancedactions" aria-selected="false">Advance Actions</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="historypanel-tab" data-toggle="tab" href="#historypanel" role="tab"
+                        aria-controls="historypanel" aria-selected="false">History</a>
+                </li>
             </ul>
             <div class="tab-content" id="myTabContent">
                 <div class="tab-pane fade show active" id="proppanel" role="tabpanel" aria-labelledby="proppanel-tab">
 
                     <input id="props-search" type="text" class="form-control form-control-sm mb-1" placeholder="Search properties…">
-                    <div id="properties-scroll-wrap" style="max-height:220px;overflow-y:auto;">
+                    <div id="properties-scroll-wrap" style="max-height:46vh;min-height:320px;overflow-y:auto;">
                     <table class="table table-sm mb-0">
                         <thead>
                             <tr>
@@ -114,7 +118,7 @@
                     </table>
                     </div>
                     <button type="button" id="gk-open-node-btn" class="btn btn-success" onclick="EventBus.dispatch('openNode')">Open</button>
-                    <button type="button" id="gk-property-add-btn" class="btn btn-success" data-toggle="modal" data-target="#myModal">+
+                    <button type="button" id="gk-property-add-btn" class="btn btn-success" data-toggle="modal" data-target="#myModal" onclick="EventBus.dispatch('openAddPropperty')">+
                         Add</button>
                 </div>
                 <div class="tab-pane fade" id="grapheditorpanel" role="tabpanel" aria-labelledby="grapheditorpanel-tab">
@@ -185,6 +189,21 @@
                     </div>
                     <br><br>
                 </div>
+                <div class="tab-pane fade" id="historypanel" role="tabpanel" aria-labelledby="historypanel-tab">
+                    <div id="history-state" class="small text-muted mb-2">Select a node to view history.</div>
+                    <div id="history-scroll-wrap" style="max-height:46vh;min-height:320px;overflow-y:auto;">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">SchemaInfoId</th>
+                                    <th scope="col">ModifiedBy</th>
+                                    <th scope="col">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyrows"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-sm-12 col-md-3" id="generalpanel">
@@ -224,6 +243,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="gk-property-delete-btn" class="btn btn-danger" style="display:none;"
+                    onclick="EventBus.dispatch('deletePropperty')">Delete</button>
                 <button type="button" id="gk-property-save-btn" class="btn btn-success"
                     onclick="EventBus.dispatch('addPropperty')">addProperty</button>
 

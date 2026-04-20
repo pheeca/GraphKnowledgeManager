@@ -6,7 +6,8 @@ public interface ISchemaInformationRepository
 {
     string? GetLatest();
     string? GetActiveBySchemaId(int userSchemaId);
-    bool Create(int userSchemaId, string schemaInfo, int modifiedBy);
+    long Create(int userSchemaId, string schemaInfo, int modifiedBy);
+    bool UpdateSchemaInfo(long id, string schemaInfo);
     string? Undo(int userSchemaId);
     string? Redo(int userSchemaId);
 }
@@ -51,7 +52,7 @@ public class SchemaInformationRepository : ISchemaInformationRepository
             new { latestId });
     }
 
-    public bool Create(int userSchemaId, string schemaInfo, int modifiedBy)
+    public long Create(int userSchemaId, string schemaInfo, int modifiedBy)
     {
         using var conn = _db.CreateConnection();
         conn.Open();
@@ -70,7 +71,16 @@ public class SchemaInformationRepository : ISchemaInformationRepository
             tx);
 
         tx.Commit();
-        return true;
+        return newId;
+    }
+
+    public bool UpdateSchemaInfo(long id, string schemaInfo)
+    {
+        using var conn = _db.CreateConnection();
+        var affected = conn.Execute(
+            "UPDATE SchemaInformation SET SchemaInfo = @schemaInfo WHERE Id = @id",
+            new { schemaInfo, id });
+        return affected > 0;
     }
 
     public string? Undo(int userSchemaId)

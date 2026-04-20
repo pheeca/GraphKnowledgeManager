@@ -1,0 +1,15 @@
+{
+  "name": "graphknowledge-devutilities",
+  "version": "1.0.0",
+  "description": "Development utilities for GraphKnowledgeManager",
+  "main": "generateNodeHistory.js",
+  "scripts": {
+    "generate-history": "node generateNodeHistory.js"
+  },
+  "keywords": ["devutil", "history", "migration"],
+  "author": "pheeca",
+  "license": "MIT",
+  "dependencies": {
+    "mssql": "^9.1.1"
+  }
+}

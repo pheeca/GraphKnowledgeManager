@@ -68,7 +68,7 @@ public class SchemaShareRepository : ISchemaShareRepository
         var merged = MergeSubtree(fullJson, partialJson, share.RootNodeId);
         if (merged == null) return false;
 
-        return _schemaRepo.Create(share.UserSchemaId, merged, modifiedBy);
+        return _schemaRepo.Create(share.UserSchemaId, merged, modifiedBy) > 0;
     }
 
     public bool Revoke(Guid shareId, int requestingUserId)

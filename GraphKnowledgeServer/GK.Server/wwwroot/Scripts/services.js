@@ -11,6 +11,7 @@ graphExplorer.ctx = graphExplorer.ctx || {};
 services.client.dataservice.deselectCurrentProperty = function()
 {
     graphExplorer.data.currentProperty = null;
+    graphExplorer.data.currentPropertyId = null;
 }
 services.client.dataservice.deselectCurrentParentNode = function()
 {
@@ -66,7 +67,7 @@ services.client.dataservice.createUpdateNode = function(nodeLabel,nodeId,parentI
     return null;
 }
 services.client.dataservice.createUpdateCurrentNode = function(nodeLabel){
-    services.client.dataservice.createUpdateNode(nodeLabel,graphExplorer.data.selectedNode, graphExplorer.data.parentNode);
+    return services.client.dataservice.createUpdateNode(nodeLabel,graphExplorer.data.selectedNode, graphExplorer.data.parentNode);
 }
 
 services.client.dataservice.createUpdateEdgeFromCurrentNode = function(nodeId,edgeId,EdgeValue,oldEdgeJSONString)

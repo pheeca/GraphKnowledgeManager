@@ -37,7 +37,7 @@ public class ShareController : ControllerBase
 
     // POST /api/share/{shareId} — save subtree changes (ReadWrite shares only)
     [HttpPost("{shareId:guid}")]
-    public IActionResult Save(Guid shareId, [FromForm] ShareSaveRequest req)
+    public IActionResult Save(Guid shareId, [FromBody] ShareSaveRequest req)
     {
         if (string.IsNullOrWhiteSpace(req.SchemaInfo))
             return BadRequest("SchemaInfo is required.");

@@ -24,3 +24,5 @@ GraphKnowledgeServer/Database/Database.jfm
 GraphKnowledgeServer/Database/Database.jfm
 *.jfm
 *.jfm
+devutilities/output/*
+devutilities/node_modules/*

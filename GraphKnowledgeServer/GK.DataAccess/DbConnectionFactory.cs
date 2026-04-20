@@ -17,5 +17,12 @@ public class SqlConnectionFactory : IDbConnectionFactory
         _connectionString = connectionString;
     }
 
-    public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+    public IDbConnection CreateConnection()
+    {
+        var builder = new SqlConnectionStringBuilder(_connectionString)
+        {
+            CommandTimeout = 300  // 5 minutes
+        };
+        return new SqlConnection(builder.ConnectionString);
+    }
 }

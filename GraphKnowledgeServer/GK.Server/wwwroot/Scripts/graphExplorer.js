@@ -59,8 +59,11 @@ EventBus.addEventListener('refreshPanel', function () {
         EventBus.dispatch('refreshPanelGraphEditor');
         EventBus.dispatch('refreshPanelCustomize');
         EventBus.dispatch('refreshPanelAdvanceAction');
+        EventBus.dispatch('refreshPanelHistory');
     } else {
         $('#generalpanel').show();
+        $('#historyrows').html('');
+        $('#history-state').text('Select a node to view history.');
     }
 });
 
@@ -296,7 +299,25 @@ EventBus.addEventListener('customizeNode', function (e) {
 });
 
 var _propsPageSize = 20;
-function _buildPropRow(item, index) {
+function _normalizeNodeProperties(node) {
+    if (!node) return;
+    var props = node.Properties || [];
+    for (var i = 0; i < props.length; i++) {
+        props[i] = props[i] || {};
+        if (!props[i].id) {
+            props[i].id = uuidv4();
+        }
+    }
+    node.Properties = props;
+}
+function _normalizeAllNodeProperties(nodes) {
+    nodes = nodes || [];
+    for (var i = 0; i < nodes.length; i++) {
+        _normalizeNodeProperties(nodes[i]);
+        _ensureNodeHistory(nodes[i]);
+    }
+}
+function _buildPropRow(item) {
     var potentialUrl = (item.value || '').split('/');
     var temp = (potentialUrl.pop() || potentialUrl.pop());
     if (temp) {
@@ -305,7 +326,7 @@ function _buildPropRow(item, index) {
     } else {
         potentialUrl = (item.value || '');
     }
-    return `<tr data-propindex="${index}">
+    return `<tr data-propid="${item.id || ''}">
         <td>${item.key}</td>
         <td data-val="${item.value}">${utilities.validateURL(item.value) ? `<a target="_blank" href="${item.value}">${potentialUrl}</a>` : item.value}</td>
         <td>${item.date}</td>
@@ -315,11 +336,162 @@ function _renderPropChunk(allProps, fromIndex) {
     var end = Math.min(fromIndex + _propsPageSize, allProps.length);
     var html = '';
     for (var i = fromIndex; i < end; i++) {
-        html += _buildPropRow(allProps[i], i);
+        html += _buildPropRow(allProps[i]);
     }
     $('#properties').append(html);
     $('#properties').data('propsRendered', end);
 }
+function _graphHasEmbeddedHistory() {
+    var nodes = (graphExplorer.data && graphExplorer.data.nodes) || [];
+    for (var i = 0; i < nodes.length; i++) {
+        if (nodes[i] && nodes[i].history && nodes[i].history.length) {
+            return true;
+        }
+    }
+    return false;
+}
+function _formatHistoryDate(rawValue) {
+    if (rawValue === null || rawValue === undefined || rawValue === '') {
+        return '';
+    }
+
+    var value = rawValue;
+    if (typeof value === 'string') {
+        var legacyMatch = value.match(/^\/Date\((\d+)\)\/$/);
+        if (legacyMatch && legacyMatch[1]) {
+            value = parseInt(legacyMatch[1], 10);
+        }
+    }
+
+    var dateObj = new Date(value);
+    if (isNaN(dateObj.getTime())) {
+        return String(rawValue);
+    }
+
+    return dateObj.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+function _ensureNodeHistory(node) {
+    if (!node) return;
+    if (!node.history || !Array.isArray(node.history)) {
+        node.history = [];
+    }
+}
+function _snapshotNodeState(node) {
+    if (!node) return null;
+    var snapshot = JSON.parse(JSON.stringify(node));
+    if (snapshot.history) {
+        delete snapshot.history;
+    }
+    return snapshot;
+}
+function _appendNodeHistoryEntry(node, action) {
+    if (!node) return;
+    _ensureNodeHistory(node);
+    node.history.push({
+        entryId: uuidv4(),
+        schemaInformationId: null,
+        modifiedBy: sessionStorage.getItem('UserId') || null,
+        creationDate: new Date().toISOString(),
+        action: action || 'updated',
+        state: _snapshotNodeState(node)
+    });
+}
+function _renderHistoryRows(rows) {
+    var $tbody = $('#historyrows');
+    $tbody.html('');
+    if (!rows || rows.length === 0) {
+        $('#history-state').text('No history found for this node.');
+        return;
+    }
+    $('#history-state').text('History loaded.');
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+        var item = rows[i] || {};
+        html += `<tr>
+            <td>${item.schemaInformationId || ''}</td>
+            <td>${item.modifiedBy || ''}</td>
+            <td>${_formatHistoryDate(item.creationDate)}</td>
+        </tr>`;
+    }
+    $tbody.html(html);
+}
+function _getNodeHistoryFromGraph(nodeId) {
+    var node = services.client.dataservice.getNode(nodeId, true);
+    if (!node || !node.history || !node.history.length) {
+        return [];
+    }
+    return node.history;
+}
+function _getNodeHistoryFromCache(nodeId) {
+    if (!graphExplorer.historyCache || !graphExplorer.historyCache[String(nodeId)]) {
+        return [];
+    }
+    return graphExplorer.historyCache[String(nodeId)] || [];
+}
+function _hydrateHistoryIntoGraphData(historyMap) {
+    if (!graphExplorer.data || !graphExplorer.data.nodes || !historyMap) return;
+    for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
+        var node = graphExplorer.data.nodes[i] || {};
+        var nodeId = node.id;
+        if (nodeId === undefined || nodeId === null) continue;
+        node.history = historyMap[String(nodeId)] || [];
+        graphExplorer.data.nodes[i] = node;
+    }
+}
+EventBus.removeEventListener('refreshPanelHistory');
+EventBus.addEventListener('refreshPanelHistory', function () {
+    var selectedNodeId = graphExplorer.data.selectedNode;
+    if (!selectedNodeId) {
+        _renderHistoryRows([]);
+        return;
+    }
+
+    // Rule requested: only call API if graph nodes do not already carry history.
+    if (_graphHasEmbeddedHistory()) {
+        _renderHistoryRows(_getNodeHistoryFromGraph(selectedNodeId));
+        return;
+    }
+
+    if (graphExplorer.historyCacheLoaded) {
+        _renderHistoryRows(_getNodeHistoryFromCache(selectedNodeId));
+        return;
+    }
+
+    if (graphExplorer.historyCacheLoading) {
+        $('#history-state').text('Loading history...');
+        return;
+    }
+
+    graphExplorer.historyCacheLoading = true;
+    $('#history-state').text('Loading history...');
+
+    var userSchemaId = sessionStorage.getItem('UserSchemaId');
+    $.ajax({
+        url: AppConfig.domain + '/api/values/' + userSchemaId + '/history',
+        type: 'GET',
+        success: function (historyMap) {
+            graphExplorer.historyCache = historyMap || {};
+            _hydrateHistoryIntoGraphData(graphExplorer.historyCache);
+            graphExplorer.historyCacheLoaded = true;
+            _renderHistoryRows(_getNodeHistoryFromCache(selectedNodeId));
+        },
+        error: function () {
+            graphExplorer.historyCache = {};
+            graphExplorer.historyCacheLoaded = true;
+            _renderHistoryRows([]);
+        },
+        complete: function () {
+            graphExplorer.historyCacheLoading = false;
+        }
+    });
+});
 function _getFilteredProps() {
     var all = $('#properties').data('allProps') || [];
     var q = ($('#props-search').val() || '').toLowerCase().trim();
@@ -341,6 +513,11 @@ function _applyPropsFilter() {
 EventBus.removeEventListener('refreshPanelProps');
 EventBus.addEventListener('refreshPanelProps', function (params) {
     params = params.target || [];
+    for (var i = 0; i < params.length; i++) {
+        if (!params[i].id) {
+            params[i].id = uuidv4();
+        }
+    }
     var $tbody = $('#properties');
     $tbody.html('');
     $tbody.data('allProps', params);
@@ -368,6 +545,9 @@ EventBus.addEventListener('refreshPanelProps', function (params) {
 
 EventBus.removeEventListener('readPropperty');
 EventBus.addEventListener('readPropperty', function (e) {
+    if (graphExplorer.shareConfig && graphExplorer.shareConfig.accessMode === 'ReadOnly') {
+        return;
+    }
     if (!e.target || e.target.target.nodeName=='A') {
         return;
     }
@@ -375,26 +555,54 @@ EventBus.addEventListener('readPropperty', function (e) {
     $('#Value').val($(e.target.currentTarget).find('td').eq(1).data('val'));
     $('#Date').val($(e.target.currentTarget).find('td').eq(2).text());
     $(graphExplorer.graphConfig.modal.property).modal("show");
-    graphExplorer.data.currentProperty = e.target.currentTarget;
+    graphExplorer.data.currentPropertyId = $(e.target.currentTarget).data('propid') || null;
+    graphExplorer.data.currentProperty = null;
+    $('#gk-property-delete-btn').show();
+});
+
+EventBus.removeEventListener('openAddPropperty');
+EventBus.addEventListener('openAddPropperty', function () {
+    if (graphExplorer.shareConfig && graphExplorer.shareConfig.accessMode === 'ReadOnly') {
+        return;
+    }
+    graphExplorer.data.currentPropertyId = null;
+    graphExplorer.data.currentProperty = null;
+    $('#Property').val('');
+    $('#Value').val('');
+    $('#Date').val('');
+    $('#gk-property-delete-btn').hide();
 });
 
 EventBus.removeEventListener('addPropperty');
 EventBus.addEventListener('addPropperty', function () {
+    if (graphExplorer.shareConfig && graphExplorer.shareConfig.accessMode === 'ReadOnly') {
+        return;
+    }
 
     var props = [];
     for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
         if (graphExplorer.data.selectedNode == graphExplorer.data.nodes[i].id) {
 
             props = graphExplorer.data.nodes[i].Properties || [];
+            for (var k = 0; k < props.length; k++) {
+                if (!props[k].id) {
+                    props[k].id = uuidv4();
+                }
+            }
             var p = null;
             if (($('#Property').val() || $('#Value').val() || $('#Date').val())) {
-                var propIdx = graphExplorer.data.currentProperty ? parseInt($(graphExplorer.data.currentProperty).data('propindex')) : -1;
+                var currentPropId = graphExplorer.data.currentPropertyId || null;
+                var propIdx = currentPropId ? props.findIndex(function (item) { return item && item.id == currentPropId; }) : -1;
                 if (graphExplorer.data.currentProperty && props[propIdx] !== undefined) {
                     props[propIdx].key = $('#Property').val() || '';
                     props[propIdx].value = $('#Value').val() || '';
                     props[propIdx].date = $('#Date').val() || '';
+                } else if (propIdx !== -1) {
+                    props[propIdx].key = $('#Property').val() || '';
+                    props[propIdx].value = $('#Value').val() || '';
+                    props[propIdx].date = $('#Date').val() || '';
                 } else {
-                    p = { key: $('#Property').val() || '', value: $('#Value').val() || '', date: $('#Date').val() || '' };
+                    p = { id: uuidv4(), key: $('#Property').val() || '', value: $('#Value').val() || '', date: $('#Date').val() || '' };
                     props.push(p);
                 }
             }
@@ -404,6 +612,36 @@ EventBus.addEventListener('addPropperty', function () {
     EventBus.dispatch('refreshPanelProps', props);
     $(graphExplorer.graphConfig.modal.property).modal('hide');
     $(graphExplorer.graphConfig.modal.property + ' input').val('');
+    $('#gk-property-delete-btn').hide();
+    graphExplorer.data.currentPropertyId = null;
+    services.client.dataservice.deselectCurrentProperty();
+});
+
+EventBus.removeEventListener('deletePropperty');
+EventBus.addEventListener('deletePropperty', function () {
+    if (graphExplorer.shareConfig && graphExplorer.shareConfig.accessMode === 'ReadOnly') {
+        return;
+    }
+    var currentPropId = graphExplorer.data.currentPropertyId || null;
+    if (!currentPropId) return;
+
+    var props = [];
+    for (var i = 0; i < graphExplorer.data.nodes.length; i++) {
+        if (graphExplorer.data.selectedNode == graphExplorer.data.nodes[i].id) {
+            props = graphExplorer.data.nodes[i].Properties || [];
+            var propIdx = props.findIndex(function (item) { return item && item.id == currentPropId; });
+            if (propIdx !== -1) {
+                props.splice(propIdx, 1);
+            }
+            graphExplorer.data.nodes[i].Properties = props;
+        }
+    }
+
+    EventBus.dispatch('refreshPanelProps', props);
+    $(graphExplorer.graphConfig.modal.property).modal('hide');
+    $(graphExplorer.graphConfig.modal.property + ' input').val('');
+    $('#gk-property-delete-btn').hide();
+    graphExplorer.data.currentPropertyId = null;
     services.client.dataservice.deselectCurrentProperty();
 });
 
@@ -468,10 +706,11 @@ EventBus.addEventListener('saveGraph', function () {
         $.ajax({
             url: AppConfig.domain + '/api/share/' + graphExplorer.shareConfig.shareId,
             type: 'POST',
-            data: {
+            contentType: 'application/json',
+            data: JSON.stringify({
                 SchemaInfo: JSON.stringify(clone),
-                ModifiedBy: sessionStorage.getItem("UserId") || 0
-            },
+                ModifiedBy: parseInt(sessionStorage.getItem("UserId") || '0', 10)
+            }),
             success: function (data) {
                 if (data) $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
             }
@@ -493,14 +732,33 @@ EventBus.addEventListener('saveGraph', function () {
             $.ajax({
                 url: graphExplorer.url,
                 type: 'POST',
-                data: {
-                    SchemaInfo:JSON.stringify(clone),
-                    ModifiedBy:sessionStorage.getItem("UserId")
-                },
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    SchemaInfo: JSON.stringify(clone),
+                    ModifiedBy: parseInt(sessionStorage.getItem("UserId") || '0', 10)
+                }),
                 success: function (data) {
-                    //do something
                     if (data) {
+                        // Server returns enriched schema with history stamped
+                        try {
+                            var enriched = (typeof data === 'string') ? JSON.parse(data) : data;
+                            // Preserve transient UI state
+                            enriched.selectedNode = graphExplorer.data.selectedNode;
+                            enriched.currentEdge = graphExplorer.data.currentEdge;
+                            enriched.currentProperty = graphExplorer.data.currentProperty;
+                            enriched.currentPropertyId = graphExplorer.data.currentPropertyId;
+                            enriched.parentNode = graphExplorer.data.parentNode;
+                            graphExplorer.data = enriched;
+                            // Update stale snapshot to the just-saved state
+                            graphExplorer.staleSnapshot = JSON.parse(JSON.stringify(enriched));
+                            graphExplorer.staleSnapshot.selectedNode = null;
+                            graphExplorer.staleSnapshot.currentEdge = null;
+                            graphExplorer.staleSnapshot.currentProperty = null;
+                        } catch (e) {
+                            console.warn('saveGraph: could not parse server response', e);
+                        }
                         $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
+                        EventBus.dispatch('refreshPanelHistory');
                     }
                 }
             });
@@ -873,6 +1131,13 @@ function initialize(_rawData) {
         _rawData = JSON.parse(_rawData);
     }
     graphExplorer.data = _rawData;
+    _normalizeAllNodeProperties(graphExplorer.data.nodes);
+    graphExplorer.data.currentPropertyId = null;
+    graphExplorer.historyCache = {};
+    graphExplorer.historyCacheLoaded = false;
+    graphExplorer.historyCacheLoading = false;
+    // Capture stale snapshot for save-time diffing (server compares prev vs incoming)
+    graphExplorer.staleSnapshot = JSON.parse(JSON.stringify(graphExplorer.data));
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));
     graphExplorer.data.parentNode = routeParams.NodeId || graphExplorer.data.parentNode || null;
     EventBus.dispatch("graphUpdated");
@@ -1019,7 +1284,7 @@ function applyShareUIMode(accessMode) {
         $('a[href="#grapheditorpanel"]').closest('li').hide();
         $('a[href="#customize"]').closest('li').hide();
         $('a[href="#advancedactions"]').closest('li').hide();
-        $('#gk-open-node-btn, #gk-property-add-btn, #gk-property-save-btn').hide();
+        $('#gk-open-node-btn, #gk-property-add-btn, #gk-property-save-btn, #gk-property-delete-btn').hide();
         $('#myModal .modal-footer .btn-success').hide();
         if ($('#proppanel-tab').length) {
             $('#proppanel-tab').tab('show');

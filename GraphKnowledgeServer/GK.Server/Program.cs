@@ -12,8 +12,24 @@ builder.Services.AddScoped<IUserSchemaRepository, UserSchemaRepository>();
 builder.Services.AddScoped<ISchemaInformationRepository, SchemaInformationRepository>();
 builder.Services.AddScoped<ISchemaShareRepository, SchemaShareRepository>();
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(o =>
+    {
+        o.Filters.Add(new Microsoft.AspNetCore.Mvc.RequestSizeLimitAttribute(60 * 1024 * 1024));
+    })
     .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+// 60 MB JSON body limit
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
+{
+    o.ValueLengthLimit = 60 * 1024 * 1024;
+    o.MultipartBodyLengthLimit = 60 * 1024 * 1024;
+});
+builder.WebHost.ConfigureKestrel(k =>
+{
+    k.Limits.MaxRequestBodySize = 60 * 1024 * 1024;
+    k.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(6);
+    k.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(6);
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
