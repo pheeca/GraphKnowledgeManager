@@ -341,6 +341,37 @@ function _renderPropChunk(allProps, fromIndex) {
     $('#properties').append(html);
     $('#properties').data('propsRendered', end);
 }
+function _getContrastTextColor(hexColor) {
+    // Returns '#000000' or '#ffffff' based on WCAG relative luminance of the background.
+    if (!hexColor || typeof hexColor !== 'string') return '#000000';
+    var hex = hexColor.replace('#', '');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if (hex.length !== 6) return '#000000';
+    var r = parseInt(hex.substring(0,2),16);
+    var g = parseInt(hex.substring(2,4),16);
+    var b = parseInt(hex.substring(4,6),16);
+    // sRGB linearisation
+    var toLinear = function(c) { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+    var L = 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+    return L > 0.179 ? '#000000' : '#ffffff';
+}
+
+function _exportGraphJSON() {
+    var dataToExport = JSON.parse(JSON.stringify(graphExplorer.data));
+    dataToExport.selectedNode = null;
+    dataToExport.currentEdge = null;
+    dataToExport.currentProperty = null;
+    var blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'graph-' + (sessionStorage.getItem('UserSchemaId') || 'export') + '-' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 function _graphHasEmbeddedHistory() {
     var nodes = (graphExplorer.data && graphExplorer.data.nodes) || [];
     for (var i = 0; i < nodes.length; i++) {
@@ -403,24 +434,103 @@ function _appendNodeHistoryEntry(node, action) {
         state: _snapshotNodeState(node)
     });
 }
+var _historyTimeline = null;
 function _renderHistoryRows(rows) {
     var $tbody = $('#historyrows');
     $tbody.html('');
+
+    var $tl = $('#history-timeline');
     if (!rows || rows.length === 0) {
         $('#history-state').text('No history found for this node.');
+        $tl.hide();
+        _historyTimeline = null;
         return;
     }
     $('#history-state').text('History loaded.');
+
+    // Build table rows and collect timeline items in the same pass
     var html = '';
+    var tlItems = [];
     for (var i = 0; i < rows.length; i++) {
         var item = rows[i] || {};
-        html += `<tr>
-            <td>${item.schemaInformationId || ''}</td>
-            <td>${item.modifiedBy || ''}</td>
-            <td>${_formatHistoryDate(item.creationDate)}</td>
-        </tr>`;
+        var rowId = 'histrow-' + i;
+        html += '<tr id="' + rowId + '" style="cursor:pointer;" onclick="_highlightHistoryRow(' + i + ')">' +
+            '<td>' + (item.schemaInformationId || '') + '</td>' +
+            '<td>' + (item.modifiedBy || '') + '</td>' +
+            '<td>' + _formatHistoryDate(item.creationDate) + '</td>' +
+            '</tr>';
+        tlItems.push({
+            idx: i,
+            action: item.action || 'save',
+            date: item.creationDate ? new Date(item.creationDate) : new Date(),
+            label: (item.action || 'save') + ' · ' + _formatHistoryDate(item.creationDate)
+        });
     }
     $tbody.html(html);
+
+    // Render vis.Timeline
+    _renderVisTimeline($tl[0], tlItems);
+}
+
+function _renderVisTimeline(container, items) {
+    if (!items || items.length === 0) { $(container).hide(); return; }
+
+    if (_historyTimeline) { _historyTimeline.destroy(); _historyTimeline = null; }
+
+    var actionColors = { created: '#28a745', updated: '#007bff', deleted: '#dc3545', save: '#6c757d' };
+
+    var visItems = new vis.DataSet(items.map(function (it) {
+        var color = actionColors[it.action] || actionColors.save;
+        return {
+            id: it.idx,
+            content: '<span title="' + it.label + '" style="font-size:10px;color:#fff;">' + it.action + '</span>',
+            start: it.date,
+            type: 'point',
+            style: 'color:' + color + ';'
+        };
+    }));
+
+    // Date range: first event − 10 days to now + 10 days
+    var dates = items.map(function(it){ return it.date.getTime(); });
+    var minDate = new Date(Math.min.apply(null, dates) - 10 * 86400000);
+    var maxDate = new Date(Date.now() + 10 * 86400000);
+
+    var options = {
+        height: '120px',
+        selectable: true,
+        stack: true,
+        showMajorLabels: true,
+        showMinorLabels: false,
+        start: minDate,
+        end: maxDate,
+        min: minDate,
+        max: maxDate,
+        zoomMin: 60 * 60 * 1000,      // 1 hour minimum zoom
+        zoomMax: (maxDate - minDate) * 1.1,
+        moveable: true,
+        zoomable: true,
+        orientation: { axis: 'bottom' }
+    };
+
+    _historyTimeline = new vis.Timeline(container, visItems, options);
+    _historyTimeline.on('select', function (props) {
+        if (props.items && props.items.length > 0) {
+            _highlightHistoryRow(props.items[0]);
+        }
+    });
+    $(container).show();
+}
+function _highlightHistoryRow(idx) {
+    var $wrap = $('#history-scroll-wrap');
+    var $rows = $wrap.find('tr');
+    $rows.css('background', '');
+    var $target = $('#histrow-' + idx);
+    $target.css('background', '#d1ecf1');
+    if ($target.length) {
+        $wrap.animate({ scrollTop: $wrap.scrollTop() + $target.position().top - $wrap.height() / 2 }, 200);
+    }
+    // Sync timeline selection
+    if (_historyTimeline) { _historyTimeline.setSelection([idx]); }
 }
 function _getNodeHistoryFromGraph(nodeId) {
     var node = services.client.dataservice.getNode(nodeId, true);
@@ -474,7 +584,7 @@ EventBus.addEventListener('refreshPanelHistory', function () {
 
     var userSchemaId = sessionStorage.getItem('UserSchemaId');
     $.ajax({
-        url: AppConfig.domain + '/api/values/' + userSchemaId + '/history',
+        url: AppConfig.domain + '/api/values/' + userSchemaId + '/history-map',
         type: 'GET',
         success: function (historyMap) {
             graphExplorer.historyCache = historyMap || {};
@@ -728,7 +838,15 @@ EventBus.addEventListener('saveGraph', function () {
             clone.selectedNode = null;
             clone.currentEdge = null;
             clone.currentProperty = null;
-            
+            // Strip per-node history before sending — server derives it from previousJson
+            if (clone.nodes) {
+                clone.nodes = clone.nodes.map(function (n) {
+                    var nc = Object.assign({}, n);
+                    delete nc.history;
+                    return nc;
+                });
+            }
+            delete clone.deletedNodeHistory;
             $.ajax({
                 url: graphExplorer.url,
                 type: 'POST',
@@ -776,10 +894,30 @@ EventBus.addEventListener('loadGraph', function (params) {
         initialize(localStorage.getItem('graphExplorer.data'));
     } else {
         if (!routeParams.UserSchemaId || window.btoa(location.href.substring(0, location.href.lastIndexOf('/'))) == routeParams.key) {
+            // Step 1: Load trimmed schema (no history) — render immediately
             $.ajax({
-                url: graphExplorer.url,
+                url: graphExplorer.url + '/trimmed',
                 type: 'GET',
-                success: initialize
+                success: function (data) {
+                    // Disable Save while history loads
+                    $('#gk-save-btn').prop('disabled', true).text('Loading…');
+                    initialize(typeof data === 'string' ? data : JSON.stringify(data));
+                    // Step 2: Load history-map in background
+                    $.ajax({
+                        url: graphExplorer.url + '/history-map',
+                        type: 'GET',
+                        success: function (historyMap) {
+                            _hydrateHistoryIntoGraphData(historyMap);
+                            graphExplorer.historyCache = historyMap;
+                            graphExplorer.historyCacheLoaded = true;
+                            $('#gk-save-btn').prop('disabled', false).text('Save');
+                        },
+                        error: function () {
+                            console.warn('loadGraph: failed to load history-map');
+                            $('#gk-save-btn').prop('disabled', false).text('Save');
+                        }
+                    });
+                }
             });
         }
     }
@@ -819,6 +957,10 @@ function getCurrentNodes(_data) {
         if (_data.nodes.map(e => e.parentId).filter(e => e).indexOf(_tempNodes[i].id) > -1) {
             _tempNodes[i].shape = 'hexagon';
         }
+        // Apply contrast font color regardless of shape (including hexagon)
+        _tempNodes[i].font = Object.assign({}, _tempNodes[i].font || {}, {
+            color: _getContrastTextColor(_tempNodes[i].color)
+        });
     }
     return _tempNodes;
 }
@@ -956,7 +1098,13 @@ EventBus.addEventListener('onGraphEnabled', function (params) {
         return;
     }
     graphExplorer.url = AppConfig.domain + '/api/Values/' + UserSchemaId;
+    // Set dynamic version label
+    $('#app-version').text('v' + AppConfig.version);
     EventBus.dispatch('loadGraph');
+    // Redraw vis-timeline when the History tab becomes visible (it needs width to render correctly)
+    $('body').off('shown.bs.tab.gkhistory').on('shown.bs.tab.gkhistory', 'a[href="#historypanel"]', function () {
+        if (_historyTimeline) { _historyTimeline.redraw(); _historyTimeline.fit(); }
+    });
     $('select[multiple]').selectpicker();
     bindBreadcrumbNavigation();
     $('#Date').datepicker();//{format:'yyyy-mm-dd'}
@@ -1156,18 +1304,24 @@ graphExplorer.ctx.History =function(mode) {
         data: {
             ModifiedBy: sessionStorage.getItem("UserId")
         },
-        success: function (_rawData) {
-            //do something
-            if (_rawData) {
-                try{
-
-                    graphExplorer.data = JSON.parse(_rawData);
-                    EventBus.dispatch("graphUpdated");
+        success: function (resp) {
+            if (resp) {
+                try {
+                    var parsed = typeof resp === 'string' ? JSON.parse(resp) : resp;
+                    // Server returns { schema: {trimmed}, historyMap: { nodeId: [] } }
+                    var trimmed = parsed.schema || parsed;
+                    var historyMap = parsed.historyMap || null;
+                    var schemaJson = typeof trimmed === 'string' ? trimmed : JSON.stringify(trimmed);
+                    initialize(schemaJson);
+                    if (historyMap) {
+                        _hydrateHistoryIntoGraphData(historyMap);
+                        graphExplorer.historyCache = historyMap;
+                        graphExplorer.historyCacheLoaded = true;
+                    }
                     $(AppConfig.messageBox).text(`Last Saved: ${new Date().toLocaleString()}`);
-
-                }catch(e){
-                    console.log(e,_rawData);
-                    alert(_rawData);
+                } catch(e) {
+                    console.log(e, resp);
+                    alert('Undo/Redo failed to parse response.');
                 }
             }
         }

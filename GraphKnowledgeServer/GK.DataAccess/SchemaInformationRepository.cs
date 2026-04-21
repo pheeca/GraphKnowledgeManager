@@ -6,6 +6,7 @@ public interface ISchemaInformationRepository
 {
     string? GetLatest();
     string? GetActiveBySchemaId(int userSchemaId);
+    IEnumerable<(int UserSchemaId, string SchemaInfo)> GetAllActive();
     long Create(int userSchemaId, string schemaInfo, int modifiedBy);
     bool UpdateSchemaInfo(long id, string schemaInfo);
     string? Undo(int userSchemaId);
@@ -23,6 +24,14 @@ public class SchemaInformationRepository : ISchemaInformationRepository
         using var conn = _db.CreateConnection();
         return conn.QueryFirstOrDefault<string>(
             "SELECT TOP 1 SchemaInfo FROM SchemaInformation ORDER BY CreationDate DESC");
+    }
+
+    public IEnumerable<(int UserSchemaId, string SchemaInfo)> GetAllActive()
+    {
+        using var conn = _db.CreateConnection();
+        return conn.Query<(int, string)>(
+            "SELECT UserSchemaId, SchemaInfo FROM SchemaInformation WHERE Status = @Active",
+            new { Constants.Active });
     }
 
     public string? GetActiveBySchemaId(int userSchemaId)

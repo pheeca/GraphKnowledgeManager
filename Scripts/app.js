@@ -3,6 +3,7 @@ var graphExplorer = graphExplorer || {};
 var EventBus = EventBus || {};
 var _isDev = (window.location.origin == "file://" || window.location.origin.indexOf('localhost') > -1);
 var AppConfig = {
+    version: '1.0.6',
     messageBox: '#updatemsg',
     mainpanelgroup: '#mainpanelgroup',
     pageSection: '#pageSection',

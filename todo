@@ -47,13 +47,14 @@ concurrent user via locking nodes and edges
 link files (how to upload files without storage limit restriction) [https://www.backblaze.com/b2/docs/calling.html https://www.mediafire.com/developers/sdks_and_tools/javascript/basics/ https://github.com/MediaFire/mediafire-csharp-open-sdk]
 --disconnect linked node
 Make a template for standard knowledge Graph, which will be default of tenant
-Change Text color (on dark background harder to recognize text) - maaz suggestion
-not overlap the nodes and edges on top of each other(may be elbow shaped edge) - maaz suggestion-https://visjs.github.io/vis-network/examples/network/layout/hierarchicalLayoutOverlapAvoidance.html
+-Change Text color (on dark background harder to recognize text) - maaz suggestion
+-not overlap the nodes and edges on top of each other[not done due to seperation of](may be elbow shaped edge) - maaz suggestion-https://visjs.github.io/vis-network/examples/network/layout/hierarchicalLayoutOverlapAvoidance.html
 Admin user to have access of other graphs
 convert to mobile (https://auth0.com/blog/converting-your-web-app-to-mobile/)
 notification engine:mobile alarm,mobile notification,email
-version of app on screen dynamic
-export json
+-version of app on screen dynamic
+-export json
+db optimize https://chatgpt.com/c/69e4b380-1a58-83e8-ac64-fdbdab72dda0
 
 look into 
 https://www.oprahmag.com/life/work-money/g27240513/best-organization-apps/?slide=1

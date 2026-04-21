@@ -33,5 +33,10 @@
   "bugs": {
     "url": "https://github.com/pheeca/GraphKnowledgeManager/issues"
   },
-  "homepage": "https://github.com/pheeca/GraphKnowledgeManager#readme"
+  "homepage": "https://github.com/pheeca/GraphKnowledgeManager#readme",
+  "devDependencies": {
+    "moment": "^2.30.1",
+    "vis-network": "^10.0.2",
+    "vis-timeline": "^8.5.0"
+  }
 }

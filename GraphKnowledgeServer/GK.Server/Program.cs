@@ -1,4 +1,5 @@
 using GK.DataAccess;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,21 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserSchemaRepository, UserSchemaRepository>();
 builder.Services.AddScoped<ISchemaInformationRepository, SchemaInformationRepository>();
 builder.Services.AddScoped<ISchemaShareRepository, SchemaShareRepository>();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddResponseCompression(opts =>
+{
+    opts.EnableForHttps = true;
+    opts.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+    opts.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+    opts.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes
+        .Concat(["application/json", "text/plain"]);
+});
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(
+    o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(
+    o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
 
 builder.Services.AddControllers(o =>
     {
@@ -52,6 +68,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseResponseCompression();
+
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
@@ -62,5 +80,30 @@ app.UseCors("MyCorsPolicy");
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Background cache warm-up: load all active schemas into memory after startup
+_ = Task.Run(async () =>
+{
+    await Task.Delay(500); // let the server fully start first
+    using var scope = app.Services.CreateScope();
+    var repo = scope.ServiceProvider.GetRequiredService<ISchemaInformationRepository>();
+    var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var schemas = repo.GetAllActive();
+        int count = 0;
+        foreach (var (userSchemaId, schemaInfo) in schemas)
+        {
+            cache.Set($"schema:{userSchemaId}", schemaInfo, TimeSpan.FromMinutes(60));
+            count++;
+        }
+        logger.LogInformation("Cache warm-up complete: {Count} schemas loaded.", count);
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Cache warm-up failed — schemas will load on first request.");
+    }
+});
 
 app.Run();
