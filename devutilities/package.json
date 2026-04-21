@@ -10,6 +10,6 @@
   "author": "pheeca",
   "license": "MIT",
   "dependencies": {
-    "mssql": "^9.1.1"
+    "mssql": "^12.3.1"
   }
 }
