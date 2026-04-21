@@ -22,3 +22,11 @@ Packages/
 GraphKnowledgeServer/Database/Database.dbmdl
 GraphKnowledgeServer/Database/Database.jfm
 GraphKnowledgeServer/Database/Database.jfm
+*.jfm
+*.jfm
+devutilities/output/*
+devutilities/node_modules/*
+/node_modules/
+/GraphKnowledgeServer/GK.Server/wwwroot/
+/abc
+/GraphKnowledgeServer/Database/Database.jfm

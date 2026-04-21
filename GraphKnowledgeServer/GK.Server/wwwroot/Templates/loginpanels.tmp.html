@@ -1,0 +1,52 @@
+<div id="appcontainer"><div class="card text-white bg-info mb-12">
+  
+    <div class="card-body"><button type="button" class="close" aria-label="Close" onclick="$(this).parent().parent().hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    
+      <p class="card-text">See Documentation <a class="text-secondary" href="https://github.com/pheeca/GraphKnowledgeManager/tree/master/Documentation">Here</a>.</p>
+    </div>
+  </div>
+    <form class="container-fluid">
+        <div class="row h-100">
+            <div class="col-sm-12 col-md-4 offset-md-4 align-self-center p-3 border rounded">
+                <h3>Login</h3>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                     <!--pheeca-->
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email" value="">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <!--password1-->
+                    <input type="password" class="form-control" id="password" placeholder="Password" value="">
+                </div>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.Login')">Login</button>
+                <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.CreateUser')">User Create</button>
+                <div class="list-group mt-3" id="schemaname"></div>
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript" src="Scripts/login.js"></script>
+    <div class="modal fade" id="GraphPopup" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add New Graph</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="graphname">Graph Name</label>
+                        <input class="form-control" id="graphname" placeholder="Graph Name" value="">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="EventBus.dispatch('UI.Web.App.UI.Login.schemaAdd')">Add</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

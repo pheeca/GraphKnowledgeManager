@@ -38,30 +38,13 @@
 		- [Setting Up Dev Environment](#setting-up-dev-environment)
 		- [Server Side Dev](#server-side-dev)
 		- [Client Side Dev](#client-side-dev)
-		- [Engine Dev \[Improper\]](#engine-dev-improper)
-			- [Front End](#front-end)
-			- [Server](#server)
-	- [Dev Problems](#dev-problems)
-- [Conceptual Model Analysis Manual](#conceptual-model-analysis-manual)
-	- [Conceptual Problems](#conceptual-problems)
-	- [Notes:](#notes)
-	- [Switch to another file](#switch-to-another-file)
-	- [Rename a file](#rename-a-file)
-	- [Delete a file](#delete-a-file)
-	- [Export a file](#export-a-file)
-- [Synchronization](#synchronization)
-	- [Open a file](#open-a-file)
-	- [Save a file](#save-a-file)
-	- [Synchronize a file](#synchronize-a-file)
-	- [Manage file synchronization](#manage-file-synchronization)
-- [Publication](#publication)
-	- [Publish a File](#publish-a-file)
-	- [Update a publication](#update-a-publication)
-	- [Manage file publication](#manage-file-publication)
-- [Markdown extensions](#markdown-extensions)
-	- [SmartyPants](#smartypants)
-	- [KaTeX](#katex)
-	- [UML diagrams](#uml-diagrams)
+		- [Engine Dev (EventBus Architecture)](#engine-dev-eventbus-architecture)
+	- [Open Dev Problems](#open-dev-problems)
+- [Conceptual Model Analysis](#conceptual-model-analysis)
+	- [System Definition](#system-definition)
+	- [Open Conceptual Questions](#open-conceptual-questions)
+	- [Event Taxonomy](#event-taxonomy)
+	- [Notes & Planning](#notes--planning)
 
 
 
@@ -75,22 +58,13 @@ The software - knowledge graph represents a collection of interlinked descriptio
 
 Name: Knowledge Graph
 
-Version: v 1.0.0
+Version: v 1.0.5
 
 Intended Use: Define entities and their relationships
 
 Access : https://graphknowledge.pheeca.com
 
-Features: 
-
 Getting Help: To receive technical support and software assistance, please contact 	support@pheeca.com
-
-# Versions
-Version: 1.0.0	
-
-Commit hash:	828bde1c753e6d6469f499dd020a03e4201b0098
-
-Date: 2/5/2021 2:37:21 AM
 
 # Getting Started
 
@@ -339,23 +313,23 @@ Share a knowledge node with a colleague to discuss without needing to export the
 
 ⚙️ Server Requirements
 
-| Component            | Specification                                     |
-| -------------------- | ------------------------------------------------- |
-| **Operating System** | Windows Server 2012 R2, 2016, 2019, or newer      |
-| **.NET Framework**   | .NET Framework 4.7.2 or higher                    |
-| **Web Server**       | IIS 8.0 or higher (with ASP.NET role enabled)     |
-| **Disk Storage**     | Minimum 1 GB free (SSD preferred for performance) |
-| **RAM**              | Minimum 2 GB (4+ GB recommended)                  |
-| **CPU**              | Dual-core (Quad-core recommended)                 |
+| Component            | Specification                                       |
+| -------------------- | --------------------------------------------------- |
+| **Operating System** | Windows, Linux, or macOS                            |
+| **.NET**             | .NET 9 SDK                                          |
+| **Web Server**       | Kestrel (built-in) or reverse proxy (nginx, IIS)    |
+| **Database**         | SQL Server 2019+ or Azure SQL                       |
+| **Disk Storage**     | Minimum 1 GB free (SSD preferred for performance)   |
+| **RAM**              | Minimum 2 GB (4+ GB recommended)                    |
+| **CPU**              | Dual-core (Quad-core recommended)                   |
 
 ## Technology Stack
 #### Database
 ![Microsoft Sql Server](https://img.shields.io/badge/-Sql%20Server-CC2927?style=flat-square&logo=microsoft-sql-server&logoColor=ffffff)
 #### Server side:
-![Nodejs](https://img.shields.io/badge/-Nodejs-339933?style=flat-square&logo=Node.js&logoColor=ffffff)
 ![C#](https://img.shields.io/badge/-C%23-239120?style=flat-square&logo=c-sharp&logoColor=ffffff)
-![Dot NET SignalR](https://img.shields.io/badge/Framework-SignalR-512BD4?style=flat-square&logo=.Net&logoColor=ffffff)
-![Dot NET](https://img.shields.io/badge/-MVC%2FWebApi-512BD4?style=flat-square&logo=.Net&logoColor=ffffff)
+![Dot NET](https://img.shields.io/badge/-.NET%209%20Web%20API-512BD4?style=flat-square&logo=.Net&logoColor=ffffff)
+![Dapper](https://img.shields.io/badge/-Dapper-512BD4?style=flat-square&logo=.Net&logoColor=ffffff)
 
 #### FrontEnd
 ![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1C?style=flat-square&logo=javascript&logoColor=white&color=F7DF1C)
@@ -363,408 +337,256 @@ Share a knowledge node with a colleague to discuss without needing to export the
 ![CSS3](https://img.shields.io/badge/-CSS-%231572B6?style=flat-square&logo=css3)
 ![Bootstrap](https://img.shields.io/badge/-Bootstrap-563D7C?style=flat-square&logo=Bootstrap)
 ![jQuery](https://img.shields.io/badge/-jQuery-0769AD?style=flat-square&logo=jquery)
+![vis.js](https://img.shields.io/badge/-vis.js%20Network-3DA639?style=flat-square)
 
 ### Pre Requisites
 - **Software/Tools**:  
-  - Visual Studio 2019+ (with ASP.NET and web development workload)  
-  - Node.js v14+ and npm  
-  - Microsoft SQL Server 2018+ (or Azure SQL Database)  
+  - Visual Studio 2022+ or VS Code (with C# Dev Kit)  
+  - .NET 9 SDK  
+  - Node.js v18+ and npm  
+  - Microsoft SQL Server 2019+ (or Azure SQL Database)  
   - Git  
 - **Accounts**:  
-  - Azure DevOps/GitHub access for repository (credentials provided by the team)  
+  - GitHub access for repository  
   - SQL Server credentials with read/write permissions  
 - **Frameworks**:  
-  - .NET Framework 4.6.1  
-  - SignalR Core  
-  - Entity Framework 6+  
+  - .NET 9  
+  - Dapper (micro-ORM)  
 
 ### Repository
-- **URL**: `https://github.com/pheeca/GraphKnowledgeManager` (private repository)  
+- **URL**: `https://github.com/pheeca/GraphKnowledgeManager`  
 - **Branch Strategy**:  
-  - `main`: Production-ready code  
-  - `dev`: Active development branch  
+  - `master`: Production-ready code  
+  - `upgrage`: Active .NET 9 migration branch  
   - Feature branches: `feature/<feature-name>`  
-- **Commit Guidelines**:  
-  - Follow Conventional Commits (e.g., `feat: add node creation API`).  
-  - Include JIRA ticket ID in commit messages (e.g., `GK-123: Fix undo-redo bug`).  
 
 ### Project Structure
 ```plaintext
-Solution 'GraphKnowledgeServer'  
-├── DataAccess             // Database models, Entity Framework mappings  
-├── Database               // SQL scripts, migrations, and backup files  
-├── EventBus               // SignalR hubs, message bus implementation  
-├── GraphKnowledgeServer   // MVC Web Application (UI and Controllers)  
-└── Shared                 // Common utilities, DTOs, and interfaces  
+/                              # Frontend source (copied to wwwroot via npm start)
+├── Scripts/                   # JS modules (app.js, services.js, graphExplorer.js, etc.)
+├── Content/                   # CSS + images
+├── *.tmp.html                 # Dynamic HTML templates
+├── index.html                 # SPA entry point
+├── package.json               # npm copy scripts
+│
+└── GraphKnowledgeServer/      # .NET solution root
+    ├── GK.Server/             # .NET 9 Web API (active development)
+    ├── GK.DataAccess/         # .NET 9 data layer (Dapper + repositories)
+    ├── Database/              # SQL Server project (.sqlproj)
+    ├── GraphKnowledgeServer/  # LEGACY .NET Framework API (reference only)
+    ├── DataAccess/            # LEGACY EF6 data layer (reference only)
+    └── EventBus/              # LEGACY SignalR hub (disabled, deferred)
 ```
 ### Data Restore (DB)
 
 Create db in mssql and compare Database project with newly created database, transfer changes to your database
 
 ## Configuration  
-Connection String: Update Web.config or appsettings.json: property "GraphKnowledgeEntities"
 
+Connection strings are stored as **user secrets** (never committed to the repo).
 
 ### Setting Up Dev Environment
-Clone the repository:
 
 ```bash
-git clone https://github.com/pheeca/GraphKnowledgeManager  
+# Clone
+git clone https://github.com/pheeca/GraphKnowledgeManager
+
+# Configure DB connection
+cd GraphKnowledgeServer/GK.Server
+dotnet user-secrets set "ConnectionStrings:GraphKnowledge" "<your-connection-string>"
+# Or use setup-dev.cmd (Windows) / setup-dev.sh (Linux)
+
+# Copy frontend assets to wwwroot
+cd ../..     # back to repo root
+npm start
+
+# Run API server
+cd GraphKnowledgeServer/GK.Server
+dotnet run
 ```
-restore database (see Data Restore section)
+
+Restore database using the SQL Server Database project in `GraphKnowledgeServer/Database/`.
+
 ### Server Side Dev
-Tech Stack: ASP.NET MVC, WebAPI, SignalR
+Tech Stack: .NET 9 Web API, Dapper
 
 Key Files:
+- `GK.Server/Program.cs` — DI setup, middleware pipeline
+- `GK.Server/Controllers/` — API controllers
+- `GK.DataAccess/` — Repository implementations (Dapper)
 
-HubStartup.cs: SignalR configuration
-
-MessageBus.cs: Event handling logic
-
-Debugging:
-
-Use Postman to test APIs.
-
+Debugging: Use Swagger UI (auto-enabled) or Postman to test APIs.
 
 ### Client Side Dev
-Tech Stack: jQuery, Bootstrap, HTML5 Canvas (for graph rendering)
+Tech Stack: jQuery 3.7, Bootstrap 4, vis.js Network
 
 Key Files:
+- `Scripts/app.js` — Hash router, template loading, session management
+- `Scripts/services.js` — Data service layer, in-memory graph CRUD, AJAX calls
+- `Scripts/graphExplorer.js` — Node selection, property panels, graph UI
+- `Scripts/utilities.js` — URL validation, deep merge helpers
 
-graph.js: Handles node/edge interactions
+Event-driven architecture via `EventBus.dispatch()` / `EventBus.addEventListener()`.
 
-main.css: Styling for graph panel and UI elements
+### Engine Dev (EventBus Architecture)
 
-### Engine Dev [Improper]
-Front End
-Event Handling:
+The system uses a custom EventBus for decoupled communication between frontend modules and (optionally) the server via SignalR.
+
+#### Frontend Event Handling
+
+Events are dispatched and consumed via the global `EventBus` object:
 
 ```javascript
-window.EventBus.listeners["nodeCreated"] = (data) => {  
-  messagebushub.trigger("updateGraph", data);  
-}; 
-``` 
-Integration: Use SignalR client to connect to server hubs.
+// Dispatching an event
+EventBus.dispatch('nodeCreated', data);
 
-Server
-Event Registration:
+// Listening for an event
+EventBus.addEventListener('nodeCreated', function(data) {
+  // handle node creation
+});
+```
+
+To propagate events to the server (when SignalR is enabled):
+
+```javascript
+messagebushub.trigger('updateGraph', data, true); // bubble=true sends to server
+```
+
+> **Note:** Events prefixed with `ui.web.` are excluded from server propagation — they stay client-side only.
+
+#### Server Event Handling
+
+The legacy EventBus uses a reflection-based pub-sub pattern with the `[OnEvent]` attribute:
+
 ```csharp
-MessageBus<object>.Instance.RegisterService(new SampleEventService());  
-```
-Service Implementation:
-
-```csharp
-public class CoreEventService : IEventService {  
-    [OnEvent("nodeCreated")]  
-    public void HandleNodeCreation(EventContext context) {  
-        // Logic here  
-    }  
-}  
-```
-
-#### Front End
-window.EventBus.listeners
-messagebushub.trigger
-
-#### Server
-MessageBus<object>.Instance.RegisterService
-SampleEventService,CoreEventService
-OnEvent
-
-
-## Dev Problems
-Database versioning
-
-Data versioning
-
-Global Uniform data template?
-
-sustainable way to Support multiple OS/Devices (Mobile, Linux, MacOS, iOS, Android)
-
-Sharing Graph wrt (Tenancy/USer/Graphs/Devices)
-
-# Conceptual Model Analysis Manual
-
-
--DEF 1
-Entities+EntityTypes+Process Declaration+Scheduler+Event Engine+Reporting/Notification Engine+Prioritization Engine+Inference/Function Engine+Information Manupulation Engine= System
-
--DEF 2
-dynamic event placement engine+events+actions+information+process declaration+inferencing/estimating all these 
-
-
-
-## Conceptual Problems
-how Tenancy/USer/Graphs/Devices/3rd party data pipelines affect event highways?
-
-App events(page load,click,login,request started,DB inserted) different than System Events (birthdays, comments,scheduled events etc)?
-APP
-   Server
-		onerror
-		appstart
-		append
-		requeststart
-   UI
-   ConnectedDevice (access other devices's events-but not hackable)
-SystemGlobal
-	Login
-		user logged in attempt(user id,isSuccess)
-	TimeInterval
-		Minute
-		Hour (timezone based)
-		Day (timezone based)
-		Weekday,Weekend,Week,Month,year
-		NamazTimeChange (timezone based)
-			Fajr
-			Zuhr
-			Asr
-			Maghrib
-			Isha
-		Sun (timezone based)
-			True Dawn (-18 degrees)
-			Sun rise (0 degree)
-			Sun Set
-Contextualized (wrt graph,user,tenant)
-	User
-		Loggedin
-		Loggedout
-	Location
-		changed
-	Data(with filter+from-to)
-	 graph created,graph saved,graph opened,node added, node modified,node deleted, property added,property modified,property deleted,undo,redo,(link node?),edge added,edge modified,edge deleted etc
-	DataPipeline
-		Twitter/FB (fb/whatsapp/twitter/news)
-	Process (Actions)
-	Bot(??? Not sure,manual + automated)
-	Prioritizer
-	Inference
-		Logical (prolog)
-		Predictive
-	Notify(including absoltue start end,interval type,interval start end,interval delayed custom point)
-		SMS
-		email
-		Mobile Notification
-		Device Alarm
-	DynamicEvent 
-		custom (filter by graph,user,tenant,Location,Time[including from-to;including absoltue start end,interval type,interval start end,interval delayed custom point])
-	Information manipulator
-		  interfaced(user facilitated)
-		  non interfaced(automatic)
-	Reporter
-		Generate Reports (tabular,visual graphs; embeded in systems internal and external systems email,mobile,etc)
-
-concurrent user/Information Manupulation Engine manipulating info?
-
-Graph Permission/share with user of other graph?
-
--------------
-## Notes:
-
-documentation
-
-USer manual
-
-Developer Manual
-
-Idea manual
-
-
-Product name
-Model or type number
-Intended use
-Features/accessories
-Description of the main product elements
-Description of the user interface
-Safety warnings
-Installation instructions
-Description of how to use/operate the product
-Troubleshooting section and instructions on how to solve problems
-Maintenance information
-Repair information
-Information on disposal of the product and packaging
-Technical specifications
-Table of content
-Index
-Glossary
-Warranty information
-Contact details
-
------------------------
-user manual
--About
--SysRequirement
--How to open website
--Getting Help
--Versions
---Create a new user
---Login/Logout
---Create a new graph/Open existing Graph
---Graph Panel - drag Nodes,select node/edge, scroll up/down/right/left, Zoom in-out
---Nodes and edges - connecting node, create new node, edit/delete node, create new edge,edit/delete edge
---entering into Child Node and Parent Node
---Save Graph 
---Undo/ReDo
---Tags & Search (tagtype:tag)
---set node color
---Neighbouring Model
---Nested Nodes & Global Mode
---Storing information on node/properties of node
---Move node/Change parent
---Join nodes as same under different context, redirect
---GraphShareing
-
-
-https://stackedit.io/app#
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The file explorer is accessible using the button in left corner of the navigation bar. You can create a new file by clicking the **New file** button in the file explorer. You can also create folders by clicking the **New folder** button.
-
-## Switch to another file
-
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
-
-## Rename a file
-
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
-
-## Delete a file
-
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
-
-## Export a file
-
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
-
-
-# Synchronization
-
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
-
-There are two types of synchronization and they can complement each other:
-
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
-
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
-
-## Open a file
-
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
-
-## Save a file
-
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
-
-## Synchronize a file
-
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
-
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
-
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
-
-## Manage file synchronization
-
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
-
-
-# Publication
-
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
-
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
-
-## Publish a File
-
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
-
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
-
-## Update a publication
-
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
-
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
-
-## Manage file publication
-
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
-
-
-# Markdown extensions
-
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
-
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
-
-
-## SmartyPants
-
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
-
-
-## KaTeX
-
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
-
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
-
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
+// Register a service with the message bus
+MessageBus<object>.Instance.RegisterService(new CoreEventService());
+
+// Service implementation — methods decorated with [OnEvent] are auto-subscribed
+public class CoreEventService : IEventService
+{
+    [OnEvent("nodeCreated")]
+    public void HandleNodeCreation(object sender, MessageBusEventArgs e)
+    {
+        // React to node creation
+    }
+}
 ```
 
-And this will produce a flow chart:
+The `MessageBus` scans registered services for `[OnEvent]` attributes and wires them as handlers. Events can optionally broadcast to all connected SignalR clients via `MessageBusHub`.
 
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
+> **Status:** Server-side EventBus is currently **disabled** (commented out in Global.asax). Migration to .NET 9 SignalR is deferred. Frontend `EventBus` continues to work for client-side module communication.
+
+---
+
+## Open Dev Problems
+
+| Problem | Description |
+|---------|-------------|
+| **Database versioning** | Schema evolution strategy — currently managed via SQL Server Database Project (.sqlproj) comparisons |
+| **Data versioning** | Graph data versions are stored as full JSON snapshots per save. No incremental diffing or compression. |
+| **Global uniform data template** | No standardized schema for node properties — each node can have arbitrary key-value pairs |
+| **Multi-device support** | Currently desktop-only (Chrome, Firefox). No responsive/mobile layout. Needs sustainable approach for Mobile, Linux, macOS, iOS, Android |
+| **Graph sharing & tenancy** | Sharing graphs across users/tenants/devices. Current model is single-owner per schema with no sharing mechanism |
+
+---
+
+# Conceptual Model Analysis
+
+## System Definition
+
+A complete system in this context is composed of:
+
+> **Entities + Entity Types + Process Declaration + Scheduler + Event Engine + Reporting/Notification Engine + Prioritization Engine + Inference/Function Engine + Information Manipulation Engine = System**
+
+Or equivalently:
+
+> **Dynamic Event Placement Engine + Events + Actions + Information + Process Declaration + Inferencing/Estimating = System**
+
+## Open Conceptual Questions
+
+- How do Tenancy/User/Graphs/Devices/3rd-party data pipelines affect event highways?
+- Are App Events and System Events fundamentally different, or should they share an event bus?
+- How do concurrent users and the Information Manipulation Engine coordinate when editing the same graph?
+- How should graph permissions and cross-user graph sharing work?
+
+## Event Taxonomy
+
+### App Events
+Events generated by application lifecycle and user interaction:
+
+| Scope | Events |
+|-------|--------|
+| **Server** | `onError`, `appStart`, `appEnd`, `requestStart` |
+| **UI** | Page load, click, login, form submission |
+| **Connected Device** | Access other devices' events (read-only, non-exploitable) |
+
+### System Global Events
+Events that exist independent of any specific graph or user context:
+
+| Category | Events |
+|----------|--------|
+| **Login** | User login attempt (`userId`, `isSuccess`) |
+| **Time Interval** | Minute, Hour, Day, Weekday/Weekend, Week, Month, Year (timezone-based) |
+| **Prayer Times** | Fajr, Zuhr, Asr, Maghrib, Isha (timezone-based, on change) |
+| **Sun Position** | True Dawn (−18°), Sunrise (0°), Sunset (timezone-based) |
+
+### Contextualized Events
+Events scoped to a specific graph, user, or tenant. Support filtering and time-range constraints.
+
+| Category | Events / Capabilities |
+|----------|----------------------|
+| **User** | Logged in, Logged out |
+| **Location** | Changed |
+| **Data** | Graph created/saved/opened, node added/modified/deleted, property added/modified/deleted, undo, redo, edge added/modified/deleted (filterable by graph/user/tenant with from-to ranges) |
+| **Data Pipeline** | External feeds — Twitter, Facebook, WhatsApp, News |
+| **Process (Actions)** | Defined workflows triggered by events |
+| **Bot** | Manual + automated actions (exact scope TBD) |
+| **Prioritizer** | Event/task prioritization engine |
+| **Inference** | Logical (Prolog-style) and Predictive inference |
+| **Notification** | SMS, Email, Mobile Push, Device Alarm — supports absolute start/end, interval types, delayed custom triggers |
+| **Dynamic Event** | Custom events filtered by graph, user, tenant, location, time (with complex scheduling: absolute, interval, delayed) |
+| **Information Manipulator** | Interfaced (user-facilitated) and Non-interfaced (automatic) data transforms |
+| **Reporter** | Generate reports — tabular, visual graphs; embeddable in internal/external systems (email, mobile, etc.) |
+
+---
+
+## Notes & Planning
+
+### Documentation Structure Checklist
+
+The documentation should eventually cover:
+
+| Manual | Sections |
+|--------|----------|
+| **User Manual** | About, System Requirements, Navigating to Site, Getting Help, Versions |
+| **User Manual — Features** | Create user, Login/Logout, Create/Open Graph, Graph Panel (drag, select, scroll, zoom), Nodes & Edges (create, edit, delete), Child/Parent navigation, Save Graph, Undo/Redo, Tags & Search, Node Color, Neighbouring Model, Nested Nodes & Global Mode, Node Properties, Move Node/Change Parent, Join nodes as same under different context (redirect), Graph Sharing |
+| **Developer Manual** | System Requirements, Tech Stack, Prerequisites, Repository, Project Structure, DB Restore, Configuration, Dev Environment Setup, Server Side Dev, Client Side Dev, Engine Dev |
+| **Idea Manual** | Conceptual Model Analysis, Event Taxonomy, System Definitions |
+
+### Product Documentation Template (Reference)
+
+Standard product documentation should include:
+- Product name, model/type number
+- Intended use
+- Features/accessories
+- Description of main product elements
+- Description of user interface
+- Safety warnings
+- Installation instructions
+- How to use/operate the product
+- Troubleshooting and problem-solving
+- Maintenance information
+- Repair information
+- Disposal of product and packaging
+- Technical specifications
+- Table of contents, Index, Glossary
+- Warranty information
+- Contact details
+
+### Open Design Questions
+
+- Are App Events (page load, click, login, request started, DB inserted) fundamentally different from System Events (birthdays, comments, scheduled events)?
+- How should concurrent users and the Information Manipulation Engine coordinate when manipulating the same data?
+- How should graph permissions and sharing with users of other graphs work?
+
