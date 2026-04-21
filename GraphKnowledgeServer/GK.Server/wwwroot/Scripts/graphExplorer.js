@@ -500,7 +500,7 @@ function _renderVisTimeline(container, items) {
         selectable: true,
         stack: true,
         showMajorLabels: true,
-        showMinorLabels: false,
+        showMinorLabels: true,
         start: minDate,
         end: maxDate,
         min: minDate,
@@ -574,33 +574,7 @@ EventBus.addEventListener('refreshPanelHistory', function () {
         return;
     }
 
-    if (graphExplorer.historyCacheLoading) {
-        $('#history-state').text('Loading history...');
-        return;
-    }
-
-    graphExplorer.historyCacheLoading = true;
-    $('#history-state').text('Loading history...');
-
-    var userSchemaId = sessionStorage.getItem('UserSchemaId');
-    $.ajax({
-        url: AppConfig.domain + '/api/values/' + userSchemaId + '/history-map',
-        type: 'GET',
-        success: function (historyMap) {
-            graphExplorer.historyCache = historyMap || {};
-            _hydrateHistoryIntoGraphData(graphExplorer.historyCache);
-            graphExplorer.historyCacheLoaded = true;
-            _renderHistoryRows(_getNodeHistoryFromCache(selectedNodeId));
-        },
-        error: function () {
-            graphExplorer.historyCache = {};
-            graphExplorer.historyCacheLoaded = true;
-            _renderHistoryRows([]);
-        },
-        complete: function () {
-            graphExplorer.historyCacheLoading = false;
-        }
-    });
+    $('#history-state').text('Loading history…');
 });
 function _getFilteredProps() {
     var all = $('#properties').data('allProps') || [];
@@ -911,6 +885,10 @@ EventBus.addEventListener('loadGraph', function (params) {
                             graphExplorer.historyCache = historyMap;
                             graphExplorer.historyCacheLoaded = true;
                             $('#gk-save-btn').prop('disabled', false).text('Save');
+                            // Re-render history panel if a node was selected during the loading window
+                            if (graphExplorer.data.selectedNode) {
+                                EventBus.dispatch('refreshPanelHistory');
+                            }
                         },
                         error: function () {
                             console.warn('loadGraph: failed to load history-map');
@@ -1283,7 +1261,6 @@ function initialize(_rawData) {
     graphExplorer.data.currentPropertyId = null;
     graphExplorer.historyCache = {};
     graphExplorer.historyCacheLoaded = false;
-    graphExplorer.historyCacheLoading = false;
     // Capture stale snapshot for save-time diffing (server compares prev vs incoming)
     graphExplorer.staleSnapshot = JSON.parse(JSON.stringify(graphExplorer.data));
     var routeParams = JSON.parse(sessionStorage.getItem('routeParams'));

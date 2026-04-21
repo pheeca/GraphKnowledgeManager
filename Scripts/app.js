@@ -15,9 +15,9 @@ var AppConfig = {
     title:'Graph Knowledge'
 };
 var AppRoutes = [
-    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp1.html' },
-    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp1.html', title:'Graph Explorer' },
-    { path: '/Share/:shareId', isAuthenticated: false, event: 'UI.Web.App.Route.Share', file: 'mainpanels.tmp1.html', title: 'Shared Graph' },
+    { path: AppConfig.GraphUrl+'/:UserSchemaId/:NodeId/:key', isAuthenticated: false, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html' },
+    { path: AppConfig.GraphUrl, isAuthenticated: true, event: 'UI.Web.App.Route.Main', file: 'mainpanels.tmp.html', title:'Graph Explorer' },
+    { path: '/Share/:shareId', isAuthenticated: false, event: 'UI.Web.App.Route.Share', file: 'mainpanels.tmp.html', title: 'Shared Graph' },
     { path: AppConfig.loginUrl , isAuthenticated: false, event: 'UI.Web.App.Route.Login', file: 'loginpanels.tmp.html' , title:'Login' },
 ];
 

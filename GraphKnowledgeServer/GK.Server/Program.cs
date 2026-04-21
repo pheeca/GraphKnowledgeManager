@@ -32,7 +32,13 @@ builder.Services.AddControllers(o =>
     {
         o.Filters.Add(new Microsoft.AspNetCore.Mvc.RequestSizeLimitAttribute(60 * 1024 * 1024));
     })
-    .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = null);
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy = null;
+        // Match legacy Newtonsoft.Json behavior: emit literal non-ASCII bytes (e.g. NBSP)
+        // instead of \uXXXX escapes. Prevents ~6x inflation per non-ASCII char on every save round-trip.
+        o.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+    });
 
 // 60 MB JSON body limit
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>

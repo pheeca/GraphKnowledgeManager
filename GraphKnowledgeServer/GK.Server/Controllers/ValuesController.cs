@@ -2,6 +2,7 @@ using GK.DataAccess;
 using GK.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 namespace GK.Server.Controllers;
@@ -15,6 +16,15 @@ public class ValuesController : ControllerBase
     private static readonly TimeSpan _cacheTtl = TimeSpan.FromMinutes(60);
     // Tracks every key this controller puts into the shared IMemoryCache so we can flush them all.
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, byte> _trackedKeys = new();
+    // Per-schema save lock: prevents concurrent saves and blocks GETs while save is in progress
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, SemaphoreSlim> _saveLocks = new();
+    private static SemaphoreSlim _getLock(int id) => _saveLocks.GetOrAdd(id, _ => new SemaphoreSlim(1, 1));
+    // Match legacy Newtonsoft.Json behavior: emit literal non-ASCII bytes (e.g. NBSP) instead of \uXXXX
+    // escapes. Without this, every round-trip of existing data inflates non-ASCII chars ~6x.
+    private static readonly JsonSerializerOptions _jsonOpts = new()
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     private static string _cacheKey(int id) => $"schema:{id}";
 
@@ -45,21 +55,30 @@ public class ValuesController : ControllerBase
 
     // GET api/values/5 — active schema for user schema id
     [HttpGet("{id}")]
-    public string? Get(int id)
+    public IActionResult Get(int id)
     {
+        var sem = _getLock(id);
+        if (sem.CurrentCount == 0)
+            return StatusCode(423, "Schema is currently being saved. Please retry shortly.");
+
         if (_cache.TryGetValue(_cacheKey(id), out string? cached))
-            return cached;
+            return Ok(cached);
 
         var json = _repo.GetActiveBySchemaId(id);
         if (json != null)
             _cacheSet(_cacheKey(id), json);
-        return json;
+        return Ok(json);
     }
 
     // POST api/values/5 — create schema version with server-side history generation
     [HttpPost("{id}")]
-    public IActionResult Post(int id, [FromBody] SchemaStore value)
+    public async Task<IActionResult> Post(int id, [FromBody] SchemaStore value)
     {
+        var sem = _getLock(id);
+        if (!await sem.WaitAsync(TimeSpan.Zero))
+            return StatusCode(423, "A save is already in progress for this schema.");
+        try
+        {
         // 1. Capture previous active schema before saving
         var previousJson = _repo.GetActiveBySchemaId(id);
         var creationDate = DateTime.UtcNow;
@@ -84,11 +103,17 @@ public class ValuesController : ControllerBase
             _cacheSet(_cacheKey(id), enriched); // warm cache with enriched schema
             return Ok(enriched);
         }
-        catch
+        catch (Exception ex)
         {
             // History stamping failed — schema was saved successfully, return original
+            Console.Error.WriteLine($"[ValuesController.Post] History enrichment failed for schemaId={id}: {ex}");
             _cacheRemove(_cacheKey(id)); // force fresh read on next GET
             return Ok(value.SchemaInfo);
+        }
+        } // end try
+        finally
+        {
+            sem.Release();
         }
     }
 
@@ -104,6 +129,7 @@ public class ValuesController : ControllerBase
 
         // Build lookup of previous nodes (keyed by id) for diffing
         var prevNodes = new Dictionary<string, JsonElement>();
+        bool prevHasHistoryTracking = false; // true if at least one prev node already carries a history array
         if (!string.IsNullOrWhiteSpace(previousJson))
         {
             using var prevDoc = JsonDocument.Parse(previousJson);
@@ -112,10 +138,17 @@ public class ValuesController : ControllerBase
                 foreach (var pn in prevNodesArr.EnumerateArray())
                 {
                     if (pn.TryGetProperty("id", out var idProp))
-                        prevNodes[idProp.ToString()] = pn;
+                        prevNodes[idProp.ToString()] = pn.Clone(); // Clone before doc is disposed
+                    if (!prevHasHistoryTracking
+                        && pn.TryGetProperty("history", out var h)
+                        && h.ValueKind == JsonValueKind.Array)
+                        prevHasHistoryTracking = true;
                 }
             }
         }
+        // First-time enrichment: the schema pre-dates history tracking.
+        // Stamp every existing node with a "snapshot" entry so history is never empty after first save.
+        bool isFirstEnrichment = prevNodes.Count > 0 && !prevHasHistoryTracking;
 
         // Materialise incoming as a mutable structure
         var root = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(incomingJson)!;
@@ -138,15 +171,16 @@ public class ValuesController : ControllerBase
                         history.Add(JsonSerializer.Deserialize<Dictionary<string, object?>>(h.GetRawText())!);
                 }
 
-                // Check if this node changed vs previous version (exclude history from comparison)
-                if (nodeId != null && _nodeChanged(n, prevNodes.GetValueOrDefault(nodeId)))
+                // Check if this node changed vs previous version (exclude history from comparison).
+                // On first-time enrichment, always stamp a snapshot entry for every node.
+                if (nodeId != null && (isFirstEnrichment || _nodeChanged(n, prevNodes.GetValueOrDefault(nodeId))))
                 {
                     history.Add(new Dictionary<string, object?>
                     {
                         ["schemaInformationId"] = newId,
                         ["modifiedBy"] = modifiedBy,
                         ["creationDate"] = creationDate.ToString("o"),
-                        ["action"] = prevNodes.ContainsKey(nodeId) ? "updated" : "created",
+                        ["action"] = isFirstEnrichment ? "snapshot" : (prevNodes.ContainsKey(nodeId) ? "updated" : "created"),
                         ["state"] = _nodeStateWithoutHistory(n)
                     });
                 }
@@ -202,7 +236,7 @@ public class ValuesController : ControllerBase
         finalRoot["nodes"] = newNodes;
         finalRoot["deletedNodeHistory"] = deletedHistory;
 
-        return JsonSerializer.Serialize(finalRoot);
+        return JsonSerializer.Serialize(finalRoot, _jsonOpts);
     }
 
     private static bool _nodeChanged(JsonElement incoming, JsonElement prev)
@@ -211,12 +245,17 @@ public class ValuesController : ControllerBase
         return _nodeStateWithoutHistory(incoming) != _nodeStateWithoutHistory(prev);
     }
 
+    // Keys excluded from the state snapshot: history is stripped to avoid recursion;
+    // Properties excluded because their size dominates and UUID-only churn would
+    // cause every node to appear "changed" on every save after IDs are first assigned.
+    private static readonly HashSet<string> _stateExcludedKeys = ["history"];
+
     private static string _nodeStateWithoutHistory(JsonElement node)
     {
         var dict = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(node.GetRawText())!;
-        dict.Remove("history");
+        foreach (var key in _stateExcludedKeys) dict.Remove(key);
         // Sort keys for stable comparison
-        return JsonSerializer.Serialize(new SortedDictionary<string, JsonElement>(dict));
+        return JsonSerializer.Serialize(new SortedDictionary<string, JsonElement>(dict), _jsonOpts);
     }
 
     // PUT api/values/5?mode=undo|redo — returns { schema: trimmedJson, historyMap: { nodeId: [] } }
